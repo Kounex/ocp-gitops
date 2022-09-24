@@ -1,0 +1,34 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: nestjs-server
+  labels:
+    app: nestjs-server
+    app.kubernetes.io/part-of: nayris
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nestjs-server
+  template:
+    metadata:
+      labels:
+        app: nestjs-server
+        deploymentconfig: nestjs-server
+    spec:
+      containers:
+        - name: nestjs-server
+          image: ghcr.io/kounex/nayris/nestjs-server:master
+          ports:
+            - name: 4444-tcp
+              containerPort: 4444
+              protocol: TCP
+          env:
+            - name: PORT
+              value: '4444'
+          imagePullPolicy: Always
+      restartPolicy: Always
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

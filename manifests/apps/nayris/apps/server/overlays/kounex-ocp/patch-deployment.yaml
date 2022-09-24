@@ -1,0 +1,11 @@
+- op: replace
+  path: /spec/template/spec/containers/0/ports/0/name
+  value: 8888-tcp
+
+- op: replace
+  path: /spec/template/spec/containers/0/ports/0/containerPort
+  value: 8888
+
+- op: replace
+  path: /spec/template/spec/containers/0/env/0/value
+  value: '8888'

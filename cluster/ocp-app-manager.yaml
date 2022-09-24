@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ocp-config-manager
+  name: ocp-app-manager
 spec:
   destination:
     namespace: openshift-gitops
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: environments/base
+    path: manifests
     repoURL: https://github.com/Kounex/ocp-gitops
     targetRevision: main
   syncPolicy:

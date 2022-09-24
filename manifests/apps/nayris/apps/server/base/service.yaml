@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nestjs-server
+  labels:
+    app: nestjs-server
+    app.kubernetes.io/part-of: nayris
+spec:
+  ports:
+    - name: port-4444
+      protocol: TCP
+      port: 4444
+      targetPort: 4444
+  type: ClusterIP
+  selector:
+    app: nestjs-server
+    deploymentconfig: nestjs-server

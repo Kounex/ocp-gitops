@@ -1,0 +1,16 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: nginx-client
+  labels:
+    app: nginx-client
+    app.kubernetes.io/part-of: nayris
+spec:
+  host: nayris.apps.ocp4.janz.cloud
+  to:
+    kind: Service
+    name: nginx-client
+    weight: 100
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

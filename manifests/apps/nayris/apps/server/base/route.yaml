@@ -1,0 +1,17 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: nestjs-server
+  labels:
+    app: nestjs-server
+    app.kubernetes.io/part-of: nayris
+spec:
+  host: nayris.apps.ocp4.janz.cloud
+  path: /api/v1
+  to:
+    kind: Service
+    name: nestjs-server
+    weight: 100
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

@@ -1,0 +1,33 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: nginx-client
+  annotations:
+    app.openshift.io/connects-to: '[{"apiVersion":"apps/v1","kind":"Deployment","name":"nestjs-server"}]'
+  labels:
+    app: nginx-client
+    app.kubernetes.io/part-of: nayris
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-client
+  template:
+    metadata:
+      labels:
+        app: nginx-client
+        deploymentconfig: nginx-client
+    spec:
+      containers:
+        - name: nginx-client
+          image: ghcr.io/kounex/nayris/nginx-client:master
+          ports:
+            - name: 8080-tcp
+              containerPort: 8080
+              protocol: TCP
+          imagePullPolicy: Always
+      restartPolicy: Always
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nayris
+spec:
+  destination:
+    namespace: nayris
+    server: https://kubernetes.default.svc
+  project: cluster-apps
+  source:
+    path: manifests/apps/nayris/apps
+    repoURL: https://github.com/Kounex/ocp-gitops.git
+    targetRevision: main
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    # automated:
+    #   selfHeal: true
