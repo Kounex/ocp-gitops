@@ -6,7 +6,7 @@ metadata:
     app: nestjs-server
     app.kubernetes.io/part-of: nayris
 spec:
-  host: nayris.apps.ocp4.janz.cloud
+  host: nayris.apps.ocp.kounex.com
   path: /api/v1
   to:
     kind: Service
