@@ -10,8 +10,8 @@ patches:
   - target:
       kind: Deployment
       name: nestjs-server
-    path: patch-deployment.yaml
+    path: patch-deployment.yml
   - target:
       kind: Service
       name: nestjs-server
-    path: patch-service.yaml
+    path: patch-service.yml
