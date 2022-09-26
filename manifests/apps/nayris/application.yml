@@ -6,7 +6,7 @@ spec:
   destination:
     namespace: nayris
     server: https://kubernetes.default.svc
-  project: ocp-apps
+  project: apps
   source:
     path: manifests/apps/nayris/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git
