@@ -6,3 +6,5 @@ namespace: openshift-gitops
 resources:
   - ocp-config-manager.yaml
   - ocp-app-manager.yaml
+  - app-project-ocp-config.yml
+  - app-project-ocp-apps.yml
