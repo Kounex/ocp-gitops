@@ -4,7 +4,7 @@ metadata:
   name: nayris
 spec:
   destination:
-    namespace: nayris
+    namespace: openshift-gitops
     server: https://kubernetes.default.svc
   project: ocp-apps
   source:
