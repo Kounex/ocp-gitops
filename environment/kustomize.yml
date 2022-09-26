@@ -4,4 +4,3 @@ kind: Kustomization
 namespace: openshift-gitops
 
 resources:
-  - ocp-config-manager.yaml
