@@ -1,21 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: nayris
+  name: cert-manager
 spec:
   destination:
-    namespace: nayris
+    namespace: openshift-cert-manager-operator
     server: https://kubernetes.default.svc
-  project: apps
+  project: configs
   source:
     path: manifests/apps/nayris/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
-  ignoreDifferences:
-    - kind: Namespace
   syncPolicy:
     automated:
       prune: true
       # selfHeal: false
-    syncOptions:
-      - RespectIgnoreDifferences=true
