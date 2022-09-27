@@ -11,9 +11,14 @@ spec:
     path: manifests/apps/nayris/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
+  ignoreDifferences:
+    - kind: "Namespace"
+      jsonPointers:
+      # - /spec/replicas
   syncPolicy:
     automated:
       prune: true
-      selfHeal: false
+      # selfHeal: false
     syncOptions:
-      - CreateNamespace=true
+      - RespectIgnoreDifferences=true
+      # - CreateNamespace=true
