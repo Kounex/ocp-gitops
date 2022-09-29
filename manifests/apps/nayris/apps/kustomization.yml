@@ -3,6 +3,7 @@ kind: Kustomization
 
 bases:
   - namespace.yml
-  - application.yml
+  - application-client.yml
+  - application-server.yml
   - client/overlays/kounex-ocp
   - server/overlays/kounex-ocp
