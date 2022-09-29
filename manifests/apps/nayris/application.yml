@@ -3,10 +3,10 @@ kind: Application
 metadata:
   name: nayris-app
 spec:
-  destination:
-    namespace: nayris
-    server: https://kubernetes.default.svc
   project: apps
+  destination:
+    namespace: openshift-gitops
+    server: https://kubernetes.default.svc
   source:
     path: manifests/apps/nayris/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git

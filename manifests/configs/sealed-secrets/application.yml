@@ -5,14 +5,14 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
-  project: default
+  project: configs
   source:
     path: manifests/configs/sealed-secrets/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
   destination:
+    namespace: openshift-gitops
     server: "https://kubernetes.default.svc"
-    namespace: sealed-secrets
   ignoreDifferences:
     - kind: Namespace
   syncPolicy:
