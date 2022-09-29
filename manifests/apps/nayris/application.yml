@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: nayris
+  name: nayris-app
 spec:
   destination:
     namespace: nayris
@@ -16,6 +16,6 @@ spec:
   syncPolicy:
     automated:
       prune: true
-      # selfHeal: false
+      selfHeal: false
     syncOptions:
       - RespectIgnoreDifferences=true

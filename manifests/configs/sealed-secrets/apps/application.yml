@@ -1,15 +1,26 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: sealed-secrets-app
+  name: sealed-secrets
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
   project: default
   source:
-    path: manifests/configs/sealed-secrets/apps
-    repoURL: https://github.com/Kounex/ocp-gitops.git
-    targetRevision: main
+    chart: sealed-secrets
+    repoURL: https://bitnami-labs.github.io/sealed-secrets
+    targetRevision: 2.5.2
+    helm:
+      releaseName: sealed-secrets
+      values: |
+        Args:
+          - '--update-status'
+        readinessProbe:
+          initialDelaySeconds: 10
+        podSecurityContext:
+          fsGroup:
+        containerSecurityContext:
+          runAsUser:
   destination:
     server: "https://kubernetes.default.svc"
     namespace: sealed-secrets
