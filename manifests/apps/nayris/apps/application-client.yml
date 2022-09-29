@@ -8,7 +8,7 @@ spec:
     server: https://kubernetes.default.svc
   project: apps
   source:
-    path: manifests/apps/nayris/apps/client
+    path: manifests/apps/nayris/apps/client/overlays/kounex-ocp
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
   ignoreDifferences:
