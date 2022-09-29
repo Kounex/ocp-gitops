@@ -11,11 +11,9 @@ spec:
     path: manifests/apps/nayris/apps/server/overlays/kounex-ocp
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
-  ignoreDifferences:
-    - kind: Namespace
   syncPolicy:
     automated:
       prune: true
-      selfHeal: false
+      
     syncOptions:
       - RespectIgnoreDifferences=true
