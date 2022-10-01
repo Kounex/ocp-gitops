@@ -3,8 +3,7 @@ kind: Kustomization
 
 resources:
   - group-cluster-admins.yml
-  - cluster-role-gitops-crd.yml
-  - crb-gitops-crd.yml
+  - crbs/gitops-crd.yml
   - app-project-gitops-configs.yml
   - app-project-gitops-apps.yml
   - application-configs-manager.yml
