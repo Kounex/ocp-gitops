@@ -3,4 +3,5 @@ kind: Kustomization
 
 resources:
   - namespace.yml
-  - application.yml
+  - application-base.yml
+  - application-web.yml
