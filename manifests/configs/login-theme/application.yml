@@ -11,6 +11,8 @@ spec:
   destination:
     namespace: openshift-config
     server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - kind: Secret
   syncPolicy:
     automated:
       prune: true
