@@ -5,11 +5,11 @@ metadata:
 spec:
   project: configs
   source:
-    path: manifests/configs/login-theme/configs
+    path: manifests/configs/login-theme/configs/overlay
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
   destination:
-    namespace: openshift-configs
+    namespace: openshift-config
     server: https://kubernetes.default.svc
   syncPolicy:
     automated:
