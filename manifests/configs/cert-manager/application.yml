@@ -3,15 +3,14 @@ kind: Application
 metadata:
   name: cert-manager
 spec:
-  destination:
-    namespace: openshift-cert-manager-operator
-    server: https://kubernetes.default.svc
-  project: configs
   source:
     path: manifests/apps/nayris/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
+  destination:
+    namespace: openshift-cert-manager-operator
+    server: https://kubernetes.default.svc
+  project: configs
   syncPolicy:
     automated:
       prune: true
-      
