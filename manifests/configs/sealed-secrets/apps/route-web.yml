@@ -1,6 +1,7 @@
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
+  namespace: sealed-secrets
   name: sealed-secrets-web
   labels:
     app: sealed-secrets-web
