@@ -5,3 +5,4 @@ resources:
   - namespace.yml
   - application-base.yml
   - application-web.yml
+  - route-web.yml

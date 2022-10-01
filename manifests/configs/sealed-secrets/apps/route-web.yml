@@ -1,0 +1,16 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: sealed-secrets-web
+  labels:
+    app: sealed-secrets-web
+    app.kubernetes.io/part-of: nayris
+spec:
+  host: sealed-secrets-web.apps.ocp.kounex.com
+  to:
+    kind: Service
+    name: sealed-secrets-web
+    weight: 100
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
