@@ -3,6 +3,32 @@ apiVersion: config.openshift.io/v1
 metadata:
   name: cluster
 spec:
+  identityProviders:
+    - name: Local
+      mappingMethod: claim
+      type: HTPasswd
+      htpasswd:
+        fileData:
+          name: htpass-secret
+      # - google:
+      #     clientID: >-
+      #       478348800225-pipjo1969ga8rg53sf9he8mb0sjkml01.apps.googleusercontent.com
+      #     clientSecret:
+      #       name: google-secret
+      #     hostedDomain: redhat.com
+      #   mappingMethod: claim
+      #   name: RedHatSSO
+      #   type: Google
+      # - github:
+      #     clientID: 2df4ad40a1cb85c00524
+      #     clientSecret:
+      #       name: github-secret
+      #     organizations:
+      #       - sa-mw-dach
+      #     teams: []
+      #   mappingMethod: claim
+      #   name: GitHub
+      #   type: GitHub
   templates:
     login:
       name: matrix-login-template
