@@ -46,7 +46,7 @@ spec:
   template:
     spec:
       containers:
-        - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+        - image: openshift/origin-cli
           command:
             - /bin/bash
             - -c
