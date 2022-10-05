@@ -2,8 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - openshift-wildcard-certificate.yml
-  - openshift-api-certificate.yml
+  - certificate-openshift-wildcard.yml
+  - certificate-openshift-api.yml
   - patch-cluster-api-cert-job.yml
   - patch-cluster-wildcard-cert-job.yml
 

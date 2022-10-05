@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: sealed-secrets-app
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: '1'
 spec:
   project: configs
   source:
@@ -12,12 +12,13 @@ spec:
     targetRevision: main
   destination:
     namespace: openshift-gitops
-    server: "https://kubernetes.default.svc"
+    server: 'https://kubernetes.default.svc'
   ignoreDifferences:
     - kind: Namespace
   syncPolicy:
     automated:
       prune: true
-      
+      selfHeal: true
+
     syncOptions:
       - RespectIgnoreDifferences=true

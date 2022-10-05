@@ -9,7 +9,7 @@ spec:
       type: HTPasswd
       htpasswd:
         fileData:
-          name: htpass-secret
+          name: htpasswd
       # - google:
       #     clientID: >-
       #       478348800225-pipjo1969ga8rg53sf9he8mb0sjkml01.apps.googleusercontent.com
@@ -29,8 +29,3 @@ spec:
       #   mappingMethod: claim
       #   name: GitHub
       #   type: GitHub
-  templates:
-    login:
-      name: matrix-login-template
-    providerSelection:
-      name: matrix-providers-template

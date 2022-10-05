@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: sealed-secrets
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: '1'
 spec:
   project: configs
   source:
@@ -22,13 +22,14 @@ spec:
         containerSecurityContext:
           runAsUser:
   destination:
-    server: "https://kubernetes.default.svc"
+    server: 'https://kubernetes.default.svc'
     namespace: sealed-secrets
   ignoreDifferences:
     - kind: Namespace
   syncPolicy:
     automated:
       prune: true
-      
+      selfHeal: true
+
     syncOptions:
       - RespectIgnoreDifferences=true
