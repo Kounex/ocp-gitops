@@ -5,10 +5,9 @@ metadata:
   namespace: openshift-ingress
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
   name: patch-cluster-wildcard-cert
-  namespace: openshift-ingress
 rules:
   - apiGroups:
       - operator.openshift.io
@@ -27,13 +26,12 @@ rules:
       - list
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   name: patch-cluster-wildcard-cert
-  namespace: openshift-ingress
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
+  kind: ClusterRole
   name: patch-cluster-wildcard-cert
 subjects:
   - kind: ServiceAccount
@@ -52,7 +50,7 @@ spec:
   template:
     spec:
       containers:
-        - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+        - image: openshift/origin-cli
           command:
             - /bin/bash
             - -c
