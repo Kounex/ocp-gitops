@@ -15,5 +15,5 @@ spec:
     - kind: Secret
   syncPolicy:
     automated:
-      prune: true
+      prune: false
       selfHeal: true
