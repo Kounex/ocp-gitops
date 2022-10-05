@@ -1,7 +1,14 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+apiVersion: v1
+kind: ServiceAccount
 metadata:
   name: patch-cluster-wildcard-cert
+  namespace: openshift-ingress
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: patch-cluster-wildcard-cert
+  namespace: openshift-ingress
 rules:
   - apiGroups:
       - operator.openshift.io
@@ -12,7 +19,7 @@ rules:
       - list
       - patch
   - apiGroups:
-      - ""
+      - ''
     resources:
       - secrets
     verbs:
@@ -20,23 +27,18 @@ rules:
       - list
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   name: patch-cluster-wildcard-cert
+  namespace: openshift-ingress
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: patch-cluster-wildcard-cert
 subjects:
   - kind: ServiceAccount
     name: patch-cluster-wildcard-cert
     namespace: openshift-ingress
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: patch-cluster-wildcard-cert
-  namespace: openshift-ingress
 ---
 apiVersion: batch/v1
 kind: Job

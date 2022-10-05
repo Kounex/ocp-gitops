@@ -3,8 +3,13 @@ kind: Kustomization
 
 resources:
   - group-cluster-admins.yml
+
+  - auth/secret-htpasswd.yml
+  - auth/oauth.yml
+
   - crbs/gitops-crd.yml
-  - app-project-gitops-configs.yml
-  - app-project-gitops-apps.yml
-  - application-configs-manager.yml
-  - application-apps-manager.yml
+
+  - argocd/app-project-gitops-configs.yml
+  - argocd/app-project-gitops-apps.yml
+  - argocd/application-configs-manager.yml
+  - argocd/application-apps-manager.yml
