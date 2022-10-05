@@ -11,6 +11,8 @@ spec:
     path: environment
     repoURL: https://github.com/Kounex/ocp-gitops
     targetRevision: main
+  ignoreDifferences:
+    - kind: Secret
   syncPolicy:
     automated:
       prune: true
