@@ -11,42 +11,48 @@ metadata:
     argocds.argoproj.io/name: openshift-gitops
     argocds.argoproj.io/namespace: openshift-gitops
 rules:
+  # - verbs:
+  #     - '*'
+  #   apiGroups:
+  #     - apiextensions.k8s.io
+  #   resources:
+  #     - customresourcedefinitions
+  # - verbs:
+  #     - '*'
+  #   apiGroups:
+  #     - ''
+  #   resources:
+  #     - serviceaccounts
+  # - verbs:
+  #     - '*'
+  #   apiGroups:
+  #     - batch
+  #   resources:
+  #     - jobs
+  # - verbs:
+  #     - '*'
+  #   apiGroups:
+  #     - ''
+  #   resources:
+  #     - services
+  # - verbs:
+  #     - '*'
+  #   apiGroups:
+  #     - apps
+  #   resources:
+  #     - deployments
+  # - verbs:
+  #     - '*'
+  #   apiGroups:
+  #     - 'route.openshift.io'
+  #   resources:
+  #     - routes
   - verbs:
       - '*'
     apiGroups:
-      - apiextensions.k8s.io
-    resources:
-      - customresourcedefinitions
-  - verbs:
       - '*'
-    apiGroups:
-      - ''
     resources:
-      - serviceaccounts
-  - verbs:
       - '*'
-    apiGroups:
-      - batch
-    resources:
-      - jobs
-  - verbs:
-      - '*'
-    apiGroups:
-      - ''
-    resources:
-      - services
-  - verbs:
-      - '*'
-    apiGroups:
-      - apps
-    resources:
-      - deployments
-  - verbs:
-      - '*'
-    apiGroups:
-      - 'route.openshift.io'
-    resources:
-      - routes
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
