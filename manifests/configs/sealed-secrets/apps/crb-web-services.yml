@@ -20,7 +20,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: sealed-secrets-web
-    namespace: sealed-secrets
+    namespace: kube-system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
