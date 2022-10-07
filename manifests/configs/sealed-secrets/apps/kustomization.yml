@@ -6,5 +6,5 @@ resources:
   - application-base.yml
 
   - application-web.yml
-  # - crb-web-services.yml
+  - crb-web-services.yml
   - route-web.yml
