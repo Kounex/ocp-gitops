@@ -23,5 +23,5 @@ subjects:
     namespace: sealed-secrets
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
+  kind: ClusterRole
   name: sealed-secrets-web-services
