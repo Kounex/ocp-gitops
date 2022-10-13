@@ -16,7 +16,7 @@ spec:
         - name: 'image.args[0]'
           value: '--kubeseal-arguments=--controller-name=sealed-secrets'
         - name: 'image.args[1]'
-          value: '--includeNamespaces="sealed-secrets"'
+          value: '--include-namespaces=sealed-secrets'
       values: |
         Args:
           - '--update-status'
