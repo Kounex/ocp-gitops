@@ -1,9 +1,9 @@
 ---
-kind: ClusterRole
+kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: sealed-secrets-web-services
-  # namespace: kube-system
+  namespace: sealed-secrets
 rules:
   - verbs:
       - '*'
@@ -12,16 +12,16 @@ rules:
     resources:
       - services
 ---
-kind: ClusterRoleBinding
+kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: sealed-secrets-web-services
-  # namespace: sealed-secrets
+  namespace: sealed-secrets
 subjects:
   - kind: ServiceAccount
     name: sealed-secrets-web
-    namespace: kube-system
+    namespace: sealed-secrets
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: sealed-secrets-web-services
