@@ -15,7 +15,9 @@ spec:
       values: |
         Args:
           - '--update-status'
-          - 'image.args={"--kubeseal-arguments=--controller-name=sealed-secrets"}'
+        parameters:
+          - name: image.args
+            value: {"--kubeseal-arguments=--controller-name=sealed-secrets"}
         readinessProbe:
           initialDelaySeconds: 10
         podSecurityContext:
