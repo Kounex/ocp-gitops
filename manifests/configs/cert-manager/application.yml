@@ -8,7 +8,7 @@ spec:
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
   destination:
-    namespace: openshift-cert-manager-operator
+    namespace: openshift-gitops
     server: https://kubernetes.default.svc
   project: configs
   syncPolicy:
