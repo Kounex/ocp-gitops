@@ -11,6 +11,7 @@ spec:
     solvers:
       - dns01:
           cloudflare:
+            email: r.schramowski@googlemail.com
             apiKeySecretRef:
               name: cloudflare-api-token
               key: api-token
