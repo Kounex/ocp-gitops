@@ -10,7 +10,7 @@ spec:
   destination:
     namespace: openshift-cert-manager
     server: https://kubernetes.default.svc
-  project: configs
+  project: cert-manager
   syncPolicy:
     automated:
       prune: true
