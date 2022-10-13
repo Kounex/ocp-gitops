@@ -14,9 +14,9 @@ spec:
       releaseName: sealed-secrets-web
       parameters:
         - name: 'image.args[0]'
-          value: '--kubeseal-arguments=--controller-name=sealed-secrets'
-        - name: 'image.args[1]'
-          value: '--include-namespaces=sealed-secrets'
+          value: '--kubeseal-arguments=--controller-name=sealed-secrets --controller-namespace=sealed-secrets'
+        # - name: 'image.args[1]'
+        #   value: '--include-namespaces=sealed-secrets'
       values: |
         Args:
           - '--update-status'
