@@ -6,7 +6,7 @@ spec:
   destination:
     namespace: openshift-gitops
     server: https://kubernetes.default.svc
-  project: apps
+  project: default
   source:
     path: manifests/apps
     repoURL: https://github.com/Kounex/ocp-gitops
