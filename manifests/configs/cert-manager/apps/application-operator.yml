@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cert-manager
+  name: cert-manager-operator
 spec:
   source:
     path: manifests/configs/cert-manager/apps/operator
