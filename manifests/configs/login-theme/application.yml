@@ -5,7 +5,7 @@ metadata:
 spec:
   project: configs
   source:
-    path: manifests/configs/login-theme/configs/overlay
+    path: manifests/configs/login-theme/configs
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
   destination:
