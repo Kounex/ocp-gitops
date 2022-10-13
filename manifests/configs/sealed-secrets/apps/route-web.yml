@@ -2,7 +2,7 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: sealed-secrets-web
-  namespace: kube-system
+  namespace: sealed-secrets
   labels:
     app: sealed-secrets-web
     app.kubernetes.io/part-of: nayris
