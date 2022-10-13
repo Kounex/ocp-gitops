@@ -18,9 +18,9 @@ rules:
       - get
       - list
   - apiGroups:
-      - ''
+      - 'argoproj.io'
     resources:
-      - argocd/openshift-gitops
+      - argocds
     verbs:
       - get
       - list
