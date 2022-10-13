@@ -3,7 +3,7 @@ kind: Kustomization
 
 commonAnnotations:
   argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-namespace: openshift-cert-manager-operator
+namespace: openshift-cert-manager
 resources:
   - operator-namespace.yml
   - operator-group.yml
