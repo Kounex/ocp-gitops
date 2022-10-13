@@ -26,7 +26,7 @@ spec:
           runAsUser:
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: kube-system
+    namespace: sealed-secrets
   ignoreDifferences:
     - kind: Namespace
   syncPolicy:
