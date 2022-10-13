@@ -12,12 +12,12 @@ spec:
     targetRevision: 2.8.1
     helm:
       releaseName: sealed-secrets-web
+      parameters:
+        - name: 'image.args[0]'
+          value: '--kubeseal-arguments=--controller-name=sealed-secrets'
       values: |
         Args:
           - '--update-status'
-        parameters:
-          - name: 'image.args[0]'
-            value: '--kubeseal-arguments=--controller-name=sealed-secrets'
         readinessProbe:
           initialDelaySeconds: 10
         podSecurityContext:
