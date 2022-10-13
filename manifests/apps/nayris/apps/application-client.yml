@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: nayris-client
 spec:
-  project: apps
+  project: nayris
   source:
     path: manifests/apps/nayris/apps/client/overlays/kounex-ocp
     repoURL: https://github.com/Kounex/ocp-gitops.git

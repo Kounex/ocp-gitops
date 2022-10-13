@@ -5,7 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: '1'
 spec:
-  project: configs
+  project: sealed-secrets
   source:
     chart: sealed-secrets-web
     repoURL: https://bakito.github.io/helm-charts
