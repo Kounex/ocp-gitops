@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - group-cluster-admins.yml
+  - patch-gitops-edge.yml
 
   - auth/sealed-secret-htpasswd.yml
   - auth/oauth.yml

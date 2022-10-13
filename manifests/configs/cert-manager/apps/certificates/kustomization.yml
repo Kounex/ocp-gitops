@@ -7,5 +7,5 @@ resources:
 
   - certificate-openshift-wildcard.yml
   - certificate-openshift-api.yml
-  - patch-cluster-api-cert-job.yml
-  - patch-cluster-wildcard-cert-job.yml
+  - patch-cluster-api-cert.yml
+  - patch-cluster-wildcard-cert.yml
