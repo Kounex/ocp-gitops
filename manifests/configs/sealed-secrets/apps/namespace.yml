@@ -3,5 +3,10 @@ kind: Namespace
 metadata:
   name: sealed-secrets
   labels:
-    argocd.argoproj.io/managed-by: openshift-gitops
+    app.kubernetes.io/managed-by: openshift-gitops
+    app.kubernetes.io/name: openshift-gitops
+    app.kubernetes.io/part-of: argocd
+  annotations:
+    argocds.argoproj.io/name: openshift-gitops
+    argocds.argoproj.io/namespace: openshift-gitops
 spec:
