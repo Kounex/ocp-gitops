@@ -51,7 +51,7 @@ spec:
             - |
               #!/usr/bin/env bash
               if oc get oauth; then
-                oc patch oauth cluster --type=merge --patch='{"spec": { "templates": { "login": { "name": "matrix-login-template" }, "providerSelection": { "name": "matrix-providers-template" }}}}'
+                oc patch oauth cluster --type=merge --patch='{"spec": { "templates": { "login": { "name": "login-template" }, "providerSelection": { "name": "providers-template" }}}}'
               else
                 echo "Could not apply login-theme since the OAuth CR is missing - create one first!"
                 exit 1
