@@ -6,5 +6,5 @@ resources:
   - application-base.yml
 
   - application-web.yml
-  - rb-web-services.yml
+  # - rb-web-services.yml
   - route-web.yml

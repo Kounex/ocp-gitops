@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - group-cluster-admins.yml
 
-  - auth/secret-htpasswd.yml
+  - auth/sealed-secret-htpasswd.yml
   - auth/oauth.yml
 
   - crbs/gitops-crd.yml
