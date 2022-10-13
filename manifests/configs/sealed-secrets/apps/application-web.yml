@@ -15,7 +15,7 @@ spec:
       values: |
         Args:
           - '--update-status'
-          - '--controller-name=sealed-secrets'
+          - '--kubeseal-arguments=--controller-name=sealed-secrets'
         readinessProbe:
           initialDelaySeconds: 10
         podSecurityContext:
