@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cert-manager-app
+  name: cert-manager
 spec:
   source:
-    path: manifests/configs/cert-manager/apps
+    path: manifests/configs/cert-manager/apps/operator
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
   destination:
