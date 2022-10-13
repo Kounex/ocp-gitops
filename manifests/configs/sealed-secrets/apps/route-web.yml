@@ -5,7 +5,7 @@ metadata:
   namespace: sealed-secrets
   labels:
     app: sealed-secrets-web
-    app.kubernetes.io/part-of: nayris
+    app.kubernetes.io/part-of: sealed-secrets
 spec:
   host: sealed-secrets-web.apps.ocp.kounex.com
   to:
