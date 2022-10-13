@@ -3,5 +3,6 @@ kind: Kustomization
 
 bases:
   - namespace.yml
+  - app-project.yml
   - application-client.yml
   - application-server.yml
