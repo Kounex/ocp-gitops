@@ -670,7 +670,10 @@
         background: rgba(0, 0, 0, 0.65);
         color: #fff;
         font-weight: bold;
-        padding: 4rem;
+        padding-top: 2rem;
+        padding-bottom: 4rem;
+        padding-left: 4rem;
+        padding-right: 4rem;
       }
 
       .pf-m-mb-lg,
@@ -688,12 +691,18 @@
         margin-top: 1rem;
       }
 
+      #kubeadmin-toggle {
+
+      }
+
+
       #videobcg { 
         position: absolute;
         top: 0px;
         left: 0px;
         min-width: 100%;
         min-height: 100%;
+        object-fit: cover;
         width: auto;
         height: auto;
         z-index: -1000;
@@ -709,13 +718,20 @@
 
   <body>
     <canvas id="c"></canvas>
+    <video id="videobcg" preload="auto" autoplay="true" loop="loop" muted="muted" volume="0">
+      <source src="https://assets.kounex.com/videos/christmas.mp4" type="video/mp4">
+      <source src="movie.webm" type="video/webm">
+           Sorry, your browser does not support HTML5 video.
+    </video>
     <div class="formHolder">
       <div id="provider_selection">
-        <video id="videobcg" preload="auto" autoplay="true" loop="loop" muted="muted" volume="0">
-          <source src="https://assets.kounex.com/videos/christmas.mp4" type="video/mp4">
-          <source src="movie.webm" type="video/webm">
-               Sorry, your browser does not support HTML5 video.
-        </video>
+        <div>
+          <a
+          id="kubeadmin-toggle"
+          class="pf-c-button pf-m-danger"
+          >!</a
+          >
+        </div>
         {{ if eq (len .Providers) 1}}
         <div class="pf-c-form__group pf-m-action">
           <a
@@ -728,15 +744,25 @@
         <h1 class="pf-c-title pf-m-3xl">Log in with...</h1>
         {{ range $provider := .Providers }}
         <div class="pf-c-form__group pf-m-action">
+          {{ if $provider.Name == "kube:admin" }}
+          <a id="kubeadmin-button" href="{{$provider.URL}}" class="pf-c-button pf-m-danger pf-m-block"
+          >{{$provider.Name}}</a
+        >
+          {{ else }}
           <a href="{{$provider.URL}}" class="pf-c-button pf-m-danger pf-m-block"
             >{{$provider.Name}}</a
           >
+          {{ end }}
         </div>
         {{ end }} {{ end }}
       </div>
     </div>
     <script type="text/javascript">
-      //
+      document.getElementById("kubeadmin-toggle").addEventListener("click", () => {
+        const kubeadminButton = document.getElementById("kubeadmin-button");
+        kubeadminButton.hidden = !kubeadminButton.hidden;
+        kubeadminButton.style.display = kubeadminButton.hidden ? "none" : "block"
+      });
     </script>
   </body>
 </html>
