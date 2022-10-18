@@ -691,11 +691,6 @@
         margin-top: 1rem;
       }
 
-      #kubeadmin-toggle {
-
-      }
-
-
       #videobcg { 
         position: absolute;
         top: 0px;
@@ -745,9 +740,9 @@
         {{ range $provider := .Providers }}
         <div class="pf-c-form__group pf-m-action">
           {{ if $provider.Name == "kube:admin" }}
-          <a id="kubeadmin-button" href="{{$provider.URL}}" class="pf-c-button pf-m-danger pf-m-block"
-          >{{$provider.Name}}</a
-        >
+            <a id="kubeadmin-button" href="{{$provider.URL}}" class="pf-c-button pf-m-danger pf-m-block"
+              >{{$provider.Name}}</a
+            >
           {{ else }}
           <a href="{{$provider.URL}}" class="pf-c-button pf-m-danger pf-m-block"
             >{{$provider.Name}}</a
