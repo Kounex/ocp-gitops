@@ -740,7 +740,7 @@
                 >{{$provider.Name}}</a
               >
             {{ else }}
-              <a href="{{$provider.URL}}" class="pf-c-button pf-m-danger pf-m-block"
+              <a href="{{$provider.URL}}" class="pf-c-button pf-m-danger pf-m-block provider-button"
                 >{{$provider.Name}}</a
               >
             {{ end }}
@@ -755,6 +755,12 @@
         kubeadminButton.hidden = !kubeadminButton.hidden;
         kubeadminButton.style.display = kubeadminButton.hidden ? "none" : "block"
       });
+
+      const providerButtons = document.getElementsByClassName("provider-button");
+      for (let button of providerButtons) {
+        button.hidden = !button.hidden;
+        button.style.display = button.hidden ? "none" : "block"
+      }
 
       var c = document.getElementById('c');
       var ctx = c.getContext('2d');
