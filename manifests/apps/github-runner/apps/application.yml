@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: github-runner
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  project: github-runner
+  source:
+    chart: actions-runner-controller
+    repoURL: https://actions-runner-controller.github.io/actions-runner-controller
+    targetRevision: 0.26.0
+    helm:
+      releaseName: actions-runner-controller
+      parameters:
+        - name: 'authSecret.create'
+          value: false
+      values: |
+        Args:
+          - '--update-status'
+          - '--wait actions-runner-controller actions-runner-controller/actions-runner-controller'
+        readinessProbe:
+          initialDelaySeconds: 10
+        podSecurityContext:
+          fsGroup:
+        containerSecurityContext:
+          runAsUser:
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: github-runner
+  ignoreDifferences:
+    - kind: Namespace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - RespectIgnoreDifferences=true
