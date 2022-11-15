@@ -14,7 +14,7 @@ spec:
       releaseName: actions-runner-controller
       parameters:
         - name: 'authSecret.create'
-          value: false
+          value: 'false'
       values: |
         Args:
           - '--update-status'
