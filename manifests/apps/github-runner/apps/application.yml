@@ -9,7 +9,7 @@ spec:
   source:
     chart: actions-runner-controller
     repoURL: https://actions-runner-controller.github.io/actions-runner-controller
-    targetRevision: 0.26.0
+    targetRevision: 0.21.0
     helm:
       releaseName: actions-runner-controller
       parameters:
