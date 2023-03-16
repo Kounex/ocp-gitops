@@ -1,11 +1,8 @@
 {
     "extends": ["config:base"],
     "schedule": ["before 2am"],
-    "packageRules": [
-      {
-        "matchManagers": ["argocd"],
-        "matchFiles": ["(?<=\/|^)(?=.*application)[^\/]*.yml$"]
-      }
-    ]
+    "argocd": {
+        "fileMatch": ["(?<=\/|^)(?=.*application)[^\/]*.yml$"]
+    }
   }
   
