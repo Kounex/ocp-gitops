@@ -2,7 +2,7 @@
     "extends": ["config:base"],
     "schedule": ["before 2am"],
     "argocd": {
-        "fileMatch": ["(?<=\/|^)(?=.*application)[^\/]*.yml$"]
+        "fileMatch": ["\\.ya?ml$"]
     }
   }
   
