@@ -9,7 +9,7 @@ spec:
   source:
     chart: sealed-secrets-web
     repoURL: https://bakito.github.io/helm-charts
-    targetRevision: 2.8.1
+    targetRevision: 3.0.5
     helm:
       releaseName: sealed-secrets-web
       parameters:
