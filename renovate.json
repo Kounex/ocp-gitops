@@ -4,7 +4,7 @@
     "packageRules": [
       {
         "matchManagers": ["argocd"],
-        "matchFiles": ["^(?=.*application).*\\.yml$"]
+        "matchFiles": ["(?<=\/|^)(?=.*application)[^\/]*.yml$"]
       }
     ]
   }
