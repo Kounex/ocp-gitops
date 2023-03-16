@@ -37,6 +37,3 @@ spec:
       selfHeal: true
     syncOptions:
       - RespectIgnoreDifferences=true
-      - apply:
-        labels:
-          app.kubernetes.io/part-of: sealed-secrets
