@@ -1,6 +1,6 @@
 {
     "extends": ["config:base"],
-    "schedule": ["every day"],
+    "schedule": ["before 2am"],
     "packageRules": [
       {
         "matchManagers": ["argocd"],
