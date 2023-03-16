@@ -8,3 +8,6 @@ resources:
 
   - application-web.yml
   - route-web.yml
+
+commonLabels:
+  app.kubernetes.io/part-of: sealed-secrets
