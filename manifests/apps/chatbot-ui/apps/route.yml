@@ -1,0 +1,16 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: chatbot-ui
+  labels:
+    app: chatbot-ui
+    app.kubernetes.io/part-of: chatbot-ui
+spec:
+  host: chatbot-ui.apps.ocp.kounex.com
+  to:
+    kind: Service
+    name: chatbot-ui
+    weight: 100
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
