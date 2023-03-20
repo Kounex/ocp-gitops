@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: chatbot-ui
+  name: chatbot-ui-app
 spec:
   project: apps
   destination:
