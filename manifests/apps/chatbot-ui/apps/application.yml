@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: chatbot-ui
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  destination:
+    namespace: chatbot-ui
+    server: https://kubernetes.default.svc
+  project: cluster-apps
+  source:
+    chart: app-template
+    repoURL: https://bjw-s.github.io/helm-charts
+    targetRevision: 1.3.2
+    helm:
+      values: |-
+        image:
+          repository: ghcr.io/kounex/chatbot-ui/chatbot-ui:sha-2edf0ac
+          tag: sha-2edf0ac
+          pullPolicy: IfNotPresent
+        service:
+          main:
+            ports:
+              http:
+                port: 80
+        # persistence:
+        #   data:
+        #     enabled: true
+        #     storageClass: odf-lvm-vg1
+        #     accessMode: ReadWriteOnce
+        #     mountPath: /data
+        #     size: 5Gi
+  ignoreDifferences:
+    - kind: Namespace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - Replace=true
