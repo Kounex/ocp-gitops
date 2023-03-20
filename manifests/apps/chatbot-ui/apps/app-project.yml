@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
   name: chatbot-ui
-  namespace: chatbot-ui
+  namespace: openshift-gitops
 spec:
   clusterResourceWhitelist:
     - group: '*'
