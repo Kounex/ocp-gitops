@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
   name: nayris
-  namespace: openshift-gitops
+  namespace: nayris
 spec:
   clusterResourceWhitelist:
     - group: '*'

@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
   name: sealed-secrets
-  namespace: openshift-gitops
+  namespace: sealed-secrets
 spec:
   clusterResourceWhitelist:
     - group: '*'
