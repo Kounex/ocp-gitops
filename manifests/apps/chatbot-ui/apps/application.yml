@@ -23,9 +23,9 @@ spec:
           main:
             ports:
               http:
-                port: 80
-        podSecurityContext:
-          runAsUser: 0
+                port: 3000
+        # podSecurityContext:
+        #   runAsUser: 0
         # persistence:
         #   data:
         #     enabled: true
