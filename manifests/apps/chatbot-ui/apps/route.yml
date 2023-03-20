@@ -2,6 +2,7 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: chatbot-ui
+  namespace: chatbot-ui
   labels:
     app: chatbot-ui
     app.kubernetes.io/part-of: chatbot-ui
