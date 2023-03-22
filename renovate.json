@@ -9,7 +9,7 @@
           "description": [
             "Process CRD dependencies - Chart and Github Release are the same version"
           ],
-          "fileMatch": ["manifests/.+\\.ya?ml$"],
+          "fileMatch": ["\\.ya?ml$"],
           "matchStrings": [
             "# renovate: registryUrl=(?<registryUrl>\\S+) chart=(?<depName>\\S+)\n.*?(?<currentValue>[^-\\s]*)\n"
           ],
@@ -17,7 +17,7 @@
         },
         {
           "description": ["Generic Docker image Regex manager"],
-          "fileMatch": ["manifests/.+\\.ya?ml$"],
+          "fileMatch": ["\\.ya?ml$"],
           "matchStrings": [
             "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)( versioning=(?<versioning>\\S+))?\n.*?\"(?<currentValue>.*)\"\n"
           ],
@@ -26,7 +26,7 @@
         },
         {
           "description": "Process various other dependencies",
-          "fileMatch": ["manifests/.+\\.ya?ml$"],
+          "fileMatch": ["\\.ya?ml$"],
           "matchStrings": [
             " *repository: \\'?\"?(?<depName>.*?)\\'?\"?\n *tag: *\\'?\"?(?<currentValue>.*)\\'?\"?\n",
             " *repository: \\'?\"?(?<depName>.*?)\\'?\"?\n *pullPolicy:.*\n *tag: *\\'?\"?(?<currentValue>.*)\\'?\"?\n",
