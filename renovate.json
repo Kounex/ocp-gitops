@@ -1,6 +1,6 @@
 {
     "extends": ["config:base"],
-    "schedule": ["every hour"],
+    "schedule": ["0 * * * *"],
     "argocd": {
         "fileMatch": ["\\.ya?ml$"]
     },
