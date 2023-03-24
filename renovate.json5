@@ -34,7 +34,7 @@
             " *repository: \\'?\"?(?<depName>.*?)\\'?\"?\n *pullPolicy:.*\n *tag: *\\'?\"?(?<currentValue>.*)\\'?\"?\n",
             " *containerRepo=\\'?\"?(?<depName>.*?)\\'?\"?\n *tag: \\'?\"?(?<currentValue>.*)\\'?\"?\n"
           ],
-          "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
+          "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-packages{{/if}}",
           "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
         }
       ]
