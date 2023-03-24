@@ -15,5 +15,5 @@ TODO
 For the GitOps workflow, we will make use ArgoCD which is part of the Red Hat GitOps Operator. To install the operator, we apply the `Subscription` which will deploy all necessary components:
 
 ```sh
-oc apply -f clusters/operator-gitops.yml
+oc apply -f clusters/operator-gitops.yml 
 ```
