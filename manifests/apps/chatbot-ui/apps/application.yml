@@ -17,8 +17,8 @@ spec:
     helm:
       values: |-
         image:
-          repository: ghcr.io/kounex/chatbot-ui/chatbot-ui
-          tag: sha-2edf0ac
+          repository: ghcr.io/kounex/chatbot-ui
+          tag: 0.1.0-rc.33
           pullPolicy: IfNotPresent
         service:
           main:

@@ -33,7 +33,7 @@
             " *containerRepo=\\'?\"?(?<depName>.*?)\\'?\"?\n *tag: \\'?\"?(?<currentValue>.*)\\'?\"?\n"
           ],
           "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
-        //   "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+          "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
         }
       ]
   }
