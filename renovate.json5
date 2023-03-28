@@ -42,9 +42,9 @@
           "description": "Process various other dependencies",
           "fileMatch": ["\\.ya?ml$"],
           "matchStrings": [
-            " *repository: \\'?\"?(?!ghcr\.io)(?<depName>.*?)\\'?\"?\n *tag: *\\'?\"?(?<currentValue>.*)\\'?\"?\n",
-            " *repository: \\'?\"?(?!ghcr\.io)(?<depName>.*?)\\'?\"?\n *pullPolicy:.*\n *tag: *\\'?\"?(?<currentValue>.*)\\'?\"?\n",
-            " *containerRepo=\\'?\"?(?!ghcr\.io)(?<depName>.*?)\\'?\"?\n *tag: \\'?\"?(?<currentValue>.*)\\'?\"?\n"
+            " *repository: *'?\"?(?!ghcr\.io)(?<depName>.*?)*'?\"?\n *tag: **'?\"?(?<currentValue>.*)*'?\"?\n",
+            " *repository: *'?\"?(?!ghcr\.io)(?<depName>.*?)*'?\"?\n *pullPolicy:.*\n *tag: **'?\"?(?<currentValue>.*)*'?\"?\n",
+            " *containerRepo=*'?\"?(?!ghcr\.io)(?<depName>.*?)*'?\"?\n *tag: *'?\"?(?<currentValue>.*)*'?\"?\n"
           ],
           "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
           "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
