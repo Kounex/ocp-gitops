@@ -30,9 +30,9 @@
           "description": "Process ghcr.io dependency",
           "fileMatch": ["\\.ya?ml$"],
           "matchStrings": [
-            " *repository: *'?\"?ghcr\.io/(?<depName>.*?)'?\"?\n *tag: *'?\"?(?<currentValue>.*)'?\"?\n",
-            " *repository: *'?\"?ghcr\.io/(?<depName>.*?)'?\"?\n *pullPolicy:.*\n *tag: *'?\"?(?<currentValue>.*)'?\"?\n",
-            " *containerRepo= *'?\"?ghcr\.io/(?<depName>.*?)'?\"?\n *tag: '?\"?(?<currentValue>.*)'?\"?\n"
+            " *repository: *'?\"?ghcr\.io\/(?<depName>.*?)'?\"?\n *tag: *'?\"?(?<currentValue>.*)'?\"?\n",
+            " *repository: *'?\"?ghcr\.io\/(?<depName>.*?)'?\"?\n *pullPolicy:.*\n *tag: *'?\"?(?<currentValue>.*)'?\"?\n",
+            " *containerRepo= *'?\"?ghcr\.io\/(?<depName>.*?)'?\"?\n *tag: '?\"?(?<currentValue>.*)'?\"?\n"
           ],
           "depNameTemplate": "github.com/{{depName}}",
           "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
