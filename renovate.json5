@@ -1,6 +1,6 @@
 {
     "extends": ["config:base"],
-    // Seems to be 4 hours routine 
+    // Seems to be 4 hours routine
     "schedule": ["* * * * *"],
     "ignoreUnstable": false,
     "argocd": {
