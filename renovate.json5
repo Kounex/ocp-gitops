@@ -37,7 +37,7 @@
           "depNameTemplate": "github.com/{{depName}}",
           "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-tags{{/if}}",
           "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
-        }
+        },
         {
           "description": "Process various other dependencies",
           "fileMatch": ["\\.ya?ml$"],
