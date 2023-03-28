@@ -37,7 +37,7 @@
             " *repository: *'?\"?(?<depName>.*?)'?\"?\n *pullPolicy:.*\n *tag: *'?\"?(?<currentValue>.*)'?\"?\n",
             " *containerRepo=*'?\"?(?<depName>.*?)'?\"?\n *tag: '?\"?(?<currentValue>.*)'?\"?\n"
           ],
-          "depNameTemplate": "{{#replace}}{{depName}}ghcr.io/{{/replace}}"
+          "depNameTemplate": "{{{replace 'ghcr.io/' '' depName}}}"
           "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
           "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
         },
