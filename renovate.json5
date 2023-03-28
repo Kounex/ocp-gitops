@@ -35,7 +35,7 @@
             " *containerRepo= *'?\"?ghcr\.io/(?<depName>.*?)'?\"?\n *tag: '?\"?(?<currentValue>.*)'?\"?\n"
           ],
           "depNameTemplate": "github.com/{{depName}}",
-          "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-tags{{/if}}",
+          "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
           "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
         },
         {
