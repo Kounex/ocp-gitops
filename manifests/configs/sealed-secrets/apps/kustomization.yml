@@ -6,6 +6,7 @@ resources:
   - namespace.yml
   - application-base.yml
 
+  - patch-anyuid-scc.yml
   - route-web.yml
   - application-web.yml
 
