@@ -11,6 +11,11 @@ spec:
     path: environment
     repoURL: https://github.com/Kounex/ocp-gitops
     targetRevision: main
+  ignoreDifferences:
+  - group: apps
+    kind: OAuth
+    jsonPointers:
+    - /metadata/labels
   syncPolicy:
     automated:
       prune: true
