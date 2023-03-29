@@ -34,12 +34,12 @@ spec:
         #     accessMode: ReadWriteOnce
         #     mountPath: /data
         #     size: 5Gi
-  ignoreDifferences:
-    - kind: Namespace
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        argocd.argoproj.io/managed-by: openshift-gitops
     syncOptions:
-      - RespectIgnoreDifferences=true
-      - Replace=true
+      - CreateNamespace=true
