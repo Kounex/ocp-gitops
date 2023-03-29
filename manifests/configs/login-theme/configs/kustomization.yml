@@ -5,7 +5,5 @@ resources:
   - secret-login-template.yml
   - secret-provider-selection-template.yml
 
-  # - patch-oauth.yml
-  
   # Making use of Server-Side apply!
-  - oauth.yml
+  - patch-oauth.yml

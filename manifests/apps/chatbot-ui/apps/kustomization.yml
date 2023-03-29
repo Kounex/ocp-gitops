@@ -3,6 +3,6 @@ kind: Kustomization
 
 resources:
   - app-project.yml
-  - namespace.yml
+  # - namespace.yml
   - route.yml
   - application.yml
