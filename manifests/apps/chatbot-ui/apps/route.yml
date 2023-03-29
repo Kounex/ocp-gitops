@@ -6,6 +6,8 @@ metadata:
   labels:
     app: chatbot-ui
     app.kubernetes.io/part-of: chatbot-ui
+  annotations:
+    argocd.argoproj.io/sync-wave: "100"
 spec:
   host: chatbot-ui.apps.ocp.kounex.com
   to:
