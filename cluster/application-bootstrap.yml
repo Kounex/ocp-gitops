@@ -12,7 +12,7 @@ spec:
     repoURL: https://github.com/Kounex/ocp-gitops
     targetRevision: main
   ignoreDifferences:
-  - group: argoproj.io
+  - group: config.openshift.io
     kind: OAuth
     jsonPointers:
     - /metadata/labels
