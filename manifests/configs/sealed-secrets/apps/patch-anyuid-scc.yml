@@ -1,0 +1,8 @@
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: anyuid
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+users:
+  - 'system:serviceaccount:sealed-secrets:sealed-secrets-web'
