@@ -12,7 +12,7 @@ spec:
     repoURL: https://github.com/Kounex/ocp-gitops
     targetRevision: main
   ignoreDifferences:
-  - group: apps
+  - group: argoproj.io
     kind: OAuth
     jsonPointers:
     - /metadata/labels
