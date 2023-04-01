@@ -18,7 +18,7 @@ spec:
       values: |-
         image:
           repository: ghcr.io/kounex/chatbot-ui
-          tag: 0.1.0-rc46
+          tag: 0.1.0-rc47
           pullPolicy: IfNotPresent
         service:
           main:
