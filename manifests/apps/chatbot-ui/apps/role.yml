@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: scc-anyuid
-  namespace: sealed-secrets
+  namespace: chatbot-ui
 rules:
   - apiGroups:
       - security.openshift.io
