@@ -4,6 +4,9 @@ kind: Kustomization
 resources:
   - app-project.yml
 
+  - application-base.yml
+  - application-web.yml
+
   # SCCs should not be patched like this
   # It's better to have RoleBindings making
   # use of a SCC to keep SCCs in base form
@@ -11,10 +14,7 @@ resources:
   - role.yml
   - role-binding.yml
 
-  - application-base.yml
-
   - route-web.yml
-  - application-web.yml
 
 commonLabels:
   app.kubernetes.io/part-of: sealed-secrets
