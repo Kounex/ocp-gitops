@@ -5,7 +5,7 @@ metadata:
   namespace: chatbot-ui
 subjects:
   - kind: ServiceAccount
-    name: app-chatbot-ui-chart
+    name: chatbot-ui
 roleRef:
   kind: Role
   name: scc-anyuid
