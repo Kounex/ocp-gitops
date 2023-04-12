@@ -3,10 +3,16 @@ kind: Kustomization
 
 resources:
   - app-project.yml
-  - namespace.yml
+
+  # SCCs should not be patched like this
+  # It's better to have RoleBindings making
+  # use of a SCC to keep SCCs in base form
+  # - patch-anyuid-scc.yml
+  - role.yml
+  - role-binding.yml
+
   - application-base.yml
 
-  - patch-anyuid-scc.yml
   - route-web.yml
   - application-web.yml
 

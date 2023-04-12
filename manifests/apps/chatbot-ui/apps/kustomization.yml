@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - app-project.yml
-  # - namespace.yml
-  - route.yml
+  - role.yml
+  - role-binding.yml
+
   - application.yml
