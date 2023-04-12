@@ -6,6 +6,8 @@ metadata:
   labels:
     app: sealed-secrets-web
     app.kubernetes.io/part-of: sealed-secrets
+  annotations:
+    argocd.argoproj.io/sync-wave: '10'
 spec:
   host: sealed-secrets-web.apps.ocp.kounex.com
   to:
