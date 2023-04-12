@@ -40,7 +40,7 @@ spec:
             annotations:
               route.openshift.io/termination: "edge"
             hosts:
-            - host: chatbot.apps.onlogic.bohne.io
+            - host: chatbot-ui.apps.ocp.kounex.com
               paths:
                 - path: /
                   pathType: Prefix
