@@ -4,6 +4,8 @@ kind: Kustomization
 namespace: nayris
 
 resources:
+  - role.yml
+  - role-binding-yml
   - deployment.yml
   - route.yml
   - service.yml
