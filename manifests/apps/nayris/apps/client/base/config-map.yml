@@ -4,4 +4,5 @@ metadata:
   name: nginx-client-flutter-config
   namespace: nayris
 data:
-  TEST: hello
+  env: |-
+    TEST=hallo
