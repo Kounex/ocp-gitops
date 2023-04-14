@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-client-flutter-config
+  namespace: nayris
+data:
+  TEST: hello

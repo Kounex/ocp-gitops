@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: nayris
 
 resources:
-  - deployment.yml
-  - route.yml
+  - config-map.yml
   - service.yml
+  - route.yml
+  - deployment.yml

@@ -26,6 +26,14 @@ spec:
               containerPort: 8080
               protocol: TCP
           imagePullPolicy: Always
+          volumeMounts:
+            - name: config-volume
+              mountPath: /assets/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: nginx-client-flutter-config
+            optional: true
       restartPolicy: Always
   strategy:
     type: Recreate
