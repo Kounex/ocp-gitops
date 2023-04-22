@@ -14,5 +14,6 @@ spec:
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
   syncPolicy:
-    syncOptions:
-      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
