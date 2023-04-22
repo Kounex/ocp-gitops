@@ -6,6 +6,6 @@ resources:
   - application-postgresql.yml
   - application-sharry.yml
   - role.yml
-  - role-binding-yml
+  - role-binding.yml
   - sealed-secrets-postgresql.yml
   - sealed-secrets-credentials.yml
