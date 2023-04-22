@@ -22,7 +22,6 @@ spec:
           repository: eikek0/sharry
           tag: v1.11.0
           pullPolicy: IfNotPresent
-
         env:
           - name: TZ
             value: Europe/Berlin
@@ -143,6 +142,19 @@ spec:
             ports:
               http:
                 port: 9090
+
+        ingress:
+          main:
+            enabled: true
+            annotations:
+              route.openshift.io/termination: "edge"
+            hosts:
+            - host: sharry.apps.ocp.kounex.com
+              paths:
+                - path: /
+                  pathType: Prefix
+                  service:
+                    port: 9090
   syncPolicy:
     automated:
       prune: true
