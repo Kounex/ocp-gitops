@@ -1,0 +1,154 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sharry
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  project: sharry
+  destination:
+    namespace: sharry
+    server: 'https://kubernetes.default.svc'
+  source:
+    chart: app-template
+    repoURL: https://bjw-s.github.io/helm-charts
+    targetRevision: 1.4.0
+    helm:
+      values: |-
+
+
+        image:
+          repository: eikek0/sharry
+          tag: v1.11.0
+          pullPolicy: IfNotPresent
+
+        env:
+          - name: TZ
+            value: Europe/Berlin
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sharry-postgresql
+                key: postgres-password
+          # - name: SHARRY_OAUTH_CLIENT_SECRET
+          #   valueFrom:
+          #     secretKeyRef:
+          #       name: sharry-credentials
+          #       key: client-secret
+          - name: SHARRY_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sharry-credentials
+                key: admin-password
+          - name: SHARRY_INVITE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sharry-credentials
+                key: invite-password
+          - name: SHARRY_SMTP_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: sharry-credentials
+                key: smtp-username
+          - name: SHARRY_SMTP_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sharry-credentials
+                key: smtp-password
+
+        dnsConfig:
+          options:
+            - name: ndots
+              value: "1"
+
+        configMaps: 
+          config:
+            enabled: true
+            data: 
+              sharry.conf: |
+                sharry.restserver {
+                  base-url = "https://share.apps.ocp.kounex.com"
+                  bind {
+                    address = "0.0.0.0"
+                    port = {{ .Values.service.main.ports.http.port }}
+                  }
+                  logging {
+                    format: "Fancy"
+                    minimum-level = "Debug"
+                  }
+                  mail {
+                    enabled = false
+                    smtp {
+                      host = "smtp.strato.de"
+                      port = 465
+                      user = ${SHARRY_SMTP_USERNAME}
+                      password = ${SHARRY_SMTP_PASSWORD}
+                      ssl-type = "ssl"
+                    }
+                  }
+                  webapp {
+                    app-name = "Kounex Share"
+                    default-language = "de"
+                    initial-theme = "dark"
+                  }
+                  backend {
+                    jdbc {
+                      url = "jdbc:postgresql://sharry-db-postgresql:5432/sharry"
+                      user = "postgres"
+                      password = ${POSTGRESQL_PASSWORD}
+                    }
+                    signup {
+                      mode = "invite"
+                      invite-password = ${SHARRY_INVITE_PASSWORD}
+                      invite-time = "7 days"
+                    }
+                    auth {
+                      oauth = [
+                        {
+                          enabled = false
+                          id = "kounex"
+                          name = "Kounex SSO"
+                          icon = "fab fa-key"
+                          authorize-url = "https://sso.apps.ocp.kounex.com/auth/realms/kounex/protocol/openid-connect/auth"
+                          token-url = "https://sso.apps.ocp.kounex.com/auth/realms/kounex/protocol/openid-connect/token"
+                          user-url = "https://sso.apps.ocp.kounex.com/auth/realms/kounex/protocol/openid-connect/userinfo"
+                          user-id-key = "preferred_username"
+                          client-id = "sharry"
+                          client-secret = ${SHARRY_OAUTH_CLIENT_SECRET}
+                        }
+                      ]
+                      fixed {
+                        enabled = true
+                        user = "admin"
+                        password = ${SHARRY_ADMIN_PASSWORD}
+                        order = 10
+                      }
+                    }
+                  }
+                }
+
+        args:
+        - "/opt/config/sharry.conf"
+
+        persistence:
+          config:
+            name: sharry-config
+            enabled: true
+            type: configMap
+            mountPath: /opt/config
+
+        service:
+          main:
+            ports:
+              http:
+                port: 9090
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        argocd.argoproj.io/managed-by: openshift-gitops
+    syncOptions:
+      - CreateNamespace=true
