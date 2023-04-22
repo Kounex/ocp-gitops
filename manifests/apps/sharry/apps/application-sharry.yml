@@ -31,11 +31,11 @@ spec:
               secretKeyRef:
                 name: sharry-postgresql
                 key: postgres-password
-          # - name: SHARRY_OAUTH_CLIENT_SECRET
-          #   valueFrom:
-          #     secretKeyRef:
-          #       name: sharry-credentials
-          #       key: client-secret
+          - name: SHARRY_OAUTH_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: sharry-credentials
+                key: client-secret
           - name: SHARRY_ADMIN_PASSWORD
             valueFrom:
               secretKeyRef:
@@ -120,7 +120,7 @@ spec:
                       ]
                       fixed {
                         enabled = true
-                        user = "admin"
+                        user = "kounex"
                         password = ${SHARRY_ADMIN_PASSWORD}
                         order = 10
                       }
