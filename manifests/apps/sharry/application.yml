@@ -1,17 +1,18 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: chatbot-ui-app
+  name: sharry-app
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
 spec:
   project: apps
   destination:
     namespace: openshift-gitops
     server: https://kubernetes.default.svc
   source:
-    path: manifests/apps/chatbot-ui/apps
+    path: manifests/apps/sharry/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git
-    targetRevision: main
+    targetRevision: master
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

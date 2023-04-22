@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sharry-db
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  project: sharry
+  destination:
+    namespace: sharry
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: postgresql
+    targetRevision: 12.2.8
+    helm:
+      values: |-
+        global:
+          storageClass: odf-lvm-vg1
+          postgresql:
+            auth:
+              username: sharry
+              existingSecret: sharry-postgresql
+              database: sharry
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        argocd.argoproj.io/managed-by: openshift-gitops
+    syncOptions:
+      - CreateNamespace=true
