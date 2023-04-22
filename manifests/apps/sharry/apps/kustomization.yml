@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - app-project.yaml
-  - sealed-secrets-postgresql.yaml
-  - sealed-secrets-credentials.yaml
   - application-postgresql.yaml
   - application-sharry.yaml
+  - sealed-secrets-postgresql.yaml
+  - sealed-secrets-credentials.yaml
