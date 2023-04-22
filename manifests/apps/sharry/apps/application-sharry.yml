@@ -149,7 +149,7 @@ spec:
             annotations:
               route.openshift.io/termination: "edge"
             hosts:
-            - host: sharry.apps.ocp.kounex.com
+            - host: share.apps.ocp.kounex.com
               paths:
                 - path: /
                   pathType: Prefix
