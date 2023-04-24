@@ -49,6 +49,12 @@ spec:
           labels:
             app.openshift.io/runtime: nodejs
 
+        service:
+          main:
+            ports:
+              http:
+                port: 8989
+
         serviceAccount:
           create: true
   syncPolicy:
