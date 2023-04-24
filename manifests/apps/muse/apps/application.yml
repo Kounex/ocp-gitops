@@ -50,6 +50,7 @@ spec:
             app.openshift.io/runtime: nodejs
 
         service:
+          enabled: true
           main:
             ports:
               http:
