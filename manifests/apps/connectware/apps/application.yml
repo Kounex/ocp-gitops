@@ -16,8 +16,8 @@ spec:
     targetRevision: 1.2.0-1
     helm:
       releaseName: connectware
-      parameters:
-        - name: 'licenseKey'
+      values: |-
+        licenseKey:
           valueFrom:
             secretKeyRef:
               name: connectware-license-key
