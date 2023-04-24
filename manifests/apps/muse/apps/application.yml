@@ -1,0 +1,62 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: muse
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  destination:
+    namespace: muse
+    server: https://kubernetes.default.svc
+  project: muse
+  source:
+    chart: app-template
+    repoURL: https://bjw-s.github.io/helm-charts
+    targetRevision: 1.4.0
+    helm:
+      values: |-
+        image:
+          repository: docker.io/codetheweb/muse
+          tag: 2.2.4
+          pullPolicy: IfNotPresent
+
+        env:
+          - name: DISCORD_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: muse-api-keys
+                key: DISCORD_TOKEN
+          - name: DATA_DIR
+            value: ./data
+          - name: YOUTUBE_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: muse-api-keys
+                key: YOUTUBE_API_KEY
+          - name: SPOTIFY_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: muse-api-keys
+                key: SPOTIFY_CLIENT_ID
+          - name: SPOTIFY_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: muse-api-keys
+                key: SPOTIFY_CLIENT_SECRET
+
+        controller:
+          labels:
+            app.openshift.io/runtime: nodejs
+
+        serviceAccount:
+          create: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        argocd.argoproj.io/managed-by: openshift-gitops
+    syncOptions:
+      - CreateNamespace=true
