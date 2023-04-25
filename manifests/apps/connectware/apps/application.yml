@@ -12,13 +12,10 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     chart: connectware
-    repoURL: https://repository.cybus.io/repository/connectware-helm
-    targetRevision: 1.2.0-1
+    repoURL: https://charts.kounex.com
+    targetRevision: 0.0.1
     helm:
       releaseName: connectware
-      parameters:
-        - name: global.licensekey
-          value: TEST
   syncPolicy:
     automated:
       prune: true
