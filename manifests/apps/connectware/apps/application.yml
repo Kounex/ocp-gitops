@@ -17,7 +17,7 @@ spec:
     helm:
       releaseName: connectware
       parameters:
-        - name: licenseKey
+        - name: global.licenseKey
           value: TEST
   syncPolicy:
     automated:
