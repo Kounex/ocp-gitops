@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - app-project.yml
   - application.yml
-  - sealed-secrets-license-key.yml
+  - sealed-secrets-image-pull-secret.yml
