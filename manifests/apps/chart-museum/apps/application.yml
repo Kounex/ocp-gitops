@@ -16,9 +16,6 @@ spec:
     targetRevision: 0.0.1
     helm:
       releaseName: connectware
-      parameters:
-        name: global.image.version
-        value: 1.1.5
   syncPolicy:
     automated:
       prune: true
