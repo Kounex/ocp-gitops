@@ -5,7 +5,7 @@ metadata:
   namespace: connectware
 subjects:
   - kind: ServiceAccount
-    name: connectware
+    name: default
 roleRef:
   kind: Role
   name: scc-anyuid
