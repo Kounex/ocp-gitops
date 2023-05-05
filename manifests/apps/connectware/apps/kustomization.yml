@@ -5,3 +5,5 @@ resources:
   - app-project.yml
   - application.yml
   - sealed-secrets-image-pull-secret.yml
+  - role.yml
+  - role-binding.yml
