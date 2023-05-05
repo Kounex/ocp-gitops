@@ -3,6 +3,8 @@ kind: Role
 metadata:
   name: scc-anyuid
   namespace: connectware
+  annotations:
+    argocd.argoproj.io/sync-wave: '10'
 rules:
   - apiGroups:
       - security.openshift.io

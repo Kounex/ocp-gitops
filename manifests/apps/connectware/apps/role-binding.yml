@@ -3,6 +3,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: sa-to-scc-anyuid
   namespace: connectware
+  annotations:
+    argocd.argoproj.io/sync-wave: '10'
 subjects:
   - kind: ServiceAccount
     name: default
