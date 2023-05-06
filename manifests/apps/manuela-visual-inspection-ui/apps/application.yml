@@ -37,7 +37,7 @@ spec:
 
         persistence:
           config:
-            name: config
+            name: manuela-visual-inspection-ui-config
             enabled: true
             type: configMap
             mountPath: /opt/app-root/src/assets/env
