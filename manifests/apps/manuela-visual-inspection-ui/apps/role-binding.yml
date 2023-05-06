@@ -2,12 +2,12 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: sa-to-scc-anyuid
-  namespace: chatbot-ui
+  namespace: manuela-visual-inspection-ui
   annotations:
     argocd.argoproj.io/sync-wave: '10'
 subjects:
   - kind: ServiceAccount
-    name: chatbot-ui
+    name: manuela-visual-inspection-ui
 roleRef:
   kind: Role
   name: scc-anyuid
