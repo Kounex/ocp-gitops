@@ -1,0 +1,72 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: manuela-visual-inspection-ui
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+spec:
+  destination:
+    namespace: manuela-visual-inspection-ui
+    server: https://kubernetes.default.svc
+  project: manuela-visual-inspection-ui
+  source:
+    chart: app-template
+    repoURL: https://bjw-s.github.io/helm-charts
+    targetRevision: 1.4.0
+    helm:
+      values: |-
+        image:
+          repository: ghcr.io/kounex/manuela-visual-inspection-ui
+          tag: 0.5.0
+          pullPolicy: IfNotPresent
+
+        controller:
+          labels:
+            app.openshift.io/runtime: nodejs
+
+        serviceAccount:
+          create: true
+
+        configMaps: 
+          config:
+            enabled: true
+            data: 
+              config: |
+                API_URL=http://dashboard-manuela-visual-inspection.apps.ocp5.stormshift.coe.muc.redhat.com/ui2
+
+        persistence:
+          config:
+            name: config
+            enabled: true
+            type: configMap
+            mountPath: /opt/app-root/src/assets/env
+
+        service:
+          main:
+            ports:
+              http:
+                port: 8080
+
+        ingress:
+          main:
+            enabled: true
+            annotations:
+              route.openshift.io/termination: "edge"
+            hosts:
+            - host: manuela-visual-inspection-ui.apps.ocp.kounex.com
+              paths:
+                - path: /
+                  pathType: Prefix
+                  service:
+                    port: 8080
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        argocd.argoproj.io/managed-by: openshift-gitops
+    syncOptions:
+      - CreateNamespace=true
