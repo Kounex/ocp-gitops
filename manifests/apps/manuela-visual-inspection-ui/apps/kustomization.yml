@@ -6,5 +6,5 @@ resources:
 
   - application.yml
 
-  - role.yml
-  - role-binding.yml
+  # - role.yml
+  # - role-binding.yml
