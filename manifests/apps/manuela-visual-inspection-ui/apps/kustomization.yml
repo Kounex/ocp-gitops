@@ -5,6 +5,3 @@ resources:
   - app-project.yml
 
   - application.yml
-
-  # - role.yml
-  # - role-binding.yml
