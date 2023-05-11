@@ -3,7 +3,11 @@ kind: Kustomization
 
 resources:
   - app-project.yml
+
   - application.yml
+
   - sealed-secrets-image-pull-secret.yml
+
   - role.yml
-  - role-binding.yml
+  - role-binding-cybus-broker.yml
+  - role-binding-default.yml
