@@ -6,6 +6,6 @@ resources:
   - github-runner
   - chatbot-ui
   - sharry
-  # - connectware
+  - connectware
   - muse
   - manuela-visual-inspection-ui
