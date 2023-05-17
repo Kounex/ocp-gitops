@@ -37,6 +37,7 @@ spec:
         ingress:
           main:
             enabled: true
+            ingressClassName: default
             annotations:
               route.openshift.io/termination: "edge"
             hosts:
