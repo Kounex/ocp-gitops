@@ -7,6 +7,7 @@ resources:
   - application.yml
 
   - sealed-secrets-image-pull-secret.yml
+  - sealed-secrets-license.key.yml
 
   - role.yml
   - role-binding-cybus-broker.yml
