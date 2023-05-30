@@ -13,7 +13,7 @@ spec:
   source:
     chart: connectware
     repoURL: https://charts.kounex.com
-    targetRevision: 0.0.1
+    targetRevision: 0.0.2
     helm:
       releaseName: connectware
   syncPolicy:
