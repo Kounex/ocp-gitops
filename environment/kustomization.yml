@@ -7,10 +7,6 @@ resources:
   - patch-gitops-edge.yml
   - group-cluster-admins.yml
 
-  - auth/sealed-secret-htpasswd.yml
-  - auth/sealed-secret-github-oauth.yml
-  - auth/oauth.yml
-
   - crbs/gitops-crd.yml
 
   - argocd/app-project-gitops-configs.yml

@@ -3,5 +3,6 @@ kind: Kustomization
 
 resources:
   - sealed-secrets
+  - auth
   - cert-manager
   - login-theme
