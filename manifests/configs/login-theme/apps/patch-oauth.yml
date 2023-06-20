@@ -5,6 +5,8 @@ metadata:
   name: cluster
   annotations:
     argocd.argoproj.io/sync-options: ServerSideApply=true
+  annotations:
+    argocd.argoproj.io/sync-wave: '150'
 spec:
   templates:
     login:

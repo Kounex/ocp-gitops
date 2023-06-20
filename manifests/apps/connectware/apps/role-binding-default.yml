@@ -4,7 +4,7 @@ metadata:
   name: sa-default-to-scc-anyuid
   namespace: connectware
   annotations:
-    argocd.argoproj.io/sync-wave: '10'
+    argocd.argoproj.io/sync-wave: '230'
 subjects:
   - kind: ServiceAccount
     name: default

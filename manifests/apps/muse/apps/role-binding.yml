@@ -4,7 +4,7 @@ metadata:
   name: sa-to-scc-anyuid
   namespace: muse
   annotations:
-    argocd.argoproj.io/sync-wave: '10'
+    argocd.argoproj.io/sync-wave: '230'
 subjects:
   - kind: ServiceAccount
     name: muse

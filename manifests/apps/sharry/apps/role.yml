@@ -3,6 +3,8 @@ kind: Role
 metadata:
   name: scc-anyuid
   namespace: sharry
+  annotations:
+    argocd.argoproj.io/sync-wave: '230'
 rules:
   - apiGroups:
       - security.openshift.io

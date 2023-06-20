@@ -4,7 +4,7 @@ metadata:
   name: scc-anyuid
   namespace: connectware
   annotations:
-    argocd.argoproj.io/sync-wave: '10'
+    argocd.argoproj.io/sync-wave: '230'
 rules:
   - apiGroups:
       - security.openshift.io

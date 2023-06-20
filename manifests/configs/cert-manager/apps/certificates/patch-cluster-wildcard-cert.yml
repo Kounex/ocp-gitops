@@ -3,11 +3,15 @@ kind: ServiceAccount
 metadata:
   name: patch-cluster-wildcard-cert
   namespace: openshift-ingress
+  annotations:
+    argocd.argoproj.io/sync-wave: '140'
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: patch-cluster-wildcard-cert
+  annotations:
+    argocd.argoproj.io/sync-wave: '140'
 rules:
   - apiGroups:
       - operator.openshift.io
@@ -29,6 +33,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: patch-cluster-wildcard-cert
+  annotations:
+    argocd.argoproj.io/sync-wave: '140'
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -44,6 +50,7 @@ metadata:
   name: patch-cluster-wildcard-cert
   namespace: openshift-ingress
   annotations:
+    argocd.argoproj.io/sync-wave: '140'
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
