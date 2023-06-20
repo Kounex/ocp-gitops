@@ -6,7 +6,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: '140'
 spec:
-  channel: tech-preview
+  channel: latest
   installPlanApproval: Automatic
   name: openshift-cert-manager-operator
   source: redhat-operators
