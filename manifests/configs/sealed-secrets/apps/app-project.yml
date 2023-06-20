@@ -3,6 +3,8 @@ kind: AppProject
 metadata:
   name: sealed-secrets
   namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
 spec:
   clusterResourceWhitelist:
     - group: '*'

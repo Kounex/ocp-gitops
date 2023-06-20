@@ -2,6 +2,8 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: cert-manager-operator
+  annotations:
+    argocd.argoproj.io/sync-wave: '120'
 spec:
   source:
     path: manifests/configs/cert-manager/apps/operator

@@ -1,18 +1,18 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: chatbot-ui-app
+  name: auth-app
   annotations:
-    argocd.argoproj.io/sync-wave: '200'
+    argocd.argoproj.io/sync-wave: '100'
 spec:
-  project: apps
+  source:
+    path: manifests/configs/auth/apps
+    repoURL: https://github.com/Kounex/ocp-gitops.git
+    targetRevision: main
   destination:
     namespace: openshift-gitops
     server: https://kubernetes.default.svc
-  source:
-    path: manifests/apps/chatbot-ui/apps
-    repoURL: https://github.com/Kounex/ocp-gitops.git
-    targetRevision: main
+  project: configs
   syncPolicy:
     automated:
       prune: true

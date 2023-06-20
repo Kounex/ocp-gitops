@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: sealed-secrets-app
   annotations:
-    argocd.argoproj.io/sync-wave: '1'
+    argocd.argoproj.io/sync-wave: '100'
 spec:
   project: configs
   source:

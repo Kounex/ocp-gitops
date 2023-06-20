@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: connectware-app
   annotations:
-    argocd.argoproj.io/sync-wave: '1'
+    argocd.argoproj.io/sync-wave: '200'
 spec:
   project: apps
   destination:

@@ -2,10 +2,12 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: login-theme
+  annotations:
+    argocd.argoproj.io/sync-wave: '100'
 spec:
   project: configs
   source:
-    path: manifests/configs/login-theme/configs
+    path: manifests/configs/login-theme/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
   destination:
@@ -16,5 +18,5 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    # - ServerSideApply=true
-    - Validate=false
+      # - ServerSideApply=true
+      - Validate=false

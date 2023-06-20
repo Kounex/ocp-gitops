@@ -4,7 +4,7 @@ metadata:
   name: manuela-visual-inspection-ui
   namespace: openshift-gitops
   annotations:
-    argocd.argoproj.io/sync-wave: '1'
+    argocd.argoproj.io/sync-wave: '220'
 spec:
   destination:
     namespace: manuela-visual-inspection-ui

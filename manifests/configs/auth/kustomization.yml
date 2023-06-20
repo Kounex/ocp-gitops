@@ -2,6 +2,4 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - sealed-secret-htpasswd.yml
-  - sealed-secret-github-oauth.yml
-  - oauth.yml
+  - application.yml
