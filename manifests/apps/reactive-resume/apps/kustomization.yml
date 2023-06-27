@@ -8,7 +8,7 @@ resources:
   - application-server.yml
   - application-client.yml
 
-  - sealed-secrets-postgres.yml
+  - sealed-secrets-postgresql.yml
   - sealed-secrets-server.yml
 
   - role.yml
