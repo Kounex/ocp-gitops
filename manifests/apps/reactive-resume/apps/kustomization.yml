@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - app-project.yml
+
+  - application-postgresql.yml
+  - application-server.yml
+  - application-client.yml
+
+  - sealed-secrets-postgres.yml
+  - sealed-secrets-server.yml
+
+  - role.yml
+
+  - role-binding-server.yml
+  - role-binding-client.yml
