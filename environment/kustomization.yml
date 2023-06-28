@@ -5,8 +5,8 @@ resources:
   - kublet-config.yml
 
   - operators/operator-lvms.yml
+  - operators/lvm-cluster.yml
 
-  - patch-gitops-edge.yml
   - group-cluster-admins.yml
 
   - crbs/gitops-crd.yml

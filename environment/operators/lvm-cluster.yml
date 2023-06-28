@@ -3,6 +3,8 @@ apiVersion: lvm.topolvm.io/v1alpha1
 metadata:
   name: test-lvmcluster
   namespace: openshift-storage
+  annotations:
+    argocd.argoproj.io/sync-wave: '15'
 spec:
   storage:
     deviceClasses:

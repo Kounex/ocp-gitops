@@ -2,6 +2,8 @@ apiVersion: machineconfiguration.openshift.io/v1
 kind: KubeletConfig
 metadata:
   name: set-allocatable
+  annotations:
+    argocd.argoproj.io/sync-wave: '10'
 spec:
   machineConfigPoolSelector:
     matchLabels:

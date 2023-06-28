@@ -3,12 +3,16 @@ kind: ServiceAccount
 metadata:
   name: patch-gitops-edge
   namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '150'
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: patch-gitops-edge
   namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '150'
 rules:
   - apiGroups:
       - ''
@@ -32,6 +36,8 @@ kind: RoleBinding
 metadata:
   name: patch-gitops-edge
   namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '150'
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -47,6 +53,7 @@ metadata:
   name: patch-gitops-edge
   namespace: openshift-gitops
   annotations:
+    argocd.argoproj.io/sync-wave: '150'
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:

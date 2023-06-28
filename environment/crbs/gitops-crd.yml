@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/name: openshift-gitops
     app.kubernetes.io/part-of: argocd
   annotations:
+    argocd.argoproj.io/sync-wave: '5'
     argocds.argoproj.io/name: openshift-gitops
     argocds.argoproj.io/namespace: openshift-gitops
 rules:

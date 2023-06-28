@@ -2,5 +2,7 @@ apiVersion: user.openshift.io/v1
 kind: Group
 metadata:
   name: cluster-admins
+  annotations:
+    argocd.argoproj.io/sync-wave: '10'
 users:
   - admin
