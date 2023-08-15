@@ -13,5 +13,6 @@ resources:
 
   - role.yml
 
+  - role-binding-postgresql.yml
   - role-binding-server.yml
   - role-binding-client.yml

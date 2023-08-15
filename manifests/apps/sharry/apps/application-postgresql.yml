@@ -16,6 +16,8 @@ spec:
     targetRevision: 12.2.8
     helm:
       values: |-
+
+
         global:
           storageClass: lvms-vg1
           postgresql:
