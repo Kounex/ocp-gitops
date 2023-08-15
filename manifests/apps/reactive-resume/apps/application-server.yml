@@ -48,8 +48,8 @@ spec:
               secretKeyRef:
                 name: reactive-resume-postgresql
                 key: password
-          - name: POSTGRES_SSL_CERT
-            value:
+          # - name: POSTGRES_SSL_CERT
+          #   value:
           - name: JWT_SECRET
             valueFrom:
               secretKeyRef:
