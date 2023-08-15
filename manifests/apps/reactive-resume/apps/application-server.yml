@@ -80,7 +80,7 @@ spec:
           - name: STORAGE_SECRET_KEY
             value:
           - name: PDF_DELETION_TIME
-            value: 180 days
+            value: 180
 
         controller:
           labels:
