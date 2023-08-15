@@ -19,8 +19,8 @@ spec:
 
 
         image:
-          repository: ghcr.io/amruthpillai/reactive-resume
-          tag: server-3.7.5
+          repository: docker.io/amruthpillai/reactive-resume
+          tag: server-3.8.4
           pullPolicy: IfNotPresent
 
         env:

@@ -17,12 +17,12 @@ spec:
     helm:
       values: |-
 
-      
+
         image:
-          repository: ghcr.io/amruthpillai/reactive-resume
-          tag: client-3.7.5
+          repository: docker.io/amruthpillai/reactive-resume
+          tag: client-3.8.4
           pullPolicy: IfNotPresent
-        
+
         env:
           - name: TZ
             value: Europe/Berlin
