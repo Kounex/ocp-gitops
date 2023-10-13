@@ -10,7 +10,5 @@ spec:
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  duration: 1440h0m0s
-  renewBefore: 360h0m0s
   dnsNames:
     - 'api.ocp.kounex.com'
