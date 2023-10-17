@@ -7,4 +7,4 @@ resources:
   - namespace.yml
   - group.yml
   - subscription.yml
-  - cert-manager.yml
+  # - cert-manager.yml
