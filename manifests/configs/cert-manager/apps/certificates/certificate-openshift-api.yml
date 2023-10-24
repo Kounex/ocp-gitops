@@ -5,6 +5,7 @@ metadata:
   namespace: openshift-config
   annotations:
     argocd.argoproj.io/sync-wave: '140'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   secretName: openshift-api-certificate
   issuerRef:
