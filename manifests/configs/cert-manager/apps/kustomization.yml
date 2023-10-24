@@ -5,4 +5,3 @@ resources:
   - app-project.yml
   - application-operator.yml
   - application-certificates.yml
-  - patch-gitops-edge.yml
