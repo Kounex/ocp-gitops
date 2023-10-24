@@ -5,6 +5,6 @@ namespace: cert-manager-operator
 
 resources:
   - namespace.yml
-  - group.yml
+  - operator-group.yml
   - subscription.yml
   # - cert-manager.yml

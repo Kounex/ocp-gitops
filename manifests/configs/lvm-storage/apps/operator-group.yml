@@ -1,7 +1,8 @@
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: lvms-operator
+  name: lvm
+  namespace: openshift-storage
   annotations:
     argocd.argoproj.io/sync-wave: '105'
 spec:
