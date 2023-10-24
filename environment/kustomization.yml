@@ -4,9 +4,6 @@ kind: Kustomization
 resources:
   - kublet-config.yml
 
-  - operators/operator-lvms.yml
-  - operators/lvm-cluster.yml
-
   - crb-custom-cluster-admins.yml
   - group-cluster-admins.yml
 

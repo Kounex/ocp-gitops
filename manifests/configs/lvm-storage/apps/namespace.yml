@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/display-name: LVM Storage
+  labels:
+    openshift.io/cluster-monitoring: 'true'
+  annotations:
+    argocd.argoproj.io/sync-wave: '100'
+  name: openshift-storage
