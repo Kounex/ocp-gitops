@@ -3,5 +3,6 @@ kind: Kustomization
 
 resources:
   - namespace.yml
+  - group.yml
   - subscription.yml
   - lvm-cluster.yml
