@@ -8,4 +8,4 @@ metadata:
     argocd.argoproj.io/sync-options: Validate=false,ServerSideApply=true
 spec:
   defaultCertificate:
-    name: openshift-wildcard-certificate
+    name: openshift-wildcard-24hnm

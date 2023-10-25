@@ -13,4 +13,4 @@ spec:
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt-prod
-  secretName: openshift-wildcard-certificate
+  secretName: openshift-wildcard-24hnm

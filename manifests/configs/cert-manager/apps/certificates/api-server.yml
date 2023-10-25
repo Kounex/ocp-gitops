@@ -11,4 +11,4 @@ spec:
       - names:
           - api.ocp.kounex.com
         servingCertificate:
-          name: openshift-api-certificate
+          name: openshift-api-zz45z
