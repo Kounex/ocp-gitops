@@ -7,7 +7,7 @@ metadata:
     argocd.argoproj.io/sync-wave: '140'
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  secretName: openshift-api-zz45z
+  secretName: openshift-api-certificate
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
