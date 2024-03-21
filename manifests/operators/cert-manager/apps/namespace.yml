@@ -6,4 +6,4 @@ metadata:
     argocd.argoproj.io/sync-wave: '140'
   labels:
     openshift.io/cluster-monitoring: 'true'
-  name: openshift-cert-manager-operator
+  name: cert-manager-operator
