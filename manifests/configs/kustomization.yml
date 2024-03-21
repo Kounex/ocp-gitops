@@ -3,8 +3,8 @@ kind: Kustomization
 
 resources:
   - external-secrets
+  - auth
   # - lvm-storage
   # - sealed-secrets
   # - cert-manager
-  # - auth
   # - login-theme
