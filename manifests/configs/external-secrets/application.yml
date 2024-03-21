@@ -1,18 +1,18 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: login-theme-app
+  name: external-secrets-app
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/sync-wave: '100'
 spec:
   project: configs
   source:
-    path: manifests/configs/login-theme/apps
+    path: manifests/configs/external-secrets/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
   destination:
-    namespace: openshift-config
+    namespace: openshift-operators
     server: https://kubernetes.default.svc
   syncPolicy:
     automated:

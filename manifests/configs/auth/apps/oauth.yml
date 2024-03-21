@@ -4,6 +4,7 @@ metadata:
   name: cluster
   annotations:
     argocd.argoproj.io/sync-wave: '150'
+    argocd.argoproj.io/sync-options: Validate=false,ServerSideApply=true
 spec:
   identityProviders:
     - name: Local
@@ -12,16 +13,16 @@ spec:
       htpasswd:
         fileData:
           name: htpasswd
-    - type: GitHub
-      name: GitHub
-      mappingMethod: claim
-      github:
-        clientID: Iv1.3abdacf08aed1bb2
-        clientSecret:
-          name: github-oauth
-        organizations:
-          - sa-mw-dach
-        teams: []
+    # - type: GitHub
+    #   name: GitHub
+    #   mappingMethod: claim
+    #   github:
+    #     clientID: Iv1.3abdacf08aed1bb2
+    #     clientSecret:
+    #       name: github-oauth
+    #     organizations:
+    #       - sa-mw-dach
+    #     teams: []
       # - google:
       #     clientID: >-
       #       478348800225-pipjo1969ga8rg53sf9he8mb0sjkml01.apps.googleusercontent.com
