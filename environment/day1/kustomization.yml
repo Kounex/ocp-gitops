@@ -10,6 +10,5 @@ resources:
   - argocd/application-configs-manager.yml
 
   - crbs/custom-cluster-admins.yml
-  - crbs/gitops.yml
 
   - groups/cluster-admins.yml
