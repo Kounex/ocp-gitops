@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bootstrap-operators
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  destination:
+    namespace: openshift-gitops
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: environment/operators
+    repoURL: https://github.com/Kounex/ocp-gitops
+    targetRevision: main
+  # ignoreDifferences:
+  #   - group: config.openshift.io
+  #     kind: OAuth
+  #     jsonPointers:
+  #       - /metadata/labels
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

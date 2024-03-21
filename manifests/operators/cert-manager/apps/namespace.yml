@@ -3,8 +3,7 @@ kind: Namespace
 metadata:
   annotations:
     openshift.io/display-name: Red Hat Certificate Manager Operator
+    argocd.argoproj.io/sync-wave: '140'
   labels:
     openshift.io/cluster-monitoring: 'true'
-  annotations:
-    argocd.argoproj.io/sync-wave: '140'
   name: openshift-cert-manager-operator

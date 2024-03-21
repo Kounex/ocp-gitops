@@ -4,5 +4,4 @@ kind: Kustomization
 namespace: openshift-gitops
 
 resources:
-  # - operator-gitops.yml
-  - application-bootstrap.yml
+  - application.yml

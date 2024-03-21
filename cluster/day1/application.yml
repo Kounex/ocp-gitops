@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: bootstrap
+  name: bootstrap-day1
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/sync-wave: '1'
@@ -12,14 +12,14 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: environment
+    path: environment/day1
     repoURL: https://github.com/Kounex/ocp-gitops
     targetRevision: main
-  ignoreDifferences:
-    - group: config.openshift.io
-      kind: OAuth
-      jsonPointers:
-        - /metadata/labels
+  # ignoreDifferences:
+  #   - group: config.openshift.io
+  #     kind: OAuth
+  #     jsonPointers:
+  #       - /metadata/labels
   syncPolicy:
     automated:
       prune: true
