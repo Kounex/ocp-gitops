@@ -14,6 +14,13 @@ spec:
   destination:
     namespace: openshift-config
     server: https://kubernetes.default.svc
+  ignoreDifferences:
+  - kind: OAuth
+    jsonPointers:
+    - /metadata/labels
   syncPolicy:
     automated:
       selfHeal: true
+    syncOptions:
+    - RespectIgnoreDifferences=true
+    
