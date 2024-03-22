@@ -14,6 +14,8 @@ spec:
     namespace: openshift-gitops
     server: https://kubernetes.default.svc
   project: configs
+  ignoreDifferences:
+    - kind: Secret
   syncPolicy:
     automated:
       prune: true
