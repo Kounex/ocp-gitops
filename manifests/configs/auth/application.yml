@@ -15,8 +15,10 @@ spec:
     server: https://kubernetes.default.svc
   project: configs
   ignoreDifferences:
-    - kind: Secret
+    - kind: 'Secret'
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
