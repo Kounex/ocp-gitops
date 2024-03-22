@@ -4,7 +4,6 @@ metadata:
   name: cluster
   annotations:
     argocd.argoproj.io/sync-wave: '150'
-    argocd.argoproj.io/sync-options: Validate=false,ServerSideApply=true
 spec:
   identityProviders:
     - name: Local
