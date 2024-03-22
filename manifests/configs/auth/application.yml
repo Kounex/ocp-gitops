@@ -14,11 +14,6 @@ spec:
     namespace: openshift-gitops
     server: https://kubernetes.default.svc
   project: configs
-  ignoreDifferences:
-    - kind: 'Secret'
-      namespace: openshift-authentication
   syncPolicy:
     automated:
       selfHeal: true
-    syncOptions:
-      - RespectIgnoreDifferences=true
