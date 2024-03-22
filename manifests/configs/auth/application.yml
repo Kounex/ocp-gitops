@@ -19,7 +19,6 @@ spec:
       namespace: openshift-authentication
   syncPolicy:
     automated:
-      prune: false
       selfHeal: true
     syncOptions:
       - RespectIgnoreDifferences=true
