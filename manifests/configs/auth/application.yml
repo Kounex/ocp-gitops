@@ -16,6 +16,7 @@ spec:
   project: configs
   ignoreDifferences:
     - kind: 'Secret'
+      namespace: openshift-authentication
   syncPolicy:
     automated:
       prune: false
