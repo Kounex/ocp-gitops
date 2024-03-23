@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - app-project.yml
   - application.yml
-  # - sealed-secrets-api-keys.yml
-  - external-secrets-api-key.yml
+  # - sealed-secret-api-keys.yml
+  - external-secret-api-keys.yml
   - role.yml
   - role-binding.yml
