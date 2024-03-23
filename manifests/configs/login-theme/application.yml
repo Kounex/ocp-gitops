@@ -22,6 +22,9 @@ spec:
     automated:
       selfHeal: true
     syncOptions:
+    # Since the secrets are huge it might break the
+    # metadata/annotations/last-applied-configuration length
+    # but serversideapply will avoid that problem!
     - ServerSideApply=true
     - RespectIgnoreDifferences=true
     
