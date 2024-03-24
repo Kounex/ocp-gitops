@@ -1,0 +1,25 @@
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  name: default
+  namespace: openshift-ingress-operator
+  annotations:
+    argocd.argoproj.io/sync-wave: "150"
+    argocd.argoproj.io/sync-options: Validate=false,ServerSideApply=true
+spec:
+  defaultCertificate:
+    name: openshift-wildcard-certificate
+# Default
+# spec:
+#   clientTLS:
+#     clientCA:
+#       name: ''
+#     clientCertificatePolicy: ''
+#   httpCompression: {}
+#   httpEmptyRequestsPolicy: Respond
+#   httpErrorCodePages:
+#     name: ''
+#   replicas: 1
+#   tuningOptions:
+#     reloadInterval: 0s
+#   unsupportedConfigOverrides: null

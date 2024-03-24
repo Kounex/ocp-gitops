@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: openshift-wildcard
+  namespace: openshift-ingress
+  annotations:
+    argocd.argoproj.io/sync-wave: '150'
+spec:
+  secretName: openshift-wildcard-certificate
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: '*.apps.ocp.kounex.com'
+  dnsNames:
+  - '*.apps.ocp.kounex.com'

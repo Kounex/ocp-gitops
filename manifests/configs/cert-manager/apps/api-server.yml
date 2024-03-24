@@ -3,12 +3,16 @@ kind: APIServer
 metadata:
   name: cluster
   annotations:
-    argocd.argoproj.io/sync-wave: '140'
+    argocd.argoproj.io/sync-wave: '150'
     argocd.argoproj.io/sync-options: Validate=false,ServerSideApply=true
 spec:
   servingCerts:
     namedCertificates:
-      - names:
-          - api.ocp.kounex.com
-        servingCertificate:
-          name: openshift-api-zz45z
+    - names:
+      - api.ocp.kounex.com
+      servingCertificate:
+        name: openshift-api-certificate
+# Default config
+# spec:
+#   audit:
+#     profile: Default
