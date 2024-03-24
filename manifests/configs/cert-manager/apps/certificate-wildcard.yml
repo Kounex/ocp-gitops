@@ -4,7 +4,7 @@ metadata:
   name: openshift-wildcard
   namespace: openshift-ingress
   annotations:
-    argocd.argoproj.io/sync-wave: '150'
+    argocd.argoproj.io/sync-wave: '145'
 spec:
   secretName: openshift-wildcard-certificate
   issuerRef:
