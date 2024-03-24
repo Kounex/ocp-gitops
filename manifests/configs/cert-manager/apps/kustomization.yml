@@ -11,3 +11,5 @@ resources:
 
   - api-server.yml
   - ingress-controller.yml
+
+  - argocd.yml
