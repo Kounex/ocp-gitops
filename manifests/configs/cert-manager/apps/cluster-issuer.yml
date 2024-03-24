@@ -1,7 +1,7 @@
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: cloudflare-issuer
+  name: letsencrypt-prod
   annotations:
     argocd.argoproj.io/sync-wave: '140'
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
