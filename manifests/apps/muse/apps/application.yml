@@ -57,6 +57,7 @@ spec:
         service:
           main:
             enabled: false
+            controller: main
             ports:
               http:
                 port: 8989
