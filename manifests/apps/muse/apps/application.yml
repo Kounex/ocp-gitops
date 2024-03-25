@@ -18,7 +18,7 @@ spec:
       values: |-
         controllers:
           main:
-            strategy: Recreate
+            strategy: RollingUpdate
 
             labels:
               app.openshift.io/runtime: nodejs
