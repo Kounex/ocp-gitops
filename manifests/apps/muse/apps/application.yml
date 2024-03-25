@@ -13,41 +13,46 @@ spec:
   source:
     chart: app-template
     repoURL: https://bjw-s.github.io/helm-charts
-    targetRevision: 1.5.1
+    targetRevision: 3.0.4
     helm:
       values: |-
-        image:
-          repository: docker.io/codetheweb/muse
-          tag: 2.7.1
-          pullPolicy: IfNotPresent
+        controllers:
+          main:
+            strategy: Recreate
 
-        env:
-          - name: DISCORD_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: muse-api-keys
-                key: DISCORD_TOKEN
-          - name: DATA_DIR
-            value: ./data
-          - name: YOUTUBE_API_KEY
-            valueFrom:
-              secretKeyRef:
-                name: muse-api-keys
-                key: YOUTUBE_API_KEY
-          - name: SPOTIFY_CLIENT_ID
-            valueFrom:
-              secretKeyRef:
-                name: muse-api-keys
-                key: SPOTIFY_CLIENT_ID
-          - name: SPOTIFY_CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: muse-api-keys
-                key: SPOTIFY_CLIENT_SECRET
+            labels:
+              app.openshift.io/runtime: nodejs
 
-        controller:
-          labels:
-            app.openshift.io/runtime: nodejs
+            containers:
+              main:
+                image:
+                  repository: docker.io/codetheweb/muse
+                  tag: 2.7.0
+                  pullPolicy: IfNotPresent
+
+                env:
+                  - name: DISCORD_TOKEN
+                    valueFrom:
+                      secretKeyRef:
+                        name: muse-api-keys
+                        key: DISCORD_TOKEN
+                  - name: DATA_DIR
+                    value: ./data
+                  - name: YOUTUBE_API_KEY
+                    valueFrom:
+                      secretKeyRef:
+                        name: muse-api-keys
+                        key: YOUTUBE_API_KEY
+                  - name: SPOTIFY_CLIENT_ID
+                    valueFrom:
+                      secretKeyRef:
+                        name: muse-api-keys
+                        key: SPOTIFY_CLIENT_ID
+                  - name: SPOTIFY_CLIENT_SECRET
+                    valueFrom:
+                      secretKeyRef:
+                        name: muse-api-keys
+                        key: SPOTIFY_CLIENT_SECRET
 
         service:
           main:
