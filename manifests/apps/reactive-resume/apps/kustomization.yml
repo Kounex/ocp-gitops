@@ -1,18 +1,25 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+namespace: reactive-resume
+
+commonLabels:
+  app.kubernetes.io/part-of: reactive-resume
+
 resources:
-  - app-project.yml
+  - app/deployment.yml
+  - app/service.yml
 
-  - application-postgresql.yml
-  - application-server.yml
-  - application-client.yml
+  - chrome/deployment.yml
+  - chrome/service.yml
 
-  - sealed-secrets-postgresql.yml
-  - sealed-secrets-server.yml
+  - minio/deployment.yml
+  - minio/pvc.yml
+  - minio/service.yml
 
-  - role.yml
+  - postgres/deployment.yml
+  - postgres/pvc.yml
+  - postgres/service.yml
 
-  - role-binding-postgresql.yml
-  - role-binding-server.yml
-  - role-binding-client.yml
+  - redis/deployment.yml
+  - redis/service.yml

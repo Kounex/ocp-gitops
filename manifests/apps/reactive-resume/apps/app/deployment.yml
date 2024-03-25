@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  labels:
+    app: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+        app: app
+    spec:
+      containers:
+        - image: amruthpillai/reactive-resume:4.0.9
+          name: app
+          env:
+            - name: ACCESS_TOKEN_SECRET
+              value: access_token_secret
+            - name: CHROME_TOKEN
+              value: chrome_token
+            - name: CHROME_URL
+              value: ws://localhost:9002
+            - name: DATABASE_URL
+              value: postgresql://postgres:postgres@postgres:8080/postgres
+            - name: GITHUB_CALLBACK_URL
+              value: http://localhost:8989/api/auth/github/callback
+            - name: GITHUB_CLIENT_ID
+              value: github_client_id
+            - name: GITHUB_CLIENT_SECRET
+              value: github_client_secret
+            - name: GOOGLE_CALLBACK_URL
+              value: http://localhost:8989/api/auth/google/callback
+            - name: GOOGLE_CLIENT_ID
+              value: google_client_id
+            - name: GOOGLE_CLIENT_SECRET
+              value: google_client_secret
+            - name: MAIL_FROM
+              value: noreply@localhost
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: 8989
+            - name: PUBLIC_URL
+              value: http://localhost:8989
+            - name: REDIS_URL
+              value: redis://default:password@redis:9001
+            - name: REFRESH_TOKEN_SECRET
+              value: refresh_token_secret
+            - name: STORAGE_ACCESS_KEY
+              value: minioadmin
+            - name: STORAGE_BUCKET
+              value: default
+            - name: STORAGE_ENDPOINT
+              value: minio
+            - name: STORAGE_PORT
+              value: 9000
+            - name: STORAGE_REGION
+              value: eu-west-1
+            - name: STORAGE_SECRET_KEY
+              value: minioadmin
+            - name: STORAGE_URL
+              value: http://localhost:9000/default
+            - name: STORAGE_USE_SSL
+              value: "false"
+          ports:
+            - containerPort: 8989
+      restartPolicy: Always

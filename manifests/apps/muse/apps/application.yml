@@ -16,6 +16,7 @@ spec:
     targetRevision: 3.0.4
     helm:
       values: |-
+
         controllers:
           main:
             strategy: RollingUpdate
