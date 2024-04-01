@@ -5,7 +5,7 @@ resources:
   # - nayris
   # - github-runner
   # - chatbot-ui
-  # - sharry
+  - sharry
   # - connectware
   - muse
   # - manuela-visual-inspection-ui

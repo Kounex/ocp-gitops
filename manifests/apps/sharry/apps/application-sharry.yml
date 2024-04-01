@@ -13,53 +13,61 @@ spec:
   source:
     chart: app-template
     repoURL: https://bjw-s.github.io/helm-charts
-    targetRevision: 1.5.1
+    targetRevision: 3.0.4
     helm:
       values: |-
 
+        controllers:
+          main:
+            strategy: RollingUpdate
 
-        image:
-          repository: eikek0/sharry
-          tag: v1.11.0
-          pullPolicy: IfNotPresent
-        env:
-          - name: TZ
-            value: Europe/Berlin
-          - name: POSTGRESQL_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: sharry-postgresql
-                key: postgres-password
-          - name: SHARRY_OAUTH_CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: sharry-credentials
-                key: client-secret
-          - name: SHARRY_ADMIN_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: sharry-credentials
-                key: admin-password
-          - name: SHARRY_INVITE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: sharry-credentials
-                key: invite-password
-          - name: SHARRY_SMTP_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: sharry-credentials
-                key: smtp-username
-          - name: SHARRY_SMTP_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: sharry-credentials
-                key: smtp-password
+            containers:
+              main:
+                image:
+                  repository: eikek0/sharry
+                  tag: v1.13.2
+                  pullPolicy: IfNotPresent
+                args:
+                  - "/opt/config/sharry.conf"
+                env:
+                  - name: TZ
+                    value: Europe/Berlin
+                  - name: POSTGRESQL_PASSWORD
+                    valueFrom:
+                      secretKeyRef:
+                        name: sharry-postgresql
+                        key: postgres-password
+                  - name: SHARRY_OAUTH_CLIENT_SECRET
+                    valueFrom:
+                      secretKeyRef:
+                        name: sharry-credentials
+                        key: client-secret
+                  - name: SHARRY_ADMIN_PASSWORD
+                    valueFrom:
+                      secretKeyRef:
+                        name: sharry-credentials
+                        key: admin-password
+                  - name: SHARRY_INVITE_PASSWORD
+                    valueFrom:
+                      secretKeyRef:
+                        name: sharry-credentials
+                        key: invite-password
+                  - name: SHARRY_SMTP_USERNAME
+                    valueFrom:
+                      secretKeyRef:
+                        name: sharry-credentials
+                        key: smtp-username
+                  - name: SHARRY_SMTP_PASSWORD
+                    valueFrom:
+                      secretKeyRef:
+                        name: sharry-credentials
+                        key: smtp-password
 
-        dnsConfig:
-          options:
-            - name: ndots
-              value: "1"
+        defaultPodOptions:
+          dnsConfig:
+            options:
+              - name: ndots
+                value: "1"
 
         configMaps: 
           config:
@@ -127,13 +135,9 @@ spec:
                   }
                 }
 
-        args:
-        - "/opt/config/sharry.conf"
-
         persistence:
           config:
             name: sharry-config
-            enabled: true
             type: configMap
             mountPath: /opt/config
 
@@ -145,7 +149,6 @@ spec:
 
         ingress:
           main:
-            enabled: true
             annotations:
               route.openshift.io/termination: "edge"
             hosts:

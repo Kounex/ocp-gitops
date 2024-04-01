@@ -7,5 +7,5 @@ resources:
   - application-sharry.yml
   - role.yml
   - role-binding.yml
-  - sealed-secrets-postgresql.yml
-  - sealed-secrets-credentials.yml
+  - external-secret-postgresql.yml
+  - external-secret-credentials.yml
