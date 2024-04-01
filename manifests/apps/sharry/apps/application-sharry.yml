@@ -123,6 +123,7 @@ spec:
                           user-id-key = "preferred_username"
                           client-id = "sharry"
                           client-secret = ${SHARRY_OAUTH_CLIENT_SECRET}
+                          scope = ""
                         }
                       ]
                       fixed {
