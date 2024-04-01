@@ -6,5 +6,5 @@ resources:
   - auth
   - login-theme
   - cert-manager
-  # - lvm-storage
+  - lvm-storage
   # - sealed-secrets
