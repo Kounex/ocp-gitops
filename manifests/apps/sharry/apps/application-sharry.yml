@@ -159,7 +159,8 @@ spec:
                 - path: /
                   pathType: Prefix
                   service:
-                    port: 9090
+                    identifier: main
+                    port: http
   syncPolicy:
     automated:
       prune: true
