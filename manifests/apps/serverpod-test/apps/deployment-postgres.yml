@@ -17,6 +17,8 @@ spec:
         app: serverpod-test-postgres
     spec:
       serviceAccountName: serverpod-test
+      securityContext:
+        runAsNonRoot: false
       containers:
         - name: postgres
           env:

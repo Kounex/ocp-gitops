@@ -17,6 +17,8 @@ spec:
         app: serverpod-test
     spec:
       serviceAccountName: serverpod-test
+      securityContext:
+        runAsNonRoot: false
       containers:
         - name: serverpod
           image: ghcr.io/kounex/serverpod-test:1.0.0
