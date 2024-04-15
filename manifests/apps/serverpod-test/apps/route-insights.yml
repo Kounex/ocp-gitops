@@ -1,0 +1,18 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: nginx-client
+  labels:
+    app: serverpod-test
+spec:
+  host: serverpod-test.apps.ocp.kounex.com
+  path: /insights
+  to:
+    kind: Service
+    name: serverpod
+    weight: 100
+  port:
+    targetPort: insights
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

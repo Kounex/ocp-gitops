@@ -1,0 +1,12 @@
+kind: Kustomization
+
+namespace: serverpod-test
+
+resources:
+  - pvc-postgres.yml
+
+  - service-postgres.yml
+  - service-serverpod.yml
+
+  - deployment-postgres.yml
+  - deployment-serverpod.yml

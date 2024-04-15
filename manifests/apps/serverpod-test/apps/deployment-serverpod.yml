@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: serverpod
+  labels:
+    app: serverpod-test
+spec:
+  containers:
+    - image: ghcr.io/kounex/serverpod-test:1.0.0
+      name: serverpod
+  restartPolicy: OnFailure
