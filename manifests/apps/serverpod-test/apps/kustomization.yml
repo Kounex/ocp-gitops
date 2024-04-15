@@ -15,3 +15,7 @@ resources:
 
   - deployment-postgres.yml
   - deployment-serverpod.yml
+
+  - route-api.yml
+  - route-insights.yml
+  - route-web.yml
