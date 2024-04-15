@@ -1,11 +1,11 @@
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: serverpod-test-anyuid
+  name: serverpod-test-hostaccess
 subjects:
   - kind: ServiceAccount
     name: serverpod-test
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: 'system:openshift:scc:anyuid'
+  name: 'system:openshift:scc:hostaccess'
