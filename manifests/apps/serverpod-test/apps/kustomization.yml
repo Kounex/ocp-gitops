@@ -5,6 +5,9 @@ namespace: serverpod-test
 resources:
   - namespace.yml
 
+  - service-account.yml
+  - role-binding.yml
+
   - pvc.yml
 
   - service-postgres.yml
