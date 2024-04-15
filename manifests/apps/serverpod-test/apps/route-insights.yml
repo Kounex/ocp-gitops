@@ -1,7 +1,7 @@
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: nginx-client
+  name: serverpod-test-insights
   labels:
     app: serverpod-test
 spec:
