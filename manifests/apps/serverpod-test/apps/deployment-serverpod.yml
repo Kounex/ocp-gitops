@@ -16,6 +16,7 @@ spec:
       labels:
         app: serverpod-test
     spec:
+      serviceAccountName: serverpod-test
       containers:
         - name: serverpod
           image: ghcr.io/kounex/serverpod-test:1.0.0

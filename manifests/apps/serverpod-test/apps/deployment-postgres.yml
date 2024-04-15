@@ -16,6 +16,7 @@ spec:
       labels:
         app: serverpod-test-postgres
     spec:
+      serviceAccountName: serverpod-test
       containers:
         - name: postgres
           env:
