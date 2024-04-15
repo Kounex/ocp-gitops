@@ -1,29 +1,40 @@
-apiVersion: v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
   labels:
-    app: serverpod-test
+    app: serverpod-test-postgres
 spec:
-  containers:
-    - env:
-        - name: POSTGRES_DB
-          value: projectname
-        - name: POSTGRES_PASSWORD
-          value: postgres
-        - name: POSTGRES_USER
-          value: postgres
-      image: postgres:14.1
-      name: postgres
-      ports:
-        - containerPort: 5432
-          hostPort: 5432
-          protocol: TCP
-      volumeMounts:
-        - mountPath: /var/lib/postgresql/data
-          name: projectname-data
-  restartPolicy: OnFailure
-  volumes:
-    - name: projectname-data
-      persistentVolumeClaim:
-        claimName: projectname-data
+  replicas: 1
+  selector:
+    matchLabels:
+      app: serverpod-test-postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: serverpod-test-postgres
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: serverpod-test
+            - name: POSTGRES_PASSWORD
+              value: postgres
+            - name: POSTGRES_USER
+              value: postgres
+          image: postgres:14.1
+          name: postgres
+          ports:
+            - containerPort: 5432
+              hostPort: 5432
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres
+      restartPolicy: OnFailure
+      volumes:
+        - name: postgres
+          persistentVolumeClaim:
+            claimName: postgres

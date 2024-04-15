@@ -1,11 +1,32 @@
-apiVersion: v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: serverpod
   labels:
     app: serverpod-test
 spec:
-  containers:
-    - image: ghcr.io/kounex/serverpod-test:1.0.0
-      name: serverpod
-  restartPolicy: OnFailure
+  replicas: 1
+  selector:
+    matchLabels:
+      app: serverpod-test
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: serverpod-test
+    spec:
+      containers:
+        - image: ghcr.io/kounex/serverpod-test:1.0.0
+          name: serverpod
+          ports:
+            - containerPort: 8080
+              hostPort: 8080
+              protocol: TCP
+            - containerPort: 8081
+              hostPort: 8081
+              protocol: TCP
+            - containerPort: 8082
+              hostPort: 8082
+              protocol: TCP
+      restartPolicy: OnFailure
