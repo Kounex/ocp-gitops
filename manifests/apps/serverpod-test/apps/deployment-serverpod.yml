@@ -21,7 +21,7 @@ spec:
         runAsNonRoot: false
       containers:
         - name: serverpod
-          image: ghcr.io/kounex/serverpod-test:1.0.0
+          image: ghcr.io/kounex/serverpod-test:1.0.1
           ports:
             - containerPort: 8080
               hostPort: 8080
