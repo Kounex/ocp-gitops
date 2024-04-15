@@ -17,8 +17,8 @@ spec:
         app: serverpod-test
     spec:
       containers:
-        - image: ghcr.io/kounex/serverpod-test:1.0.0
-          name: serverpod
+        - name: serverpod
+          image: ghcr.io/kounex/serverpod-test:1.0.0
           ports:
             - containerPort: 8080
               hostPort: 8080
@@ -29,4 +29,5 @@ spec:
             - containerPort: 8082
               hostPort: 8082
               protocol: TCP
-      restartPolicy: OnFailure
+          imagePullPolicy: Always
+      restartPolicy: Always
