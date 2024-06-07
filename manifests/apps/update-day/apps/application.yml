@@ -1,0 +1,61 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: update-day
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '220'
+spec:
+  destination:
+    namespace: update-day
+    server: https://kubernetes.default.svc
+  project: update-day
+  source:
+    chart: app-template
+    repoURL: https://bjw-s.github.io/helm-charts
+    targetRevision: 3.0.4
+    helm:
+      values: |-
+
+        controllers:
+          main:
+            strategy: RollingUpdate
+
+            labels:
+              app.openshift.io/runtime: nodejs
+
+            containers:
+              main:
+                image:
+                  repository: ghcr.io/kounex/manuela-visual-inspection-ui
+                  tag: 0.8.0
+                  pullPolicy: IfNotPresent
+
+                env:
+                  - name: DISCORD_TOKEN
+                    valueFrom:
+                      secretKeyRef:
+                        name: muse-api-keys
+                        key: DISCORD_TOKEN
+                  - name: DATA_DIR
+                    value: ./data
+
+        service:
+          main:
+            enabled: false
+            controller: main
+            ports:
+              http:
+                port: 8989
+
+        serviceAccount:
+          create: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        argocd.argoproj.io/managed-by: openshift-gitops
+    syncOptions:
+      - CreateNamespace=true

@@ -11,3 +11,4 @@ resources:
   # - manuela-visual-inspection-ui
   # - reactive-resume
   - serverpod-test
+  - update-day
