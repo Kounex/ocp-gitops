@@ -35,7 +35,7 @@ spec:
                   - name: DISCORD_TOKEN
                     valueFrom:
                       secretKeyRef:
-                        name: update-day-keys
+                        name: update-day-api-keys
                         key: DISCORD_TOKEN
                   - name: DATA_DIR
                     value: ./data
