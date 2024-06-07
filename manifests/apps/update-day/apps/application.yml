@@ -27,7 +27,7 @@ spec:
             containers:
               main:
                 image:
-                  repository: ghcr.io/kounex/manuela-visual-inspection-ui
+                  repository: ghcr.io/kounex/update-day
                   tag: 0.8.0
                   pullPolicy: IfNotPresent
 
