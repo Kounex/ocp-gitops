@@ -28,7 +28,7 @@ spec:
               main:
                 image:
                   repository: ghcr.io/kounex/update-day
-                  tag: 0.8.0
+                  tag: 0.8.1
                   pullPolicy: IfNotPresent
 
                 env:
@@ -39,6 +39,13 @@ spec:
                         key: DISCORD_TOKEN
                   - name: DATA_DIR
                     value: ./data
+
+        persistence:
+          data:
+            enabled: true
+            storageClass: lvms-vg1
+            accessMode: ReadWriteOnce
+            size: 5Gi
 
         service:
           main:
