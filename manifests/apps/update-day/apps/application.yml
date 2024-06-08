@@ -28,7 +28,7 @@ spec:
               main:
                 image:
                   repository: ghcr.io/kounex/update-day
-                  tag: 0.8.11
+                  tag: 0.8.12
                   pullPolicy: IfNotPresent
 
                 env:
@@ -46,6 +46,7 @@ spec:
             storageClass: lvms-vg1
             accessMode: ReadWriteOnce
             size: 5Gi
+            mountPath: /usr/app/data
 
         service:
           main:
