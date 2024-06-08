@@ -46,7 +46,8 @@ spec:
             storageClass: lvms-vg1
             accessMode: ReadWriteOnce
             size: 5Gi
-            mountPath: /usr/app/data
+            globalMounts:
+              - path: /usr/app/data
 
         service:
           main:
