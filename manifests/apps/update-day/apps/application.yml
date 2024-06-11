@@ -28,7 +28,7 @@ spec:
               main:
                 image:
                   repository: ghcr.io/kounex/update-day
-                  tag: 0.9.12
+                  tag: 0.9.13
                   pullPolicy: IfNotPresent
 
                 env:
