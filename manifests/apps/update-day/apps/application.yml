@@ -28,11 +28,7 @@ spec:
               main:
                 image:
                   repository: ghcr.io/kounex/update-day
-<<<<<<< HEAD
                   tag: 0.9.32
-=======
-                  tag: 0.9.30
->>>>>>> b7238bddd4a9e3a290de8d6f52b573b745e3ffa4
                   pullPolicy: IfNotPresent
 
                 env:
