@@ -29,7 +29,10 @@ spec:
           annotations:
             route.openshift.io/termination: "edge"
           hosts:
-            host: gitea.apps.ocp.kounex.com
+            - host: gitea.apps.ocp.kounex.com
+              paths:
+                - path: /
+                  pathType: Prefix
 
         serviceAccount:
           create: true
