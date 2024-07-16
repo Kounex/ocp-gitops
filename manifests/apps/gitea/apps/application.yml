@@ -26,10 +26,10 @@ spec:
 
         ingress:
           enabled: true
-          hosts:
-            - host: gitea.apps.ocp.kounex.com
           annotations:
             route.openshift.io/termination: "edge"
+          hosts:
+            host: gitea.apps.ocp.kounex.com
 
         serviceAccount:
           create: true
