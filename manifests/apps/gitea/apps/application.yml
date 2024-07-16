@@ -28,7 +28,10 @@ spec:
           enabled: true
           annotations:
             route.openshift.io/termination: "edge"
-            
+
+        serviceAccount:
+          create: true
+
   destination:
     namespace: gitea
     server: https://kubernetes.default.svc
