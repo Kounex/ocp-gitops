@@ -12,3 +12,4 @@ resources:
   # - reactive-resume
   - serverpod-test
   - update-day
+  - gitea
