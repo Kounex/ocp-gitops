@@ -17,11 +17,12 @@ spec:
         gitea:
           config:
             APP_NAME: "Gitea: With a cup of tea."
-            LFS_START_SERVER: true
-            admin:
-              existingSecret: gitea-admin
             repository:
               ROOT: "~/gitea-repositories"
+            admin:
+              existingSecret: gitea-admin
+            server:
+              LFS_START_SERVER: true
   destination:
     namespace: gitea
     server: https://kubernetes.default.svc
