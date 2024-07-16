@@ -1,0 +1,17 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: gitea
+  labels:
+    app: gitea
+    app.kubernetes.io/part-of: gitea
+annotations:
+    argocd.argoproj.io/sync-wave: '240'
+spec:
+  to:
+    kind: Service
+    name: gitea-http
+    weight: 100
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
