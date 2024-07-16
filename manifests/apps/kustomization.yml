@@ -10,6 +10,6 @@ resources:
   - muse
   # - manuela-visual-inspection-ui
   # - reactive-resume
-  - serverpod-test
+  # - serverpod-test
   - update-day
   - gitea
