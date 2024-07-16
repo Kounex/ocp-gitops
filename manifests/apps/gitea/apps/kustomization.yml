@@ -4,4 +4,6 @@ kind: Kustomization
 resources:
   - app-project.yml
   - external-secret-admin-password.yml
+  - role.yml
+  - role-binding.yml
   - application.yml
