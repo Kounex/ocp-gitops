@@ -7,4 +7,4 @@ resources:
   - role.yml
   - role-binding.yml
   - application.yml
-  - route.yml
+  # - route.yml

@@ -23,6 +23,10 @@ spec:
               existingSecret: gitea-admin
             server:
               LFS_START_SERVER: true
+            ingress:
+              enabled: true
+              annotations:
+                route.openshift.io/termination: "edge"
   destination:
     namespace: gitea
     server: https://kubernetes.default.svc
