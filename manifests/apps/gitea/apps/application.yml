@@ -8,11 +8,22 @@ metadata:
 spec:
   project: gitea
   source:
-    path: OLMDeploy
-    repoURL: https://github.com/rhpds/gitea-operator.git
-    targetRevision: main
+    chart: gitea
+    repoURL: https://gitea.com/gitea/helm-chart
+    targetRevision: 10.3.0
+    helm:
+      values: |-
+
+        gitea:
+          config:
+            APP_NAME: "Gitea: With a cup of tea."
+            LFS_START_SERVER: true
+            admin:
+              existingSecret: gitea-admin
+            repository:
+              ROOT: "~/gitea-repositories"
   destination:
-    namespace: gitea-operator
+    namespace: gitea
     server: https://kubernetes.default.svc
   syncPolicy:
     automated:
