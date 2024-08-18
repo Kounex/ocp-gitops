@@ -27,7 +27,7 @@ spec:
             containers:
               main:
                 image:
-                  repository: ghcr.io/codetheweb/muse
+                  repository: ghcr.io/museofficial/muse
                   tag: pr-1066
                   pullPolicy: IfNotPresent
 
