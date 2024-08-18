@@ -28,7 +28,7 @@ spec:
               main:
                 image:
                   repository: ghcr.io/museofficial/muse
-                  tag: 5bf5547cd1fc7cc90a2e34e1c569d91bff47da51
+                  tag: 5bf5547cd1fc7cc90a2e34e1c569d91bff47da51-amd64
                   pullPolicy: IfNotPresent
 
                 env:
