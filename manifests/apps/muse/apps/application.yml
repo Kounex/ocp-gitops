@@ -28,7 +28,7 @@ spec:
               main:
                 image:
                   repository: ghcr.io/museofficial/muse@sha256
-                  tag: 9d284c72cccc6e832fe133c432f8a1ef3c568f1f40871ceb617611a58b3ee37c
+                  tag: c78648e48ef6339fecf41114fbc3030fafb27c35bec67e06a7e0145ec4dcc561
                   pullPolicy: IfNotPresent
 
                 env:
