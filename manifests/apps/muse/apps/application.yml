@@ -27,8 +27,8 @@ spec:
             containers:
               main:
                 image:
-                  repository: docker.io/codetheweb/muse
-                  tag: 2.9.1
+                  repository: ghcr.io/codetheweb/muse
+                  tag: pr-1066
                   pullPolicy: IfNotPresent
 
                 env:
