@@ -27,7 +27,7 @@ spec:
             containers:
               main:
                 image:
-                  repository: ghcr.io/museofficial/muse
+                  repository: ghcr.io/museofficial/muse@sha256
                   tag: c78648e48ef6339fecf41114fbc3030fafb27c35bec67e06a7e0145ec4dcc561
                   pullPolicy: IfNotPresent
 
