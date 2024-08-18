@@ -28,7 +28,7 @@ spec:
               main:
                 image:
                   repository: ghcr.io/museofficial/muse
-                  tag: pr-1066-amd64
+                  tag: 5bf5547-amd64
                   pullPolicy: IfNotPresent
 
                 env:
