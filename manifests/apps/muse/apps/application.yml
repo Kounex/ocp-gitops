@@ -28,7 +28,7 @@ spec:
               main:
                 image:
                   repository: ghcr.io/museofficial/muse
-                  tag: 2.10.0
+                  tag: 2.11.1
                   pullPolicy: IfNotPresent
 
                 env:
