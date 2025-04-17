@@ -5,5 +5,5 @@ resources:
   - app-project.yml
   - application.yml
   - external-secret-api-keys.yml
-  - role.yml
-  - role-binding.yml
+  # - role.yml
+  # - role-binding.yml
