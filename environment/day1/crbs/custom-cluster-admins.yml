@@ -14,4 +14,5 @@ subjects:
     name: cluster-admins
   - apiGroup: rbac.authorization.k8s.io
     kind: ServiceAccount
+    namespace: openshift-gitops
     name: openshift-gitops-argocd-application-controller
