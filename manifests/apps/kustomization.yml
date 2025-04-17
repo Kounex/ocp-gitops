@@ -7,9 +7,9 @@ resources:
   # - chatbot-ui
   - sharry
   # - connectware
-  - muse
+  # - muse
   # - manuela-visual-inspection-ui
   # - reactive-resume
   # - serverpod-test
   - update-day
-  - gitea
+  # - gitea
