@@ -37,8 +37,22 @@ spec:
                 env:
                   - name: NODE_ENV
                     value: production
-                  - name: NEXT_PUBLIC_API_BASE_URL
-                    value: "http://api.bracket.apps.ocp.kounex.com"
+                  # - name: NEXT_PUBLIC_API_BASE_URL
+                  #   value: https://api.bracket.apps.ocp.kounex.com
+
+        configMaps: 
+          config:
+            enabled: true
+            data: 
+              .env: |
+                NEXT_PUBLIC_API_BASE_URL=/api
+
+        persistence:
+          config:
+            name: bracket-frontend-config
+            type: configMap
+            globalMounts:
+              - path: /app
 
         service:
           main:
