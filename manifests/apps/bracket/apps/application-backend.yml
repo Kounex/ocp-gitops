@@ -82,7 +82,7 @@ spec:
             annotations:
               route.openshift.io/termination: "edge"
             hosts:
-            - host: api.bracket.apps.ocp.kounex.com
+            - host: bracket-api.apps.ocp.kounex.com
               paths:
                 - path: /
                   pathType: Prefix

@@ -43,28 +43,28 @@ spec:
                   - name: NODE_ENV
                     value: production
                   - name: NEXT_PUBLIC_API_BASE_URL
-                    value: https://api.bracket.apps.ocp.kounex.com
+                    value: https://bracket-api.apps.ocp.kounex.com
 
-        configMaps:
-          config:
-            enabled: true
-            data: 
-              .env: |-
-                NEXT_PUBLIC_API_BASE_URL=https://api.bracket.apps.ocp.kounex.com
-                FOO=BAR
-              docker-entrypoint.sh: |-
-                #!/bin/bash
-                cp /app/custom-scripts/.env /app
+        # configMaps:
+        #   config:
+        #     enabled: true
+        #     data: 
+        #       .env: |-
+        #         NEXT_PUBLIC_API_BASE_URL=https://api.bracket.apps.ocp.kounex.com
+        #         FOO=BAR
+        #       docker-entrypoint.sh: |-
+        #         #!/bin/bash
+        #         cp /app/custom-scripts/.env /app
 
-                exec "yarn" "start"
+        #         exec "yarn" "start"
 
-        persistence:
-          config:
-            name: bracket-frontend-config
-            type: configMap
-            defaultMode: 0777
-            globalMounts:
-              - path: /app/custom-scripts
+        # persistence:
+        #   config:
+        #     name: bracket-frontend-config
+        #     type: configMap
+        #     defaultMode: 0777
+        #     globalMounts:
+        #       - path: /app/custom-scripts
 
         service:
           main:
