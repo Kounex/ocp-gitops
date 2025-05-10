@@ -38,7 +38,7 @@ spec:
                   - name: NODE_ENV
                     value: production
                   - name: NEXT_PUBLIC_API_BASE_URL
-                    value: https://api.bracket.apps.ocp.kounex.com
+                    value: "https://api.bracket.apps.ocp.kounex.com"
 
         service:
           main:
