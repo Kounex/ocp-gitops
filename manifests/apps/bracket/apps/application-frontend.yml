@@ -50,7 +50,7 @@ spec:
             enabled: true
             data: 
               .env: |-
-                NEXT_PUBLIC_API_BASE_URL=/api
+                NEXT_PUBLIC_API_BASE_URL=https://api.bracket.apps.ocp.kounex.com
                 FOO=BAR
               docker-entrypoint.sh: |-
                 #!/bin/bash
