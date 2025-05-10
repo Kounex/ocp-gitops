@@ -8,7 +8,7 @@ resources:
   - external-secret-admin.yml
 
   - role.yml
-  - role-binding-yml
+  - role-binding.yml
 
   - application-postgresql.yml
   - application-backend.yml
