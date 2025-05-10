@@ -22,7 +22,7 @@ spec:
           storageClass: lvms-vg1
           postgresql:
             auth:
-              username: bracket
+              username: bracket_prod
               database: bracket_prod
               existingSecret: brackets-postgresql
         serviceAccount:

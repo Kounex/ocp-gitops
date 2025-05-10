@@ -42,11 +42,13 @@ spec:
                   - name: ENVIRONMENT
                     value: PRODUCTION
                   - name: PG_DSN
-                    value: postgresql://bracket:bracket_prod@brackets-db-postgresql:5432/bracket_prod
+                    value: postgresql://bracket_prod:bracket_prod@brackets-db-postgresql:5432/bracket_prod
                   - name: CORS_ORIGIN_REGEX
                     value: https://*\.kounex\.com
                   - name: JWT_SECRET
-                    value: 5cdd32f72a145ea257a569abf36b61050af70f541e92ddc8994b5577444775b97337c6c588f17d32e214536249d7c8f6312d014b03f474533557b86f159ea3995466f43ef5f6bd8992a09ef2ed4a553f6bf970674b62785955ccc5cb0bab7af43815556f2c800054862193fd0e4e3646fedf46fa5fa20396611137ed429ed267fe6994968df19f6cafbb09a3054d287525b4bd25cb74225c97bf953dabf2a9ce7906cebacdc576056b88b049098a901ba9261d96de3acacfc77a8eb643f26b0f4d92f9a225827ce9f284ba5092efc3c846b35a6492fc9206d1ffd89a533ba2e97b57c05fa74bb491dc2d8aca73b764d933d8517e4f63391a7911aa9b0d26a477
+                    value: f0e050bb786b8b10fc1abc9efbd0cd5e6b69f739011714b46c4224ee30c80af5
+                  - name: ALLOW_INSECURE_HTTP_SSO
+                    value: false
                   - name: ADMIN_EMAIL
                     valueFrom:
                       secretKeyRef:
