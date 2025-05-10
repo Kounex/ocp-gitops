@@ -21,8 +21,8 @@ spec:
           main:
             strategy: RollingUpdate
 
-            # annotations:
-            #   openshift.io/required-scc: anyuid
+            annotations:
+              openshift.io/required-scc: anyuid
 
             labels:
               app.openshift.io/runtime: nodejs
