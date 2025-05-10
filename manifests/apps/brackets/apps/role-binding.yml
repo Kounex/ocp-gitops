@@ -7,7 +7,7 @@ metadata:
     argocd.argoproj.io/sync-wave: '230'
 subjects:
   - kind: ServiceAccount
-    name: brackets
+    name: brackets-backend
 roleRef:
   kind: Role
   name: scc-anyuid
