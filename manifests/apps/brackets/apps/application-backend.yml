@@ -42,7 +42,7 @@ spec:
                   - name: ENVIRONMENT
                     value: PRODUCTION
                   - name: PG_DSN
-                    value: postgresql://brackets-db-postgresql:5432/bracket_prod
+                    value: postgresql://bracket:bracket_pord@brackets-db-postgresql:5432/bracket_prod
                   - name: CORS_ORIGIN_REGEX
                     value: https://*\.kounex\.com
                   - name: JWT_SECRET
