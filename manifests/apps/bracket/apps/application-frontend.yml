@@ -36,15 +36,14 @@ spec:
                   tag: v2.2.2
                   pullPolicy: IfNotPresent
 
-                command: "NEXT_PUBLIC_API_BASE_URL=https://api.bracket.apps.ocp.kounex.com yarn"
-                args:
-                  - start
+                # command: "/app/custom-scripts/docker-entrypoint.sh"
+                # args: []
 
                 env:
                   - name: NODE_ENV
                     value: production
-                  # - name: NEXT_PUBLIC_API_BASE_URL
-                  #   value: https://api.bracket.apps.ocp.kounex.com
+                  - name: NEXT_PUBLIC_API_BASE_URL
+                    value: https://api.bracket.apps.ocp.kounex.com
 
         configMaps:
           config:
