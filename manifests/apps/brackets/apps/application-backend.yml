@@ -17,12 +17,13 @@ spec:
     helm:
       values: |-
 
+        global:
+          annotations:
+            openshift.io/required-scc: anyuid
+
         controllers:
           main:
             strategy: RollingUpdate
-
-            annotations:
-              openshift.io/required-scc: anyuid
 
             labels:
               app.openshift.io/runtime: nodejs
@@ -33,9 +34,6 @@ spec:
                   repository: ghcr.io/evroon/bracket-backend
                   tag: v2.2.2
                   pullPolicy: IfNotPresent
-
-                annotations:
-                  openshift.io/required-scc: anyuid
 
                 env:
                   - name: ENVIRONMENT
