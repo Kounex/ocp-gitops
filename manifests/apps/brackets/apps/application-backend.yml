@@ -17,7 +17,7 @@ spec:
     helm:
       values: |-
 
-        global:
+        defaultPodOptions:
           annotations:
             openshift.io/required-scc: anyuid
 
