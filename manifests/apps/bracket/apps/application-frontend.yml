@@ -36,8 +36,9 @@ spec:
                   tag: v2.2.2
                   pullPolicy: IfNotPresent
 
-                command: "/app/custom-scripts/docker-entrypoint.sh"
-                args: []
+                command: "NEXT_PUBLIC_API_BASE_URL=https://api.bracket.apps.ocp.kounex.com yarn"
+                args:
+                  - start
 
                 env:
                   - name: NODE_ENV
