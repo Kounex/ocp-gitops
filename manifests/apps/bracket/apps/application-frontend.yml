@@ -17,12 +17,14 @@ spec:
     helm:
       values: |-
 
+        defaultPodOptions:
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+
         controllers:
           main:
             strategy: RollingUpdate
-
-            # annotations:
-            #   openshift.io/required-scc: anyuid
 
             labels:
               app.openshift.io/runtime: nodejs
@@ -43,12 +45,13 @@ spec:
                   # - name: NEXT_PUBLIC_API_BASE_URL
                   #   value: https://api.bracket.apps.ocp.kounex.com
 
-        configMaps: 
-          lol:
+        configMaps:
+          config:
             enabled: true
             data: 
               .env: |-
                 NEXT_PUBLIC_API_BASE_URL=/api
+                FOO=BAR
               docker-entrypoint.sh: |-
                 #!/bin/bash
                 cp /app/custom-scripts/.env /app
@@ -57,7 +60,7 @@ spec:
 
         persistence:
           config:
-            name: bracket-frontend-lol
+            name: bracket-frontend-config
             type: configMap
             globalMounts:
               - path: /app/custom-scripts
