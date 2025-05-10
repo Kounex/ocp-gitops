@@ -28,6 +28,9 @@ spec:
             labels:
               app.openshift.io/runtime: nodejs
 
+            annotations:
+              openshift.io/required-scc: anyuid
+
             containers:
               main:
                 image:
