@@ -17,9 +17,9 @@ spec:
     helm:
       values: |-
 
-        defaultPodOptions:
-          annotations:
-            openshift.io/required-scc: anyuid
+        # defaultPodOptions:
+        #   annotations:
+        #     openshift.io/required-scc: anyuid
 
         controllers:
           main:
