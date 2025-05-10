@@ -62,6 +62,7 @@ spec:
           config:
             name: bracket-frontend-config
             type: configMap
+            defaultMode: 0777
             globalMounts:
               - path: /app/custom-scripts
 
