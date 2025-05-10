@@ -34,6 +34,9 @@ spec:
                   tag: v2.2.2
                   pullPolicy: IfNotPresent
 
+                command: "/app/custom-scripts/docker-entrypoint.sh"
+                args: []
+
                 env:
                   - name: NODE_ENV
                     value: production
@@ -41,18 +44,23 @@ spec:
                   #   value: https://api.bracket.apps.ocp.kounex.com
 
         configMaps: 
-          config:
+          lol:
             enabled: true
             data: 
-              .env: |
+              .env: |-
                 NEXT_PUBLIC_API_BASE_URL=/api
+              docker-entrypoint.sh: |-
+                #!/bin/bash
+                cp /app/custom-scripts/.env /app
+
+                exec "yarn" "start"
 
         persistence:
           config:
-            name: bracket-frontend-config
+            name: bracket-frontend-lol
             type: configMap
             globalMounts:
-              - path: /app
+              - path: /app/custom-scripts
 
         service:
           main:
