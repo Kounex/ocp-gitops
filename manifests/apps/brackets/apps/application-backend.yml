@@ -47,12 +47,12 @@ spec:
                     valueFrom:
                       secretKeyRef:
                         name: brackets-admin
-                        key: BRACKETS_ADMIN_EMAIL
+                        key: ADMIN_EMAIL
                   - name: ADMIN_PASSWORD
                     valueFrom:
                       secretKeyRef:
                         name: brackets-admin
-                        key: BRACKETS_ADMIN_PASSWORD
+                        key: ADMIN_PASSWORD
 
         persistence:
           data:
