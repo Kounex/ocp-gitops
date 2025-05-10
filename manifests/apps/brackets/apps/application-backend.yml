@@ -34,6 +34,9 @@ spec:
                   tag: v2.2.2
                   pullPolicy: IfNotPresent
 
+                annotations:
+                  openshift.io/required-scc: anyuid
+
                 env:
                   - name: ENVIRONMENT
                     value: PRODUCTION
