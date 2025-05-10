@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: brackets-db
+  name: bracket-db
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/sync-wave: '220'
 spec:
-  project: brackets
+  project: bracket
   destination:
-    namespace: brackets
+    namespace: bracket
     server: https://kubernetes.default.svc
   source:
     repoURL: https://charts.bitnami.com/bitnami
@@ -24,10 +24,10 @@ spec:
             auth:
               username: bracket_prod
               database: bracket_prod
-              existingSecret: brackets-postgresql
+              existingSecret: bracket-postgresql
         serviceAccount:
           create: true
-          name: brackets-db
+          name: bracket-db
 
   syncPolicy:
     automated:

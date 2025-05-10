@@ -2,12 +2,12 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: sa-to-scc-anyuid-backend
-  namespace: brackets
+  namespace: bracket
   annotations:
     argocd.argoproj.io/sync-wave: '230'
 subjects:
   - kind: ServiceAccount
-    name: brackets-backend
+    name: bracket-backend
 roleRef:
   kind: Role
   name: scc-anyuid

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: brackets-app
+  name: bracket-app
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/sync-wave: '200'
@@ -11,7 +11,7 @@ spec:
     namespace: openshift-gitops
     server: https://kubernetes.default.svc
   source:
-    path: manifests/apps/brackets/apps
+    path: manifests/apps/bracket/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
   syncPolicy:

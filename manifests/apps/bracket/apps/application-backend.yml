@@ -1,15 +1,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: brackets-backend
+  name: bracket-backend
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/sync-wave: '220'
 spec:
   destination:
-    namespace: brackets
+    namespace: bracket
     server: https://kubernetes.default.svc
-  project: brackets
+  project: bracket
   source:
     chart: app-template
     repoURL: https://bjw-s.github.io/helm-charts
@@ -42,7 +42,7 @@ spec:
                   - name: ENVIRONMENT
                     value: PRODUCTION
                   - name: PG_DSN
-                    value: postgresql://bracket_prod:bracket_prod@brackets-db-postgresql:5432/bracket_prod
+                    value: postgresql://bracket_prod:bracket_prod@bracket-db-postgresql:5432/bracket_prod
                   - name: CORS_ORIGIN_REGEX
                     value: https://*\.kounex\.com
                   - name: JWT_SECRET
@@ -52,12 +52,12 @@ spec:
                   - name: ADMIN_EMAIL
                     valueFrom:
                       secretKeyRef:
-                        name: brackets-admin
+                        name: bracket-admin
                         key: ADMIN_EMAIL
                   - name: ADMIN_PASSWORD
                     valueFrom:
                       secretKeyRef:
-                        name: brackets-admin
+                        name: bracket-admin
                         key: ADMIN_PASSWORD
 
         persistence:
@@ -82,7 +82,7 @@ spec:
             annotations:
               route.openshift.io/termination: "edge"
             hosts:
-            - host: api.brackets.apps.ocp.kounex.com
+            - host: api.bracket.apps.ocp.kounex.com
               paths:
                 - path: /
                   pathType: Prefix

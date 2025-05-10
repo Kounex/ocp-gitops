@@ -1,15 +1,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: brackets-frontend
+  name: bracket-frontend
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/sync-wave: '220'
 spec:
   destination:
-    namespace: brackets
+    namespace: bracket
     server: https://kubernetes.default.svc
-  project: brackets
+  project: bracket
   source:
     chart: app-template
     repoURL: https://bjw-s.github.io/helm-charts
@@ -38,7 +38,7 @@ spec:
                   - name: NODE_ENV
                     value: production
                   - name: NEXT_PUBLIC_API_BASE_URL
-                    value: https://api.brackets.apps.ocp.kounex.com
+                    value: https://api.bracket.apps.ocp.kounex.com
 
         service:
           main:
@@ -53,7 +53,7 @@ spec:
             annotations:
               route.openshift.io/termination: "edge"
             hosts:
-            - host: brackets.apps.ocp.kounex.com
+            - host: bracket.apps.ocp.kounex.com
               paths:
                 - path: /
                   pathType: Prefix
