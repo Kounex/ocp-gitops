@@ -8,6 +8,7 @@ resources:
   - external-secret-admin.yml
 
   - role.yml
+  - role-binding-frontend.yml
   - role-binding-backend.yml
   - role-binding-db.yml
 
