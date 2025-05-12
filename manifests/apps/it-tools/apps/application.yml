@@ -27,7 +27,7 @@ spec:
             containers:
               main:
                 image:
-                  repository: docker pull ghcr.io/bjw-s-labs/it-tools
+                  repository: ghcr.io/bjw-s-labs/it-tools
                   tag: sha256-4dfe650a4be1e13d59e37f2b2aa6b8faf915c8afb53a379ea5eaaba679a0a456
                   pullPolicy: IfNotPresent
 
