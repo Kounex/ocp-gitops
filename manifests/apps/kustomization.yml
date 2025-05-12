@@ -14,3 +14,4 @@ resources:
   - update-day
   # - gitea
   - bracket
+  - it-tools

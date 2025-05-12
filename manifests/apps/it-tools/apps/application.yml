@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: it-tools
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '220'
+spec:
+  destination:
+    namespace: it-tools
+    server: https://kubernetes.default.svc
+  project: it-tools
+  source:
+    chart: app-template
+    repoURL: https://bjw-s.github.io/helm-charts
+    targetRevision: 3.0.4
+    helm:
+      values: |-
+
+        controllers:
+          main:
+            strategy: RollingUpdate
+
+            labels:
+              app.openshift.io/runtime: nodejs
+
+            containers:
+              main:
+                image:
+                  repository: docker pull ghcr.io/bjw-s-labs/it-tools
+                  tag: sha256-4dfe650a4be1e13d59e37f2b2aa6b8faf915c8afb53a379ea5eaaba679a0a456
+                  pullPolicy: IfNotPresent
+
+        service:
+          main:
+            ports:
+              http:
+                port: 8080
+
+        ingress:
+          main:
+            enabled: true
+            annotations:
+              route.openshift.io/termination: "edge"
+            hosts:
+            - host: it-tools.apps.ocp.kounex.com
+              paths:
+                - path: /
+                  pathType: Prefix
+                  service:
+                    port: 8080
+
+        serviceAccount:
+          create: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        argocd.argoproj.io/managed-by: openshift-gitops
+    syncOptions:
+      - CreateNamespace=true
