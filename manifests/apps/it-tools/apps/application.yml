@@ -33,13 +33,13 @@ spec:
 
         service:
           main:
+            controller: main
             ports:
               http:
                 port: 8080
 
         ingress:
           main:
-            enabled: true
             annotations:
               route.openshift.io/termination: "edge"
             hosts:
