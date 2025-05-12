@@ -60,7 +60,8 @@ spec:
                 - path: /
                   pathType: Prefix
                   service:
-                    port: 8080
+                    identifier: main
+                    port: http
 
   syncPolicy:
     automated:
