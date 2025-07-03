@@ -14,7 +14,7 @@ spec:
         app: app
     spec:
       containers:
-        - image: amruthpillai/reactive-resume:4.0.9
+        - image: amruthpillai/reactive-resume:4.4.6
           name: app
           env:
             - name: ACCESS_TOKEN_SECRET
