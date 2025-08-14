@@ -28,7 +28,7 @@ spec:
               value: postgres
             - name: POSTGRES_USER
               value: postgres
-          image: postgres:14.1
+          image: postgres:14.19
           ports:
             - containerPort: 5432
               hostPort: 5432
