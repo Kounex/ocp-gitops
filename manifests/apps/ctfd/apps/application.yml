@@ -1,0 +1,64 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ctfd
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '220'
+spec:
+  destination:
+    namespace: ctfd
+    server: https://kubernetes.default.svc
+  project: ctfd
+  source:
+    chart: app-template
+    repoURL: https://bjw-s.github.io/helm-charts
+    targetRevision: 3.0.4
+    helm:
+      values: |-
+
+        controllers:
+          main:
+            strategy: RollingUpdate
+
+            labels:
+              app.openshift.io/runtime: nodejs
+
+            containers:
+              main:
+                image:
+                  repository: docker pull ghcr.io/ctfd/ctfd
+                  tag: 3.7.7
+                  pullPolicy: IfNotPresent
+
+        service:
+          main:
+            controller: main
+            ports:
+              http:
+                port: 8080
+
+        ingress:
+          main:
+            annotations:
+              route.openshift.io/termination: "edge"
+            hosts:
+            - host: ctfd.apps.ocp.kounex.com
+              paths:
+                - path: /
+                  pathType: Prefix
+                  service:
+                    identifier: main
+                    port: http
+
+        serviceAccount:
+          create: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        argocd.argoproj.io/managed-by: openshift-gitops
+    syncOptions:
+      - CreateNamespace=true
