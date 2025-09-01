@@ -62,6 +62,12 @@ spec:
                       secretKeyRef:
                         name: bracket-admin
                         key: ADMIN_PASSWORD
+                        
+        serviceAccount:
+          default:
+            enabled: true
+            labels:
+              name: bracket-backend
 
         persistence:
           data:

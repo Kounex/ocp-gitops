@@ -46,6 +46,12 @@ spec:
                   - name: DATA_DIR
                     value: ./data
 
+        serviceAccount:
+          default:
+            enabled: true
+            labels:
+              name: update-day
+
         persistence:
           data:
             enabled: true

@@ -48,6 +48,12 @@ spec:
                   - name: NEXT_PUBLIC_API_BASE_URL
                     value: https://bracket-api.apps.ocp.kounex.com
 
+        serviceAccount:
+          default:
+            enabled: true
+            labels:
+              name: bracket-frontend
+
         # configMaps:
         #   config:
         #     enabled: true
