@@ -27,6 +27,9 @@ spec:
             labels:
               app.openshift.io/runtime: nodejs
 
+            serviceAccount:
+              name: update-day
+
             containers:
               main:
                 image:
@@ -60,8 +63,6 @@ spec:
               http:
                 port: 8989
 
-        serviceAccount:
-          name: update-day
   syncPolicy:
     automated:
       prune: true

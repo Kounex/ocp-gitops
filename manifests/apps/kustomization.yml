@@ -3,14 +3,9 @@ kind: Kustomization
 
 resources:
   # - nayris
-  # - github-runner
-  # - chatbot-ui
   - sharry
-  # - connectware
   # - muse
   # - manuela-visual-inspection-ui
-  # - reactive-resume
-  # - serverpod-test
   - update-day
   # - gitea
   - bracket

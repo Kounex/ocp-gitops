@@ -24,6 +24,9 @@ spec:
             labels:
               app.openshift.io/runtime: nodejs
 
+            serviceAccount:
+              name: it-tools
+
             containers:
               main:
                 image:
@@ -51,8 +54,6 @@ spec:
                     identifier: main
                     port: http
 
-        serviceAccount:
-          name: it-tools
   syncPolicy:
     automated:
       prune: true

@@ -24,6 +24,9 @@ spec:
             labels:
               app.openshift.io/runtime: nodejs
 
+            serviceAccount:
+              name: muse
+
             containers:
               main:
                 image:
@@ -63,8 +66,6 @@ spec:
               http:
                 port: 8989
 
-        serviceAccount:
-          name: muse
   syncPolicy:
     automated:
       prune: true

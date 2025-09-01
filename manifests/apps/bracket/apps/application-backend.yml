@@ -31,6 +31,9 @@ spec:
             annotations:
               openshift.io/required-scc: anyuid
 
+            serviceAccount:
+              name: bracket-backend
+
             containers:
               main:
                 image:
@@ -90,8 +93,6 @@ spec:
                     identifier: main
                     port: http
 
-        serviceAccount:
-          name: bracket-backend
   syncPolicy:
     automated:
       prune: true

@@ -29,6 +29,9 @@ spec:
             labels:
               app.openshift.io/runtime: nodejs
 
+            serviceAccount:
+              name: bracket-frontend
+
             containers:
               main:
                 image:
@@ -87,8 +90,6 @@ spec:
                     identifier: main
                     port: http
 
-        serviceAccount:
-          name: bracket-frontend
   syncPolicy:
     automated:
       prune: true
