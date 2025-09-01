@@ -27,7 +27,7 @@ spec:
             containers:
               main:
                 image:
-                  repository: docker pull ghcr.io/ctfd/ctfd
+                  repository: ghcr.io/ctfd/ctfd
                   tag: 3.7.7
                   pullPolicy: IfNotPresent
 
