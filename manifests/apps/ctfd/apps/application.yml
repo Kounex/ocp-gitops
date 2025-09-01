@@ -24,12 +24,21 @@ spec:
             labels:
               app.openshift.io/runtime: nodejs
 
+            serviceAccount:
+              name: ctfd
+
             containers:
               main:
                 image:
                   repository: ghcr.io/ctfd/ctfd
                   tag: 3.7.7
                   pullPolicy: IfNotPresent
+
+        serviceAccount:
+          default:
+            enabled: true
+            labels:
+              name: ctfd
 
         service:
           main:
@@ -50,6 +59,8 @@ spec:
                   service:
                     identifier: main
                     port: http
+
+        
 
   syncPolicy:
     automated:
