@@ -16,6 +16,8 @@ spec:
     targetRevision: 1.5.1
     helm:
       values: |-
+
+
         image:
           repository: ghcr.io/kounex/manuela-visual-inspection-ui
           tag: 1.1.1
@@ -25,8 +27,8 @@ spec:
           labels:
             app.openshift.io/runtime: nodejs
 
-        serviceAccount:
-          create: true
+        # serviceAccount:
+        #   create: true
 
         configMaps: 
           config:
