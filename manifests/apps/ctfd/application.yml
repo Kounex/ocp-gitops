@@ -11,7 +11,7 @@ spec:
     namespace: openshift-gitops
     server: https://kubernetes.default.svc
   source:
-    path: manifests/apps/it-tools/apps
+    path: manifests/apps/ctfd/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
   syncPolicy:
