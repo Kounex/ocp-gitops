@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - app-project.yml
   - application.yml
+  - role-binding.yml
