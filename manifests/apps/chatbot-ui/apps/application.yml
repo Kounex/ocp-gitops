@@ -27,8 +27,8 @@ spec:
           labels:
             app.openshift.io/runtime: nodejs
 
-        # serviceAccount:
-        #   create: true
+        serviceAccount:
+          name: chatbot-ui
 
         service:
           main:

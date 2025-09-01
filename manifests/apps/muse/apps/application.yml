@@ -63,8 +63,8 @@ spec:
               http:
                 port: 8989
 
-        # serviceAccount:
-        #   create: true
+        serviceAccount:
+          name: muse
   syncPolicy:
     automated:
       prune: true

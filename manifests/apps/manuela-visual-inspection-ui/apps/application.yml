@@ -27,8 +27,8 @@ spec:
           labels:
             app.openshift.io/runtime: nodejs
 
-        # serviceAccount:
-        #   create: true
+        serviceAccount:
+          name: manuela-visual-inspection
 
         configMaps: 
           config:

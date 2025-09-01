@@ -87,8 +87,8 @@ spec:
                     identifier: main
                     port: http
 
-        # serviceAccount:
-        #   create: true
+        serviceAccount:
+          name: bracket-frontend
   syncPolicy:
     automated:
       prune: true

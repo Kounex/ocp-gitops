@@ -25,9 +25,8 @@ spec:
               username: bracket_prod
               database: bracket_prod
               existingSecret: bracket-postgresql
-        # serviceAccount:
-        #   create: true
-        #   name: bracket-db
+        serviceAccount:
+          name: bracket-db
 
   syncPolicy:
     automated:

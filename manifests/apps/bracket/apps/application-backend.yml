@@ -90,8 +90,8 @@ spec:
                     identifier: main
                     port: http
 
-        # serviceAccount:
-        #   create: true
+        serviceAccount:
+          name: bracket-backend
   syncPolicy:
     automated:
       prune: true
