@@ -34,8 +34,8 @@ spec:
                 - path: /
                   pathType: Prefix
 
-        serviceAccount:
-          create: true
+        # serviceAccount:
+        #   create: true
 
   destination:
     namespace: gitea

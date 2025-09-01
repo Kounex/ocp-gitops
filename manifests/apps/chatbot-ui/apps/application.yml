@@ -16,6 +16,8 @@ spec:
     targetRevision: 1.5.1
     helm:
       values: |-
+
+      
         image:
           repository: ghcr.io/kounex/chatbot-ui
           tag: 0.1.0-rc52
@@ -25,8 +27,8 @@ spec:
           labels:
             app.openshift.io/runtime: nodejs
 
-        serviceAccount:
-          create: true
+        # serviceAccount:
+        #   create: true
 
         service:
           main:

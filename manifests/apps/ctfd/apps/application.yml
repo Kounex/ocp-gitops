@@ -51,8 +51,6 @@ spec:
                     identifier: main
                     port: http
 
-        serviceAccount:
-          create: true
   syncPolicy:
     automated:
       prune: true
