@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: nestjs-server
-          image: ghcr.io/kounex/nayris/nestjs-server:1.1.5
+          image: ghcr.io/kounex/nayris/nestjs-server:1.1.6
           ports:
             - name: 4444-tcp
               containerPort: 4444

@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: nginx-client
-          image: ghcr.io/kounex/nayris/nginx-client:1.1.5
+          image: ghcr.io/kounex/nayris/nginx-client:1.1.6
           ports:
             - name: 8080-tcp
               containerPort: 8080
