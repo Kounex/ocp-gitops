@@ -25,8 +25,8 @@ spec:
               username: sharry
               existingSecret: sharry-postgresql
               database: sharry
-        serviceAccount:
-          name: sharry-db
+        # serviceAccount:
+        #   name: sharry-db
 
   syncPolicy:
     automated:
