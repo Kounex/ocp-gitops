@@ -38,6 +38,12 @@ spec:
                 API_URL=http://dashboard-manuela-visual-inspection.apps.ocp5.stormshift.coe.muc.redhat.com/ui2
                 MOCK_MODE=true
 
+        serviceAccount:
+          default:
+            enabled: true
+            labels:
+              name: manuela-visual-inspection
+        
         persistence:
           config:
             name: manuela-visual-inspection-ui-config

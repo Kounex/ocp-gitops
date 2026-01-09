@@ -58,6 +58,12 @@ spec:
                         name: muse-api-keys
                         key: SPOTIFY_CLIENT_SECRET
 
+        serviceAccount:
+          default:
+            enabled: true
+            labels:
+              name: muse
+        
         service:
           main:
             enabled: false
