@@ -30,11 +30,17 @@ spec:
             - name: yt-cookies
               mountPath: /etc/secrets/youtube
               readOnly: true
+            - name: yt-po-token
+              mountPath: /etc/secrets/youtube
+              readOnly: true
           imagePullPolicy: Always
       volumes:
         - name: yt-cookies
           secret:
             secretName: yt-cookies
+        - name: yt-po-token
+          secret:
+            secretName: yt-po-token
       restartPolicy: Always
   strategy:
     type: Recreate
