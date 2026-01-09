@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - app-project.yml
-  - service-account-postgresql.yml
+  - service-account-postgresql.ym
   - application-postgresql.yml
   - application-sharry.yml
   - role.yml

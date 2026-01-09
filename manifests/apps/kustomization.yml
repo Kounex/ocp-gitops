@@ -3,11 +3,11 @@ kind: Kustomization
 
 resources:
   - nayris
-  - sharry
+  # - sharry
   # - muse
   # - manuela-visual-inspection-ui
   - update-day
   # - gitea
   - bracket
   - it-tools
-  - ctfd
+  # - ctfd
