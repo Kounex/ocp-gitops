@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: nestjs-server
-          image: ghcr.io/kounex/nayris/nestjs-server:1.1.7
+          image: ghcr.io/kounex/nayris/nestjs-server:1.1.8
           ports:
             - name: 4444-tcp
               containerPort: 4444
@@ -28,10 +28,10 @@ spec:
               value: '4444'
           volumeMounts:
             - name: yt-cookies
-              mountPath: /etc/secrets/youtube
+              mountPath: /etc/secrets/yt-cookies
               readOnly: true
             - name: yt-po-token
-              mountPath: /etc/secrets/youtube
+              mountPath: /etc/secrets/yt-po-token
               readOnly: true
           imagePullPolicy: Always
       volumes:
