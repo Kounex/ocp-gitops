@@ -138,7 +138,7 @@ spec:
 
         persistence:
           config:
-            name: sharry-config
+            name: sharry
             type: configMap
             globalMounts:
               - path: /opt/config
