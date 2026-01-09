@@ -6,6 +6,7 @@ namespace: nayris
 resources:
   - role.yml
   - role-binding.yml
+  - external-secret-yt-cookies.yml
   - deployment.yml
   - route.yml
   - service.yml

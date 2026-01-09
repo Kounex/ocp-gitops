@@ -26,7 +26,15 @@ spec:
           env:
             - name: PORT
               value: '4444'
+          volumeMounts:
+            - name: yt-cookies
+              mountPath: /etc/secrets/youtube
+              readOnly: true
           imagePullPolicy: Always
+      volumes:
+        - name: yt-cookies
+          secret:
+            secretName: yt-cookies
       restartPolicy: Always
   strategy:
     type: Recreate
