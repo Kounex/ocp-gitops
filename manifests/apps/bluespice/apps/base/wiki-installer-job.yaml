@@ -23,7 +23,12 @@ spec:
       containers:
         - name: installer
           image: bluespice/wiki:5.2.4
-          command: ["start-installer"]
+          command:
+            - sh
+            - -c
+            - |
+              start-installer && \
+              php /app/bluespice/w/maintenance/run.php update --quick
           envFrom:
             - configMapRef:
                 name: bluespice-config
