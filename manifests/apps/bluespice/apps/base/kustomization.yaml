@@ -15,6 +15,7 @@ resources:
 
   # Config & Secrets
   - configmap.yaml
+  - wiki-settings.yaml
   - external-secret.yaml
 
   # Init Jobs

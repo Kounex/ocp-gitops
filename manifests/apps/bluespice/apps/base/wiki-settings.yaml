@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bluespice-wiki-settings
+  namespace: bluespice
+  labels:
+    app.kubernetes.io/part-of: bluespice
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+data:
+  pre-init-settings.php: |
+    <?php
+    // Trust X-Forwarded-Proto from reverse proxy (e.g. OpenShift Route edge TLS)
+    if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+        $_SERVER['HTTPS'] = 'on';
+        $_SERVER['SERVER_PORT'] = 443;
+    }

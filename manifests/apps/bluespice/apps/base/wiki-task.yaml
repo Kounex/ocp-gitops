@@ -52,6 +52,9 @@ spec:
             - name: wiki-secrets
               mountPath: /run/secrets
               readOnly: true
+            - name: wiki-settings
+              mountPath: /config/settings
+              readOnly: true
           resources:
             requests:
               cpu: 250m
@@ -62,6 +65,9 @@ spec:
         - name: wiki-data
           persistentVolumeClaim:
             claimName: wiki-data
+        - name: wiki-settings
+          configMap:
+            name: bluespice-wiki-settings
         - name: wiki-secrets
           secret:
             secretName: bluespice-secrets
