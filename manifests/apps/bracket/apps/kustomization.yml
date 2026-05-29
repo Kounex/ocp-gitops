@@ -7,8 +7,6 @@ resources:
   - external-secret-postgresql.yml
   - external-secret-admin.yml
 
-  - service-account-postgresql.yml
-
   - role.yml
   - role-binding-frontend.yml
   - role-binding-backend.yml
