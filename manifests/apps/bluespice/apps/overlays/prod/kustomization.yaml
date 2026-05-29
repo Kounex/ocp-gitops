@@ -36,6 +36,15 @@ patches:
           termination: edge
           insecureEdgeTerminationPolicy: Redirect
   - target:
+      version: v1
+      kind: PersistentVolumeClaim
+      name: wiki-data
+    patch: |
+      - op: replace
+        path: /spec/accessModes
+        value:
+          - ReadWriteOnce
+  - target:
       group: route.openshift.io
       version: v1
       kind: Route
