@@ -1,0 +1,62 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: bluespice
+
+labels:
+  - pairs:
+      app.kubernetes.io/managed-by: kustomize
+
+resources:
+  # Namespace & RBAC
+  - namespace.yaml
+  - serviceaccounts.yaml
+  - scc-anyuid-binding.yaml
+
+  # Config & Secrets
+  - configmap.yaml
+  - external-secret.yaml
+
+  # Init Jobs
+  - prepare-job.yaml
+  - wiki-installer-job.yaml
+
+  # Persistent data services
+  - database.yaml
+  - search.yaml
+
+  # Core wiki
+  - wiki-web.yaml
+  - wiki-task.yaml
+
+  # Stateless services
+  - cache.yaml
+  - pdf.yaml
+  - formula.yaml
+  - diagram.yaml
+  - wire.yaml
+
+  # Routes
+  - route-wiki.yaml
+  - route-wire.yaml
+  - route-diagram.yaml
+
+images:
+  - name: bluespice/wiki
+    newTag: "5.2.4"
+  - name: bluespice/database
+    newTag: "5.2.4"
+  - name: bluespice/search
+    newTag: "5.2.4"
+  - name: bluespice/helper
+    newTag: "5.2.4"
+  - name: bluespice/cache
+    newTag: "5.2.4"
+  - name: bluespice/pdf
+    newTag: "5.2.4"
+  - name: bluespice/formula
+    newTag: "5.2.4"
+  - name: bluespice/diagram
+    newTag: "5.2.4"
+  - name: bluespice/wire
+    newTag: "5.2.4"

@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bluespice-prepare
+  namespace: bluespice
+  labels:
+    app.kubernetes.io/name: prepare
+    app.kubernetes.io/part-of: bluespice
+    app.kubernetes.io/component: init
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: prepare
+        app.kubernetes.io/part-of: bluespice
+    spec:
+      serviceAccountName: bluespice-anyuid
+      restartPolicy: OnFailure
+      containers:
+        - name: prepare
+          image: bluespice/helper:5.2.4
+          command: ["prepare-bluespice"]
+          envFrom:
+            - configMapRef:
+                name: bluespice-config
+          env:
+            - name: DATADIR
+              value: /data
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: bluespice-secrets
+                  key: DB_PASS
+          volumeMounts:
+            - name: bluespice-data
+              mountPath: /data
+      volumes:
+        - name: bluespice-data
+          persistentVolumeClaim:
+            claimName: wiki-data

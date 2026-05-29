@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-task
+  namespace: bluespice
+  labels:
+    app.kubernetes.io/name: wiki-task
+    app.kubernetes.io/part-of: bluespice
+    app.kubernetes.io/component: wiki
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wiki-task
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wiki-task
+        app.kubernetes.io/part-of: bluespice
+        app.kubernetes.io/component: wiki
+    spec:
+      serviceAccountName: bluespice-anyuid
+      containers:
+        - name: wiki-task
+          image: bluespice/wiki:5.2.4
+          command: ["start-task"]
+          args: ["--runAll"]
+          envFrom:
+            - configMapRef:
+                name: bluespice-config
+          env:
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: bluespice-secrets
+                  key: DB_PASS
+            - name: DB_ROOT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: bluespice-secrets
+                  key: DB_ROOT_PASS
+            - name: SMTP_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: bluespice-secrets
+                  key: SMTP_PASS
+          volumeMounts:
+            - name: wiki-data
+              mountPath: /data
+            - name: wiki-secrets
+              mountPath: /run/secrets
+              readOnly: true
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              memory: 1Gi
+      volumes:
+        - name: wiki-data
+          persistentVolumeClaim:
+            claimName: wiki-data
+        - name: wiki-secrets
+          secret:
+            secretName: bluespice-secrets
+            items:
+              - key: INTERNAL_WIKI_SECRETKEY
+                path: INTERNAL_WIKI_SECRETKEY
+              - key: INTERNAL_WIKI_UPGRADEKEY
+                path: INTERNAL_WIKI_UPGRADEKEY
+              - key: INTERNAL_WIKI_TOKEN_AUTH_SALT
+                path: INTERNAL_WIKI_TOKEN_AUTH_SALT
+              - key: INTERNAL_SIMPLESAMLPHP_ADMIN_PASS
+                path: INTERNAL_SIMPLESAMLPHP_ADMIN_PASS
+              - key: INTERNAL_SIMPLESAMLPHP_SECRET_SALT
+                path: INTERNAL_SIMPLESAMLPHP_SECRET_SALT
+              - key: INTERNAL_WIRE_API_KEY
+                path: INTERNAL_WIRE_API_KEY

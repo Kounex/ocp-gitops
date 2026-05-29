@@ -1,0 +1,19 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: wiki
+  namespace: bluespice
+  labels:
+    app.kubernetes.io/name: wiki-web
+    app.kubernetes.io/part-of: bluespice
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  host: REPLACE-IN-OVERLAY
+  path: /
+  to:
+    kind: Service
+    name: wiki-web
+    weight: 100
+  port:
+    targetPort: http

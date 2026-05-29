@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bluespice-config
+  namespace: bluespice
+data:
+  WIKI_HOST: "wiki-dev.apps.example.com"
+  WIKI_PROTOCOL: "http"
+  WIKI_PORT: "80"

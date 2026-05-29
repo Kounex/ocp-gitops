@@ -1,0 +1,19 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: diagram
+  namespace: bluespice
+  labels:
+    app.kubernetes.io/name: diagram
+    app.kubernetes.io/part-of: bluespice
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  host: REPLACE-IN-OVERLAY
+  path: /_diagram
+  to:
+    kind: Service
+    name: diagram
+    weight: 100
+  port:
+    targetPort: http

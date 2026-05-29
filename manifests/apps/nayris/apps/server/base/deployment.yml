@@ -27,17 +27,11 @@ spec:
             - name: PORT
               value: '4444'
           volumeMounts:
-            - name: yt-cookies
-              mountPath: /etc/secrets/yt-cookies
-              readOnly: true
             - name: yt-po-token
               mountPath: /etc/secrets/yt-po-token
               readOnly: true
           imagePullPolicy: Always
       volumes:
-        - name: yt-cookies
-          secret:
-            secretName: yt-cookies
         - name: yt-po-token
           secret:
             secretName: yt-po-token

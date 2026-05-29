@@ -1,0 +1,19 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: wire
+  namespace: bluespice
+  labels:
+    app.kubernetes.io/name: wire
+    app.kubernetes.io/part-of: bluespice
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  host: REPLACE-IN-OVERLAY
+  path: /_wire
+  to:
+    kind: Service
+    name: wire
+    weight: 100
+  port:
+    targetPort: http
