@@ -123,7 +123,7 @@ metadata:
     app.kubernetes.io/name: wiki-data
     app.kubernetes.io/part-of: bluespice
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   accessModes:
     - ReadWriteMany
