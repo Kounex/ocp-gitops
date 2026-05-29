@@ -34,10 +34,14 @@ data:
   SMTP_USER: ""
   SMTP_ID_HOST: ""
 
+  SEARCH_HOST: "search"
+  SEARCH_PORT: "9200"
+  SEARCH_PROTOCOL: "http"
+
   CHAT_HOST: "-"
 
-  WIKI_PRE_INIT_SETTINGS_FILE: "/data/wiki/pre-init-settings.php"
-  WIKI_POST_INIT_SETTINGS_FILE: "/data/wiki/pre-init-settings.php"
+  WIKI_PRE_INIT_SETTINGS_FILE: "/data/wiki/bluespice/pre-init-settings.php"
+  WIKI_POST_INIT_SETTINGS_FILE: "/data/wiki/bluespice/post-init-settings.php"
 
   WIRE_LOG_LEVEL: "debug"
   WIRE_WIKI_BASE_PATH: "http://wiki-web:9090"
