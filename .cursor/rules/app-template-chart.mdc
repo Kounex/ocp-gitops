@@ -1,0 +1,96 @@
+---
+description: bjw-s app-template Helm chart usage for single-image ArgoCD deployments
+globs: "**/application*.yml"
+alwaysApply: false
+---
+
+# bjw-s app-template Chart
+
+Used for deploying single-image applications via ArgoCD on OpenShift.
+
+## Chart Source
+- Chart: `app-template`
+- Repo: `https://bjw-s-labs.github.io/helm-charts`
+- Version: `4.2.0`
+
+## Values Structure
+
+```yaml
+controllers:
+  main:
+    strategy: RollingUpdate
+    labels:
+      app.openshift.io/runtime: nodejs  # OpenShift console icon
+    annotations:
+      openshift.io/required-scc: anyuid  # if the image needs root/anyuid
+    serviceAccount:
+      name: <sa-name>
+    containers:
+      main:
+        image:
+          repository: ghcr.io/org/image
+          tag: v1.0.0
+          pullPolicy: IfNotPresent
+        env:
+          - name: KEY
+            value: val
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: my-secret
+                key: secret-key
+
+defaultPodOptions:          # only if needed (e.g. run as root)
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0
+
+serviceAccount:
+  default:
+    enabled: true
+    labels:
+      name: <sa-name>
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 8080
+
+ingress:
+  main:
+    annotations:
+      route.openshift.io/termination: "edge"  # creates an OpenShift Route
+    hosts:
+      - host: myapp.apps.ocp.kounex.com
+        paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: main
+              port: http
+
+persistence:                # optional
+  data:
+    storageClass: lvms-vg1
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    globalMounts:
+      - path: /data
+
+configMaps:                 # optional
+  config:
+    enabled: true
+    data:
+      key: value
+```
+
+## Canonical Examples
+- Frontend (no persistence, env vars): `manifests/apps/bracket/apps/application-frontend.yml`
+- Backend (with PVC, secretKeyRef, SCC): `manifests/apps/bracket/apps/application-backend.yml`
+
+## OpenShift Notes
+- `ingress` with `route.openshift.io/termination: "edge"` creates an OpenShift Route automatically
+- Images needing root require SCC annotation and a matching RoleBinding to `anyuid`
+- `app.openshift.io/runtime` label controls the icon in the OpenShift console topology view

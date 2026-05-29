@@ -1,0 +1,97 @@
+---
+description: GitOps repo structure and ArgoCD conventions for this project
+globs: "**/manifests/**"
+alwaysApply: false
+---
+
+# GitOps Conventions
+
+## Repo Structure
+
+```
+manifests/apps/kustomization.yml          # root — lists all enabled apps
+manifests/apps/<app-name>/
+  application.yml                         # parent ArgoCD Application (sync-wave 200)
+  kustomization.yml                       # references application.yml
+  apps/
+    kustomization.yml                     # lists all child resources
+    app-project.yml                       # ArgoCD AppProject
+    external-secret-*.yml                 # ExternalSecrets (sync-wave 230)
+    service-account-*.yml                 # ServiceAccounts (sync-wave 210)
+    role.yml / role-binding-*.yml         # RBAC for SCC (sync-wave 230)
+    application-<component>.yml           # child ArgoCD Applications (sync-wave 220)
+```
+
+## App-of-Apps Pattern
+
+1. Root `manifests/apps/kustomization.yml` enables/disables entire apps by commenting lines
+2. Each app's `application.yml` is the **parent** ArgoCD Application:
+   - `project: apps`
+   - `destination.namespace: openshift-gitops`
+   - `source.path: manifests/apps/<app-name>/apps` pointing at this Git repo
+   - `sync-wave: 200`
+3. Child resources in `apps/` are managed by the parent via Kustomize
+
+## Sync Waves
+
+| Wave | Resources |
+|------|-----------|
+| 200  | Parent ArgoCD Application |
+| 210  | AppProject, ServiceAccounts |
+| 220  | Child ArgoCD Applications (the actual workloads) |
+| 230  | ExternalSecrets, Roles, RoleBindings |
+
+## Sync Policy (standard for all apps)
+
+```yaml
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+  managedNamespaceMetadata:
+    labels:
+      argocd.argoproj.io/managed-by: openshift-gitops
+  syncOptions:
+    - CreateNamespace=true
+```
+
+**Do NOT add `ServerSideApply=true`** unless the app needs to override fields owned by another controller (e.g. patching the OAuth CRD). SSA causes drift on resources with server-defaulted fields (ExternalSecrets, StatefulSet VCTs) and requires `ignoreDifferences` workarounds. Client-side apply is the default for all apps in this repo.
+
+## Conventions — Follow Existing Patterns
+
+Before adding ArgoCD annotations, sync options, or structural changes to an Application:
+1. **Check 2-3 existing apps** in `manifests/apps/` to see the established pattern
+2. Only diverge from that pattern with explicit justification
+3. If a Kustomize overlay exists (e.g. `overlays/prod`), use it for cluster-specific config rather than modifying base manifests
+
+## Secrets
+
+Never store secrets inline. Use ExternalSecrets referencing an external secret store. Example:
+
+```yaml
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: my-secret
+  namespace: my-app
+  annotations:
+    argocd.argoproj.io/sync-wave: '230'
+spec:
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  target:
+    name: my-secret
+  data:
+    - secretKey: PASSWORD
+      remoteRef:
+        key: path/to/secret
+        property: password
+```
+
+## Adding a New App
+
+1. Create `manifests/apps/<app-name>/` with `application.yml` and `kustomization.yml`
+2. Create `manifests/apps/<app-name>/apps/` with child resources and a `kustomization.yml`
+3. Add the app name to `manifests/apps/kustomization.yml`
+4. Commit and push — ArgoCD auto-syncs from `main`

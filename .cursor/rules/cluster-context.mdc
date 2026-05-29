@@ -1,0 +1,27 @@
+---
+description: OpenShift cluster and ArgoCD environment context
+alwaysApply: true
+---
+
+# Cluster Context
+
+## OpenShift Cluster
+- API: `https://api.ocp.kounex.com:6443`
+- Apps domain: `*.apps.ocp.kounex.com`
+- Default storage class: `lvms-vg1`
+- Managed by OpenShift GitOps operator
+
+## ArgoCD
+- Namespace: `openshift-gitops`
+- Route: `https://openshift-gitops-server-openshift-gitops.apps.ocp.kounex.com`
+- Admin credentials stored in secret `openshift-gitops-cluster` in `openshift-gitops` namespace
+- App-of-apps pattern:
+  - `apps-manager` (root) -> per-app parent (e.g. `bracket-app`) -> child apps (e.g. `bracket-db`, `bracket-frontend`)
+  - Parent apps use Kustomize, pointing to `manifests/apps/<app-name>/apps` in this repo
+  - Child apps are ArgoCD Application CRDs managed by their parent
+
+## MCP Servers
+- `user-kubernetes` — general cluster operations (pods, deployments, services, logs)
+- `user-argocd` — ArgoCD API (list/get/sync/delete applications, resource trees, events, logs)
+
+Use the ArgoCD MCP for application-level operations (sync, status, rollback). Use the Kubernetes MCP for lower-level cluster inspection (pod logs, describe resources, exec).
