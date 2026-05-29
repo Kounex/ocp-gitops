@@ -9,7 +9,6 @@ metadata:
     app.kubernetes.io/component: init
   annotations:
     argocd.argoproj.io/sync-wave: "1"
-    argocd.argoproj.io/sync-options: Replace=true
 spec:
   backoffLimit: 3
   ttlSecondsAfterFinished: 300
