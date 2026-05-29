@@ -41,6 +41,7 @@ spec:
         app.kubernetes.io/component: stateless
     spec:
       serviceAccountName: bluespice-anyuid
+      enableServiceLinks: false
       containers:
         - name: wire
           image: bluespice/wire:5.2.4
