@@ -38,6 +38,9 @@ data:
   SEARCH_PORT: "9200"
   SEARCH_PROTOCOL: "http"
 
+  CACHE_HOST: "cache"
+  CACHE_PORT: "11211"
+
   CHAT_HOST: "-"
 
   WIKI_INITIAL_ADMIN_USER: "Admin"
