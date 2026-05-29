@@ -36,6 +36,7 @@ data:
   CHAT_HOST: "-"
 
   WIKI_PRE_INIT_SETTINGS_FILE: "/data/wiki/pre-init-settings.php"
+  WIKI_POST_INIT_SETTINGS_FILE: "/data/wiki/pre-init-settings.php"
 
   WIRE_LOG_LEVEL: "debug"
   WIRE_WIKI_BASE_PATH: "http://wiki-web:9090"
