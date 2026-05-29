@@ -13,13 +13,14 @@ spec:
   source:
     repoURL: https://charts.bitnami.com/bitnami
     chart: postgresql
-    targetRevision: 12.2.8
+    targetRevision: 18.6.8
     helm:
       values: |-
-
-
         global:
-          storageClass: lvms-vg1
+          defaultStorageClass: lvms-vg1
+          compatibility:
+            openshift:
+              adaptSecurityContext: auto
           postgresql:
             auth:
               username: bracket_prod
