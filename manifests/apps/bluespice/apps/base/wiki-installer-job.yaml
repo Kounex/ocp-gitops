@@ -8,9 +8,11 @@ metadata:
     app.kubernetes.io/part-of: bluespice
     app.kubernetes.io/component: init
   annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
     argocd.argoproj.io/sync-wave: "1"
 spec:
-  backoffLimit: 3
+  backoffLimit: 5
   ttlSecondsAfterFinished: 300
   template:
     metadata:
