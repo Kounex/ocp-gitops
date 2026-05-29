@@ -23,6 +23,7 @@ data:
   WIKI_BASE_PATH: "/"
 
   DB_HOST: "database"
+  DB_TYPE: "mysql"
   DB_NAME: "bluespice"
   DB_PREFIX: ""
   DB_USER: "bluespice"
