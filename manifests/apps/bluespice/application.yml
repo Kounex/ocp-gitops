@@ -21,6 +21,20 @@ spec:
       jsonPointers:
         - /spec/selector
         - /spec/template/metadata/labels
+    - group: apps
+      kind: StatefulSet
+      jqPathExpressions:
+        - .spec.volumeClaimTemplates[]?.spec.volumeMode
+        - .spec.volumeClaimTemplates[]?.status
+    - group: external-secrets.io
+      kind: ExternalSecret
+      jqPathExpressions:
+        - .spec.data[]?.remoteRef.conversionStrategy
+        - .spec.data[]?.remoteRef.decodingStrategy
+        - .spec.data[]?.remoteRef.metadataPolicy
+        - .spec.refreshInterval
+        - .spec.target.creationPolicy
+        - .spec.target.deletionPolicy
   syncPolicy:
     automated:
       prune: true
