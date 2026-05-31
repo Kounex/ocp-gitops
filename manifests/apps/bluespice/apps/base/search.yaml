@@ -48,7 +48,7 @@ spec:
         # This privileged init container sets it at pod level.
         # Alternative: use the Node Tuning Operator cluster-wide and remove this.
         - name: sysctl-init
-          image: busybox:1.36
+          image: busybox:1.38
           command: ["sysctl", "-w", "vm.max_map_count=262144"]
           securityContext:
             privileged: true
