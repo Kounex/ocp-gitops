@@ -43,7 +43,7 @@ spec:
       serviceAccountName: bluespice-anyuid
       containers:
         - name: diagram
-          image: bluespice/diagram:5.2.4
+          image: bluespice/diagram:5.2.6
           ports:
             - containerPort: 8080
               name: http
