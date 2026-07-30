@@ -54,7 +54,7 @@ spec:
             privileged: true
       containers:
         - name: search
-          image: bluespice/search:5.2.4
+          image: bluespice/search:5.2.6
           ports:
             - containerPort: 9200
               name: http
