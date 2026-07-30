@@ -48,7 +48,7 @@ images:
   - name: bluespice/database
     newTag: "5.2.4"
   - name: bluespice/search
-    newTag: "5.2.4"
+    newTag: "5.2.6"
   - name: bluespice/helper
     newTag: "5.2.4"
   - name: bluespice/cache
