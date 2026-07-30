@@ -58,6 +58,6 @@ images:
   - name: bluespice/formula
     newTag: "5.2.4"
   - name: bluespice/diagram
-    newTag: "5.2.4"
+    newTag: "5.2.6"
   - name: bluespice/wire
     newTag: "5.2.4"
