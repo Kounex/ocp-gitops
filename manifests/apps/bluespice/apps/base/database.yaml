@@ -45,7 +45,7 @@ spec:
       serviceAccountName: bluespice-anyuid
       containers:
         - name: database
-          image: bluespice/database:5.2.4
+          image: bluespice/database:5.2.6
           ports:
             - containerPort: 3306
               name: mysql
