@@ -56,7 +56,7 @@ images:
   - name: bluespice/pdf
     newTag: "5.2.4"
   - name: bluespice/formula
-    newTag: "5.2.4"
+    newTag: "5.2.6"
   - name: bluespice/diagram
     newTag: "5.2.4"
   - name: bluespice/wire
