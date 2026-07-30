@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
         - name: cache
-          image: bluespice/cache:5.2.4
+          image: bluespice/cache:5.2.6
           resources:
             requests:
               cpu: 100m
