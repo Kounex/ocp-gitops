@@ -24,7 +24,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: prepare
-          image: bluespice/helper:5.2.4
+          image: bluespice/helper:5.2.6
           command: ["prepare-bluespice"]
           envFrom:
             - configMapRef:
