@@ -60,4 +60,4 @@ images:
   - name: bluespice/diagram
     newTag: "5.2.4"
   - name: bluespice/wire
-    newTag: "5.2.4"
+    newTag: "5.2.6"

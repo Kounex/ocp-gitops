@@ -44,7 +44,7 @@ spec:
       enableServiceLinks: false
       containers:
         - name: wire
-          image: bluespice/wire:5.2.4
+          image: bluespice/wire:5.2.6
           ports:
             - containerPort: 3333
               name: http
