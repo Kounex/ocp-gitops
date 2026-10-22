@@ -10,7 +10,7 @@ spec:
         - name: wiki-web
           resources:
             requests:
-              cpu: 500m
+              cpu: 200m
               memory: 1Gi
             limits:
               cpu: "2"
@@ -28,7 +28,7 @@ spec:
         - name: wiki-task
           resources:
             requests:
-              cpu: 500m
+              cpu: 50m
               memory: 1Gi
             limits:
               cpu: "2"
@@ -46,7 +46,7 @@ spec:
         - name: database
           resources:
             requests:
-              cpu: 500m
+              cpu: 100m
               memory: 1Gi
             limits:
               cpu: "2"
@@ -79,7 +79,7 @@ spec:
         - name: search
           resources:
             requests:
-              cpu: 500m
+              cpu: 100m
               memory: 1Gi
             limits:
               cpu: "2"
