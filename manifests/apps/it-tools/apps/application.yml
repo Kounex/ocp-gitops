@@ -31,7 +31,7 @@ spec:
               main:
                 image:
                   repository: ghcr.io/bjw-s-labs/it-tools
-                  tag: latest
+                  tag: 2024.10.22
                   pullPolicy: IfNotPresent
 
         serviceAccount:

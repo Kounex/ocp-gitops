@@ -7,4 +7,3 @@ resources:
   - login-theme
   - cert-manager
   - lvm-storage
-  # - sealed-secrets

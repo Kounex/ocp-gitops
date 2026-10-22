@@ -32,7 +32,7 @@ Open work: the audit of 2026-10-22, `docs/private/audit-2026-10-22.md`
   unmanaged (that is how `ctfd`, `sharry`, `test` and `mirror-test` were left
   behind). After disabling, delete the child Application and the namespace by
   hand. Check for PVC data first.
-- **Duplicates:** bracket, nayris, muse and update-day also run on the NAS
+- **Duplicates:** bracket, nayris, muse and update-day run on the NAS
   (`/volume1/docker/...`), and the NAS copies are the live ones. Do not
   re-enable a cluster copy that shares a token with a NAS service (update-day
   shares its Discord token).

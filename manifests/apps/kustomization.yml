@@ -1,14 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+# One line per app. Removing a line deletes that app from the cluster
+# (see AGENTS.md "Disabling an app").
 resources:
-  - nayris
-  # - sharry
-  # - muse
-  # - manuela-visual-inspection-ui
-  # - update-day  # runs on the NAS (newer, same Discord token); disabled here 2026-10-22
-  # - gitea
-  - bracket
-  - it-tools
-  # - ctfd
   - bluespice
+  - it-tools
