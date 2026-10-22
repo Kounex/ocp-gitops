@@ -87,7 +87,7 @@ Bootstrap chain (manual steps only on a fresh cluster, see README):
 | Area | Entries |
 |---|---|
 | operators | `external-secrets` (Red Hat ESO, `stable-v1`), `cert-manager` (Red Hat), `lvm-storage` (channel follows the OpenShift minor: `stable-4.22`) |
-| configs | `external-secrets` (ExternalSecretsConfig + Doppler store), `oauth` (htpasswd IdP + login pages built from `apps/login-theme/*.html`), `gitops` (ArgoCD CR, GitopsService, ntfy notifications), `cert-manager` (Let's Encrypt via Cloudflare DNS, API + wildcard certs), `lvm-storage` |
+| configs | `external-secrets` (ExternalSecretsConfig + Doppler store), `oauth` (htpasswd IdP + login pages built from `apps/login-theme/*.html`), `gitops` (ArgoCD CR, GitopsService, ntfy notifications), `cert-manager` (Let's Encrypt via Cloudflare DNS, API + wildcard certs), `lvm-storage`, `cloudflared` (Cloudflare Tunnel `ocp`, rules in `apps/config.yaml`) |
 | apps | `bluespice` (wiki, `wiki.apps.ocp.kounex.com`), `it-tools` |
 
 Projects: `apps` may only use this repo, deploy to `openshift-gitops` and
@@ -131,6 +131,14 @@ not just Cursor. Keep them and this file in sync. In short:
   host; the 2026-10-22 one is there). Move lvm-storage's channel with the
   OpenShift minor. On one node the API drops several times during an update;
   "Failing" in between is normal.
+- **Public hostnames via Cloudflare Tunnel:** an app can get
+  `<name>.kounex.com` (Cloudflare TLS, optional Authentik login) without a
+  Route or certificate. Add a rule to
+  `manifests/configs/cloudflared/apps/config.yaml` above the catch-all,
+  pointing at the Service (`http://<svc>.<ns>.svc:<port>`), push, then run
+  `~/agent/it-env/scripts/tunnel-route.sh add <host> ocp <service> --access|--public`
+  on the NAS for the Access app and DNS record. Full guide (all four
+  tunnels): `~/agent/it-env/services/cloudflare-tunnels/AGENTS.md`.
 - **Renovate:** dashboard is issue #44. BlueSpice images come as one grouped
   PR that is merged by hand (database update runs on sync).
 
@@ -159,6 +167,12 @@ Cluster state that this repo does not describe:
 
 - Secret `openshift-operators/doppler-token` (Doppler service token for the
   ClusterSecretStore). Without it no ExternalSecret works.
+- Doppler key `CLOUDFLARE_TUNNEL_TOKEN` (project `ocp`, config `main`):
+  the `ocp` tunnel's token. Until it exists there, Secret
+  `cloudflared/cloudflared-tunnel` was created by hand (2026-10-22) and the
+  ExternalSecret is red, which blocks `cloudflared-app`'s auto-sync before
+  the Deployment wave. A copy of the token is in `~/.cloudflared/ocp-tunnel-token`
+  on the NAS (`600`).
 - Key `ntfyTopic` in Secret `openshift-gitops/argocd-notifications-secret`
   (the ntfy topic is the credential; value in `~/.localrc` as `NTFY_TOPIC`).
 - Argo's local `admin` account and its non-expiring API token (issued
