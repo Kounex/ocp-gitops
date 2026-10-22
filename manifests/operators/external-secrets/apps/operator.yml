@@ -1,0 +1,33 @@
+# External Secrets Operator for Red Hat OpenShift (replaced the community
+# operator on 2026-10-22). The operand runs in namespace external-secrets
+# and is configured by ExternalSecretsConfig/cluster (configs/external-secrets).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: external-secrets-operator
+  annotations:
+    argocd.argoproj.io/sync-wave: '100'
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-external-secrets-operator
+  namespace: external-secrets-operator
+  annotations:
+    argocd.argoproj.io/sync-wave: '105'
+spec:
+  targetNamespaces: []
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: openshift-external-secrets-operator
+  namespace: external-secrets-operator
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+spec:
+  channel: stable-v1
+  installPlanApproval: Automatic
+  name: openshift-external-secrets-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
