@@ -6,7 +6,7 @@ resources:
   # - sharry
   # - muse
   # - manuela-visual-inspection-ui
-  - update-day
+  # - update-day  # runs on the NAS (newer, same Discord token); disabled here 2026-10-22
   # - gitea
   - bracket
   - it-tools
