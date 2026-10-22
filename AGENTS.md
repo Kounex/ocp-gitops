@@ -167,12 +167,9 @@ Cluster state that this repo does not describe:
 
 - Secret `openshift-operators/doppler-token` (Doppler service token for the
   ClusterSecretStore). Without it no ExternalSecret works.
-- Doppler key `CLOUDFLARE_TUNNEL_TOKEN` (project `ocp`, config `main`):
-  the `ocp` tunnel's token. Until it exists there, Secret
-  `cloudflared/cloudflared-tunnel` was created by hand (2026-10-22) and the
-  ExternalSecret is red, which blocks `cloudflared-app`'s auto-sync before
-  the Deployment wave. A copy of the token is in `~/.cloudflared/ocp-tunnel-token`
-  on the NAS (`600`).
+  It is a read-only service token for Doppler project `ocp`, config `main`
+  (workplace `rh`); keep it that way. New keys are added with the personal
+  token `DOPPLER_TOKEN` in `~/.localrc` on the NAS.
 - Key `ntfyTopic` in Secret `openshift-gitops/argocd-notifications-secret`
   (the ntfy topic is the credential; value in `~/.localrc` as `NTFY_TOPIC`).
 - Argo's local `admin` account and its non-expiring API token (issued
