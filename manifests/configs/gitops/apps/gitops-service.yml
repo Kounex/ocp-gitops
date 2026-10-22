@@ -1,0 +1,27 @@
+# Console plugin pods of the GitOps operator. Small requests for the
+# 8 vCPU single-node cluster (operator default is 250m each).
+apiVersion: pipelines.openshift.io/v1alpha1
+kind: GitopsService
+metadata:
+  name: cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: '150'
+    argocd.argoproj.io/sync-options: Validate=false,ServerSideApply=true,Prune=false
+spec:
+  consolePlugin:
+    backend:
+      resources:
+        requests:
+          cpu: 25m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 256Mi
+    gitopsPlugin:
+      resources:
+        requests:
+          cpu: 25m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 256Mi

@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - external-secrets
-  - auth
-  - login-theme
+  - oauth
+  - gitops
   - cert-manager
   - lvm-storage

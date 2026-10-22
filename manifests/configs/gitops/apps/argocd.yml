@@ -7,6 +7,8 @@ metadata:
     argocd.argoproj.io/sync-wave: '150'
     argocd.argoproj.io/sync-options: Validate=false,ServerSideApply=true,Prune=false
 spec:
+  notifications:
+    enabled: true
   # CPU requests trimmed for the 8 vCPU single-node cluster (operator
   # defaults reserve ~250m per component); limits are the operator defaults.
   controller:

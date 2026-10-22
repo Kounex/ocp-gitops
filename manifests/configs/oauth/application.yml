@@ -1,19 +1,26 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: auth-app
+  name: oauth-app
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/sync-wave: '100'
 spec:
+  project: configs
   source:
-    path: manifests/configs/auth/apps
+    path: manifests/configs/oauth/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git
     targetRevision: main
   destination:
-    namespace: openshift-gitops
+    namespace: openshift-config
     server: https://kubernetes.default.svc
-  project: configs
+  ignoreDifferences:
+    - group: config.openshift.io
+      kind: OAuth
+      jsonPointers:
+        - /metadata/labels
   syncPolicy:
     automated:
       selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true

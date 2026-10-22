@@ -1,0 +1,47 @@
+# Push to the workspace's ntfy topic when a sync fails or an app turns
+# Degraded or Missing. The topic name is the secret: key ntfyTopic in
+# Secret argocd-notifications-secret, set by hand (not in Git), see AGENTS.md.
+# Only these keys are ours; the operator owns the default templates/triggers.
+apiVersion: argoproj.io/v1alpha1
+kind: NotificationsConfiguration
+metadata:
+  name: default-notifications-configuration
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '160'
+    argocd.argoproj.io/sync-options: Validate=false,ServerSideApply=true,Prune=false
+spec:
+  services:
+    service.webhook.ntfy: |
+      url: https://ntfy.sh/$ntfyTopic
+      headers:
+        - name: Title
+          value: Argo CD (ocp.kounex.com)
+        - name: Tags
+          value: warning
+  templates:
+    template.ntfy-sync-failed: |
+      webhook:
+        ntfy:
+          method: POST
+          body: "{{.app.metadata.name}}: sync {{.app.status.operationState.phase}}. {{.app.status.operationState.message}}"
+    template.ntfy-health: |
+      webhook:
+        ntfy:
+          method: POST
+          body: "{{.app.metadata.name}} is {{.app.status.health.status}}."
+  triggers:
+    trigger.ntfy-on-sync-failed: |
+      - when: app.status.operationState != nil and app.status.operationState.phase in ['Error', 'Failed']
+        oncePer: app.status.operationState.syncResult.revision
+        send: [ntfy-sync-failed]
+    trigger.ntfy-on-health-bad: |
+      - when: app.status.health.status in ['Degraded', 'Missing']
+        send: [ntfy-health]
+  subscriptions:
+    subscriptions: |
+      - recipients:
+          - ntfy
+        triggers:
+          - ntfy-on-sync-failed
+          - ntfy-on-health-bad

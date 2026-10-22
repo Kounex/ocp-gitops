@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - external-secret-htpasswd.yml
+  - oauth.yml
+
+# Login and provider-selection pages, built from the HTML files so there is
+# one copy. Server-side apply: the pages are too big for the
+# last-applied-configuration annotation of client-side apply.
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    argocd.argoproj.io/sync-wave: '150'
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+
+secretGenerator:
+  - name: login-template
+    namespace: openshift-config
+    files:
+      - login.html=login-theme/login.html
+  - name: provider-template
+    namespace: openshift-config
+    files:
+      - providers.html=login-theme/providers.html
