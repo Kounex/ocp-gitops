@@ -1,69 +1,53 @@
 {
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
-    'config:base',
+    'config:recommended',
     'docker:enableMajor',
     ':disableRateLimiting',
     ':dependencyDashboard',
     ':semanticCommits',
-    ':enablePreCommit',
     ':automergeDigest',
     ':automergeBranch',
     'helpers:pinGitHubActionDigests',
   ],
-  dependencyDashboard: true,
   dependencyDashboardTitle: 'Renovate Dashboard 🤖',
   suppressNotifications: ['prIgnoreNotification'],
   rebaseWhen: 'conflicted',
-  schedule: ['every saturday'],
+  schedule: ['on saturday'],
   packageRules: [
     {
-      matchUpdateTypes: ['minor', 'patch'],
+      // Merged straight to main once the validate workflow passes.
+      matchUpdateTypes: ['minor', 'patch', 'digest'],
       automerge: true,
-      automergeType: 'branch'
+      automergeType: 'branch',
     },
     {
-      matchDepTypes: ['devDependencies'],
-      automerge: true,
-      automergeType: 'branch'
-    }
+      // One PR for all BlueSpice images, merged by hand: every BlueSpice
+      // update runs its database update (installer Job) and has needed
+      // config changes before (see AGENTS.md).
+      matchPackageNames: ['bluespice/**'],
+      groupName: 'BlueSpice',
+      versioning: 'loose', // hotfix tags like 5.2.7.1
+      automerge: false,
+    },
   ],
-  platformAutomerge: true,
-  'pre-commit': {
-    enabled: true,
-  },
   argocd: {
-    fileMatch: ['manifests/argocd/.+\\.yaml$'],
+    // Chart versions in Argo CD Applications (app-template, ...).
+    managerFilePatterns: ['/(^|/)(manifests|environment|cluster)/.+\\.ya?ml$/'],
   },
   kubernetes: {
-    fileMatch: ['manifests/.+\\.ya?ml$'],
+    managerFilePatterns: ['/(^|/)manifests/.+\\.ya?ml$/'],
   },
-  'helm-values': {
-    fileMatch: ['manifests/.+\\.yaml$'],
-  },
-  regexManagers: [
+  customManagers: [
     {
-      description: 'Process various other dependencies',
-      fileMatch: ['manifests/.+\\.ya?ml$'],
+      // Image repository/tag pairs in Helm values embedded in Argo CD
+      // Applications (bjw-s app-template).
+      customType: 'regex',
+      managerFilePatterns: ['/(^|/)manifests/.+\\.ya?ml$/'],
       matchStrings: [
-        " *repository: *'?\"?(?<depName>.*?)'?\"?\n *tag: *'?\"?(?<currentValue>.*)'?\"?\n",
-        " *repository: *'?\"?(?<depName>.*?)'?\"?\n *pullPolicy:.*\n *tag: *'?\"?(?<currentValue>.*)'?\"?\n",
-        " *containerRepo=*'?\"?(?<depName>.*?)'?\"?\n *tag: '?\"?(?<currentValue>.*)'?\"?\n"
+        'repository:\\s*["\']?(?<depName>[^\\s"\']+)["\']?\\s*\\n\\s*tag:\\s*["\']?(?<currentValue>[^\\s"\']+)["\']?',
       ],
-      "depNameTemplate": "{{{replace 'ghcr.io/' '' depName}}}",
-      "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+      datasourceTemplate: 'docker',
     },
-    {
-      description: 'Process various other dependencies',
-      fileMatch: ['manifests/.+\\.ya?ml$'],
-      matchStrings: [
-        " *repository: *'?\"?(?<depName>.*?)'?\"?\n *tag: *'?\"?(?<currentValue>.*)'?\"?\n",
-        " *repository: *'?\"?(?<depName>.*?)'?\"?\n *pullPolicy:.*\n *tag: *'?\"?(?<currentValue>.*)'?\"?\n",
-        " *containerRepo=*'?\"?(?<depName>.*?)'?\"?\n *tag: '?\"?(?<currentValue>.*)'?\"?\n"
-      ],
-      "depNameTemplate": "{{{replace 'docker.io/' '' depName}}}",
-      "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
-    }
   ],
 }
