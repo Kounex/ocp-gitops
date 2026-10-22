@@ -16,7 +16,7 @@ alwaysApply: true
 - Route: `https://openshift-gitops-server-openshift-gitops.apps.ocp.kounex.com`
 - Admin credentials stored in secret `openshift-gitops-cluster` in `openshift-gitops` namespace
 - App-of-apps pattern:
-  - `apps-manager` (root) -> per-app parent (e.g. `bracket-app`) -> child apps (e.g. `bracket-db`, `bracket-frontend`)
+  - `apps-manager` (root) -> per-app parent (e.g. `it-tools-app`) -> child apps (e.g. `it-tools`)
   - Parent apps use Kustomize, pointing to `manifests/apps/<app-name>/apps` in this repo
   - Child apps are ArgoCD Application CRDs managed by their parent
 

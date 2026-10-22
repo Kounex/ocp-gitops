@@ -87,8 +87,8 @@ configMaps:                 # optional
 ```
 
 ## Canonical Examples
-- Frontend (no persistence, env vars): `manifests/apps/bracket/apps/application-frontend.yml`
-- Backend (with PVC, secretKeyRef, SCC): `manifests/apps/bracket/apps/application-backend.yml`
+- Minimal app (no persistence): `manifests/apps/it-tools/apps/application.yml`
+- With PVC, secretKeyRef and the anyuid SCC: see git history of `manifests/apps/bracket/apps/application-backend.yml` (removed 2026-10-22; it ran on the NAS instead). Never put secret values in `env.value`; use `secretKeyRef` to an ExternalSecret-managed Secret.
 
 ## OpenShift Notes
 - `ingress` with `route.openshift.io/termination: "edge"` creates an OpenShift Route automatically

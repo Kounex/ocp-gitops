@@ -69,24 +69,24 @@ Before adding ArgoCD annotations, sync options, or structural changes to an Appl
 Never store secrets inline. Use ExternalSecrets referencing an external secret store. Example:
 
 ```yaml
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: my-secret
   namespace: my-app
   annotations:
     argocd.argoproj.io/sync-wave: '230'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   secretStoreRef:
-    name: vault-backend
+    name: doppler
     kind: ClusterSecretStore
   target:
     name: my-secret
   data:
     - secretKey: PASSWORD
       remoteRef:
-        key: path/to/secret
-        property: password
+        key: MY_APP_PASSWORD   # Doppler secret name
 ```
 
 ## Adding a New App
