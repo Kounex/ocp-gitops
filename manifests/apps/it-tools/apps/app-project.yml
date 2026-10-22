@@ -6,11 +6,11 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: '210'
 spec:
-  clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
-  destinations:
-    - namespace: '*'
-      server: '*'
   sourceRepos:
-    - '*'
+    - https://bjw-s-labs.github.io/helm-charts
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: it-tools
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace

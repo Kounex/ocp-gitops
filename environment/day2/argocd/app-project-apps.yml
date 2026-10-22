@@ -6,11 +6,19 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: '10'
 spec:
-  clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
-  destinations:
-    - namespace: '*'
-      server: '*'
+  description: Parent apps under manifests/apps. They create child Applications
+    and AppProjects, or deploy an app directly (bluespice).
   sourceRepos:
-    - '*'
+    - https://github.com/Kounex/ocp-gitops.git
+    - https://github.com/Kounex/ocp-gitops
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: openshift-gitops
+    - server: https://kubernetes.default.svc
+      namespace: bluespice
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+    # bluespice binds its service accounts to the anyuid SCC
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding

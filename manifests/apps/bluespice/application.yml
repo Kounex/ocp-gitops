@@ -3,6 +3,9 @@ kind: Application
 metadata:
   name: bluespice-app
   namespace: openshift-gitops
+  # Removing this app from Git deletes its resources too (PVCs included).
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/sync-wave: '200'
 spec:

@@ -13,4 +13,5 @@ spec:
     - namespace: '*'
       server: '*'
   sourceRepos:
-    - '*'
+    - https://github.com/Kounex/ocp-gitops.git
+    - https://github.com/Kounex/ocp-gitops
