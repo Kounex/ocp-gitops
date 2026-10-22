@@ -1,0 +1,10 @@
+[Unit]
+Description=Pull the BlueSpice backup daily, after BlueSpice writes it at 04:00 UTC
+
+[Timer]
+OnCalendar=*-*-* 07:15:00
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

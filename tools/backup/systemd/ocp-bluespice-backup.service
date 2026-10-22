@@ -1,0 +1,8 @@
+[Unit]
+Description=Pull the newest BlueSpice backup from the OpenShift cluster to the NAS
+After=network-online.target
+
+[Service]
+Type=oneshot
+TimeoutStartSec=15min
+ExecStart=/home/kounex/agent/ocp-gitops/tools/backup/pull-bluespice-backup.sh
