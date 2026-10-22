@@ -8,7 +8,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
 data:
-  VERSION: "5.2.4"
+  VERSION: "5.2.7"
   EDITION: "free"
   TZ: "UTC"
   BACKUP_HOUR: "04"
@@ -21,6 +21,11 @@ data:
   WIKI_PORT: "443"
   WIKI_PROTOCOL: "https"
   WIKI_BASE_PATH: "/"
+  # Same as the image default, but must be set explicitly: since 5.2.7,
+  # start-web derives the nginx "/" redirect from it before init-envs
+  # applies the default, so leaving it unset renders "return 301 /"
+  # (an endless redirect loop that fails the probes).
+  WIKI_ARTICLE_PATH: "wiki"
 
   DB_HOST: "database"
   DB_TYPE: "mysql"
