@@ -7,3 +7,4 @@ resources:
   - gitops
   - cert-manager
   - lvm-storage
+  - cloudflared

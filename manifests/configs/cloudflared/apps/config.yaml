@@ -1,0 +1,9 @@
+# Tunnel "ocp" (locally managed: these rules are the only ones it has).
+# Add a hostname here, then create its DNS record and optional Access app
+# with ~/agent/it-env/scripts/tunnel-route.sh (see AGENTS.md, "Cloudflare Tunnel").
+# Target the Service directly: http://<service>.<namespace>.svc:<port>
+tunnel: 38d37189-c519-475d-bbf2-5effc99eba72
+metrics: 0.0.0.0:2000
+no-autoupdate: true
+ingress:
+  - service: http_status:404
