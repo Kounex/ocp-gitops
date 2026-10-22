@@ -6,4 +6,6 @@ tunnel: 38d37189-c519-475d-bbf2-5effc99eba72
 metrics: 0.0.0.0:2000
 no-autoupdate: true
 ingress:
+  - hostname: tunnel-test-ocp.kounex.com
+    service: http://it-tools.it-tools.svc:8080
   - service: http_status:404
