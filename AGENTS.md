@@ -27,6 +27,14 @@ State (2026-10-22): OpenShift 4.22.18, OpenShift GitOps 1.22 (Argo CD 3.5),
   passes.
 - **Image tags:** exact, readable versions, never `latest` (workspace rule in
   `~/agent/AGENTS.md`). Renovate reads the raw `image:` lines.
+- **Updates:** Renovate (Saturdays) automerges minor/patch/digest image and
+  chart updates after CI; majors and the BlueSpice group wait as PRs. The
+  OpenShift version itself is never updated by anything: z-streams on channel
+  `stable-4.22` are applied by hand, a new minor is a channel change. Operator
+  subscriptions are `Automatic` within their channels. How this fits the rest
+  of the fleet (and when a new project should run here rather than on the NAS
+  or Hetzner): `docs/version-management.md` and `docs/new-project.md` in the
+  private it-env repo.
 - **CPU budget:** 8 vCPU / 32 GiB, 7.5 CPU allocatable. The scheduler counts
   **requests**, not usage. Check before adding workloads:
   `oc describe node master-0 | grep -A5 "Allocated resources"` (about 5 of 7.5
