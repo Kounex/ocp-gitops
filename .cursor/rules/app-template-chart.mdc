@@ -11,7 +11,7 @@ Used for deploying single-image applications via ArgoCD on OpenShift.
 ## Chart Source
 - Chart: `app-template`
 - Repo: `https://bjw-s-labs.github.io/helm-charts`
-- Version: `4.2.0`
+- Version: `5.3.0` (since 2026-10-27). v5 defaults `automountServiceAccountToken` to `false`; an app that calls the Kubernetes API needs `defaultPodOptions: {automountServiceAccountToken: true}`. Without an explicit `serviceAccount`, v5 creates one named after the release. `rawResources` entries go under `manifest:`.
 
 ## Values Structure
 
