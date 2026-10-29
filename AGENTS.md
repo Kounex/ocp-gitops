@@ -13,7 +13,7 @@ Secrets come from Doppler through External Secrets
 (gitignored). The audit of 2026-10-22 is `docs/private/audit-2026-10-22.md`
 (local only; its status table says what was done).
 
-State (2026-10-22): OpenShift 4.22.18, OpenShift GitOps 1.22 (Argo CD 3.5),
+State (2026-10-29): OpenShift 4.22.19, OpenShift GitOps 1.22 (Argo CD 3.5),
 8 vCPU / 32 GiB.
 
 ## Rules
