@@ -24,7 +24,7 @@ spec:
       serviceAccountName: bluespice-anyuid
       containers:
         - name: wiki-task
-          image: bluespice/wiki:5.2.7.1
+          image: bluespice/wiki:5.2.7.2
           command: ["start-task"]
           args: ["--runAll"]
           envFrom:
