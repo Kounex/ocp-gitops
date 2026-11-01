@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: cloudflared
-          image: docker.io/cloudflare/cloudflared:2026.10.3
+          image: docker.io/cloudflare/cloudflared:2026.10.7
           args:
             - tunnel
             - --config
