@@ -1,6 +1,9 @@
-# CTFd
+# Open Tech Quest on CTFd
 
-CTFd, MariaDB 10.11 and Redis 7.4, translated from the
+[Open Tech Quest](https://github.com/Kounex/open-tech-quest) extends CTFd
+with event-branded sequential team rooms, shared progress, prize timing,
+organizer controls and a 50-team projector. The stack uses MariaDB 10.11
+and Redis 7.4, translated from the
 [upstream Compose deployment](https://docs.ctfd.io/docs/deployment/installation/).
 Argo CD deploys `apps/overlays/prod` into namespace `ctfd`.
 
@@ -19,9 +22,10 @@ downtime during upgrades.
 
 The init container waits for MariaDB, applies CTFd migrations, then runs
 the upstream setup flow once. It creates the `admin` account (email
-`contact@kounex.com`), a default CTF named `CTFd`, individual user mode,
+`contact@kounex.com`), an event named `Open Tech Quest`, team user mode,
 and public registration. Customize the event through the admin UI.
-On subsequent starts it preserves existing accounts and settings. The
+On subsequent starts it preserves existing accounts and settings, renaming
+only the stock `CTFd` placeholder title. The
 web server starts only after setup succeeds, preventing public takeover
 of an unclaimed installation. The bootstrap password is not passed to
 the web server container.
@@ -72,3 +76,29 @@ kustomization prunes its resources, including all three PVCs.
 
 SMTP is not configured; configure it in CTFd before relying on password
 reset or email verification. Registration does not require email verification.
+
+## Application image and event setup
+
+CI in `Kounex/open-tech-quest` builds `ghcr.io/kounex/open-tech-quest`; both
+initialization and runtime use the same version/digest. The pinned upstream
+CTFd base is extended with a plugin and built React frontend, without a core
+fork. Runtime secrets remain the same Doppler keys above.
+
+The plugin creates five empty rooms in **draft**: OpenShift, Ansible, RHEL,
+Security and AI. No demo participants, flags or challenges enter the image.
+A fresh instance safely switches to team mode; an existing instance with
+individual solves refuses conversion until ownership is explicitly migrated.
+
+- Participant app: `/quest` (also the root redirect).
+- Organizer app: `/quest/admin`, using the existing CTFd admin login.
+- Projector: `/quest/stage`, controlled from the organizer Projector tab.
+- Native challenge authoring: `/admin/challenges`.
+
+Configure challenge order, teams, roster release, timing and selected room
+assets before opening the event. Use quest lifecycle controls rather than
+native time/mode settings; the plugin records pauses/cutoffs and final
+publication snapshots. See the application repository's operations guide.
+
+Pre-migration private backup on Hetzner:
+`/root/ocp-backups/ctfd/pre-open-tech-quest-2026-11-03/` (SQL and uploads;
+contains credentials, never copy into this public repository).

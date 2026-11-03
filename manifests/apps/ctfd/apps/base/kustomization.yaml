@@ -27,7 +27,7 @@ configMapGenerator:
       - SESSION_COOKIE_SECURE=true
       - CTFD_ADMIN_NAME=admin
       - CTFD_ADMIN_EMAIL=contact@kounex.com
-      - CTFD_NAME=CTFd
+      - CTFD_NAME=Open Tech Quest
   - name: ctfd-bootstrap
     files:
       - bootstrap.py

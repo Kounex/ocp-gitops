@@ -3,12 +3,15 @@ import os
 
 from CTFd import create_app
 from CTFd.models import Admins
-from CTFd.utils import get_config
+from CTFd.utils import get_config, set_config
 
 app = create_app()
 assert app.config["SESSION_COOKIE_SECURE"] is True
 with app.app_context():
     if get_config("setup"):
+        # Rename only the stock placeholder title; preserve organizer names.
+        if get_config("ctf_name") == "CTFd":
+            set_config("ctf_name", os.environ["CTFD_NAME"])
         print("CTFd is already initialized; preserving accounts and settings.")
     else:
         with app.test_client() as client:
@@ -26,7 +29,7 @@ with app.app_context():
                     "name": os.environ["CTFD_ADMIN_NAME"],
                     "email": os.environ["CTFD_ADMIN_EMAIL"],
                     "password": os.environ["CTFD_ADMIN_PASSWORD"],
-                    "user_mode": "users",
+                    "user_mode": "teams",
                     "challenge_visibility": "private",
                     "registration_visibility": "public",
                     "score_visibility": "public",
