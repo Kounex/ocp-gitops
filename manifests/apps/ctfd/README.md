@@ -120,12 +120,23 @@ Q favicon on participant, login and native administration pages.
 
 ## Participant attendance and final rosters
 
-Participants register their own CTFd account and confirm **I'm ready to quest**
-in the lobby. **Organize → Teams** persists the maximum group size (default
-five), previews random provisional allocation, tracks personal attendance and
-shows names/status for each group. Close check-in, review the attendance-based
-optimization, then apply its server-bound plan. Changed readiness or rosters
-invalidate older previews; no-show accounts are kept unassigned.
+Participants register their own CTFd account. **Organize → Event / Teams →
+Attendance check-in** independently controls when they can confirm **I'm ready
+to quest**; capture starts off on installation and this upgrade. Keep it closed
+while collecting early registrations. Opening prompts unconfirmed signed-in
+participants across Quest within five seconds and on returning to a tab; signup
+during the window leads directly to the same prompt. Native account pages show
+a link notice without discarding edits. Pages held open from before this release
+need one initial refresh to load the new prompt behavior.
+
+Closing rejects new confirmations even from stale forms and retains recorded
+attendance. Reopening prompts only unconfirmed people. **Organize → Teams**
+persists the maximum group size (default five), previews random provisional
+allocation, tracks personal attendance and shows names/status for each group.
+Close attendance capture before previewing/applying optimization or finalizing
+rosters. **Move to attendance review** also closes capture atomically. Apply the
+server-bound plan after review; intervening window changes, readiness or roster
+changes invalidate older previews. No-show accounts are kept unassigned.
 
 Any ready member then chooses the final unique team name once. Organizers can
 place late arrivals with a reason or create an additional group if needed.
