@@ -113,3 +113,20 @@ previous introductions without removing real challenges or participant data.
 The competition cannot start while demo content is active. See the application
 operations guide for preview/removal behavior. The app also supplies the event
 Q favicon on participant, login and native administration pages.
+
+## Participant attendance and final rosters
+
+Participants register their own CTFd account and confirm **I'm ready to quest**
+in the lobby. **Organize → Teams** persists the maximum group size (default
+five), previews random provisional allocation, tracks personal attendance and
+shows names/status for each group. Close check-in, review the attendance-based
+optimization, then apply its server-bound plan. Changed readiness or rosters
+invalidate older previews; no-show accounts are kept unassigned.
+
+Any ready member then chooses the final unique team name once. Organizers can
+place late arrivals with a reason or create an additional group if needed.
+Finalize rosters before starting the competition; membership stays fixed.
+Check-in and naming never start room or event clocks. Native account moderation
+remains available. All ownership and progress remain in native CTFd models;
+plugin metadata uses the same backed-up MariaDB database and existing secrets.
+See [event operations](https://github.com/Kounex/open-tech-quest/blob/main/docs/operations.md).
