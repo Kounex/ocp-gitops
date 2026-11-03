@@ -102,3 +102,14 @@ publication snapshots. See the application repository's operations guide.
 Pre-migration private backup on Hetzner:
 `/root/ocp-backups/ctfd/pre-open-tech-quest-2026-11-03/` (SQL and uploads;
 contains credentials, never copy into this public repository).
+
+## Organizer demo preview
+
+The organizer Event tab offers explicit **Load demo content** / **Remove demo
+content** controls: 25 self-contained practice challenges and Markdown room
+introductions. Startup never seeds them. Loading requires draft and unmapped
+rooms; durable batch ownership supports targeted cleanup and restoration of
+previous introductions without removing real challenges or participant data.
+The competition cannot start while demo content is active. See the application
+operations guide for preview/removal behavior. The app also supplies the event
+Q favicon on participant, login and native administration pages.
