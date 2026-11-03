@@ -7,7 +7,7 @@ and Redis 7.4, translated from the
 [upstream Compose deployment](https://docs.ctfd.io/docs/deployment/installation/).
 Argo CD deploys `apps/overlays/prod` into namespace `ctfd`.
 
-Public URL: https://ctfd.apps.ocp.kounex.com. The edge-terminated Route uses
+Public URL: https://otq.apps.ocp.kounex.com. The edge-terminated Route uses
 the ingress controller's existing wildcard certificate and redirects HTTP
 to HTTPS. CTFd handles participant and administrator authentication.
 This hostname uses the OpenShift router directly, as requested, rather

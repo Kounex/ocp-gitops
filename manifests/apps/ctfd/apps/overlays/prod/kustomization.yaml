@@ -17,4 +17,4 @@ patches:
     patch: |
       - op: add
         path: /spec/host
-        value: ctfd.apps.ocp.kounex.com
+        value: otq.apps.ocp.kounex.com
