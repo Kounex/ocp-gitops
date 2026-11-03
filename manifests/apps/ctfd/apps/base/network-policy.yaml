@@ -1,0 +1,55 @@
+# Only CTFd can reach the database and cache. Only the OpenShift router
+# can reach the web server. Egress remains available for DNS and email.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ctfd-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: ctfd
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              network.openshift.io/policy-group: ingress
+      ports:
+        - protocol: TCP
+          port: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: ctfd-database
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ctfd
+      ports:
+        - protocol: TCP
+          port: 3306
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cache-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: ctfd-cache
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ctfd
+      ports:
+        - protocol: TCP
+          port: 6379

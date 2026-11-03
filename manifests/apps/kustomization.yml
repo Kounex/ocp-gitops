@@ -5,4 +5,5 @@ kind: Kustomization
 # (see AGENTS.md "Disabling an app").
 resources:
   - bluespice
+  - ctfd
   - it-tools

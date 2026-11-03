@@ -16,6 +16,8 @@ spec:
       namespace: openshift-gitops
     - server: https://kubernetes.default.svc
       namespace: bluespice
+    - server: https://kubernetes.default.svc
+      namespace: ctfd
   clusterResourceWhitelist:
     - group: ''
       kind: Namespace

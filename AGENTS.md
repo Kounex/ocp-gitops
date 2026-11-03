@@ -96,10 +96,10 @@ Bootstrap chain (manual steps only on a fresh cluster, see README):
 |---|---|
 | operators | `external-secrets` (Red Hat ESO, `stable-v1`), `cert-manager` (Red Hat), `lvm-storage` (channel follows the OpenShift minor: `stable-4.22`) |
 | configs | `external-secrets` (ExternalSecretsConfig + Doppler store), `oauth` (htpasswd IdP + login pages built from `apps/login-theme/*.html`), `gitops` (ArgoCD CR, GitopsService, ntfy notifications), `cert-manager` (Let's Encrypt via Cloudflare DNS, API + wildcard certs), `lvm-storage`, `cloudflared` (Cloudflare Tunnel `ocp`, rules in `apps/config.yaml`) |
-| apps | `bluespice` (wiki, `wiki.apps.ocp.kounex.com`), `it-tools` |
+| apps | `bluespice` (wiki, `wiki.apps.ocp.kounex.com`), `it-tools`, `ctfd` (`ctfd.apps.ocp.kounex.com`, CTFd + MariaDB + Redis; see its README) |
 
 Projects: `apps` may only use this repo, deploy to `openshift-gitops` and
-`bluespice`, and create Namespaces and ClusterRoleBindings. Each child app has
+`bluespice` and `ctfd`, and create Namespaces and ClusterRoleBindings. Each child app has
 its own project (e.g. `it-tools`: the bjw-s chart repo, its own namespace). A
 new app needs its namespace added to `apps` if the parent deploys into it.
 

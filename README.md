@@ -15,7 +15,7 @@ Agents and anyone operating the cluster: read [AGENTS.md](AGENTS.md) first.
 | `environment/` | AppProjects and the three "manager" Applications that read `manifests/`. |
 | `manifests/operators/` | Operator Subscriptions (cert-manager, External Secrets, LVM Storage). |
 | `manifests/configs/` | Cluster configuration: OAuth and login page, certificates, Argo CD itself, secret store, storage, Cloudflare Tunnel. |
-| `manifests/apps/` | Workloads: BlueSpice wiki, IT-Tools. |
+| `manifests/apps/` | Workloads: BlueSpice wiki, IT-Tools, [CTFd](manifests/apps/ctfd/README.md). |
 | `tools/` | Manifest validation (also run in CI) and the off-cluster backup job. |
 
 ## Bootstrap a fresh cluster
