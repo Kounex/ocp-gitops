@@ -76,6 +76,10 @@ kustomization prunes its resources, including all three PVCs.
 
 SMTP is not configured; configure it in CTFd before relying on password
 reset or email verification. Registration does not require email verification.
+Use **Organize → Event → Public registration** to open or close self-signup.
+Closing signup blocks new native-form accounts; existing users can still log in
+and check in where attendance permits. This control preserves CTFd’s existing
+setting on startup and records changes in the organizer audit log.
 
 ## Application image and event setup
 
