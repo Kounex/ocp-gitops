@@ -88,7 +88,7 @@ initialization and runtime use the same version/digest. The pinned upstream
 CTFd base is extended with a plugin and built React frontend, without a core
 fork. Runtime secrets remain the same Doppler keys above.
 
-The plugin creates five empty rooms in **draft**: OpenShift, Ansible, RHEL,
+The plugin creates five empty default rooms in **draft**: OpenShift, Ansible, RHEL,
 Security and AI. No demo participants, flags or challenges enter the image.
 A fresh instance safely switches to team mode; an existing instance with
 individual solves refuses conversion until ownership is explicitly migrated.
@@ -117,6 +117,28 @@ previous introductions without removing real challenges or participant data.
 The competition cannot start while demo content is active. See the application
 operations guide for preview/removal behavior. The app also supplies the event
 Q favicon on participant, login and native administration pages.
+
+## Staff and room authoring
+
+Use **Organize → Users** as a full administrator to promote self-registered
+accounts to **Challenge maintainer**. Full administrators remain managed in
+native CTFd. Maintainers get only Rooms in Organize and no privileged event,
+participant, team or role administration. They are excluded from attendance,
+team allocation and play; promotion clears readiness and detaches an unused
+provisional assignment. Recorded competition activity prevents conversion.
+
+Both staff roles can create standard flag challenges directly in Rooms, edit
+Markdown descriptions and accepted static flags, check answers without progress,
+and manage the prerequisite order. Authoring is restricted to Draft without
+recorded activity; an administrator must remove the loaded demo before real
+challenge authoring. Flags stay in the database and authorized editor responses,
+never Git or public bootstrap/audit payloads.
+
+The five topic rooms remain defaults. Room managers can rename display titles,
+add custom rooms with a generic theme and remove unused rooms. Removal preserves
+native challenges/flags/files and rejects activity or demo ownership. Stable
+slugs preserve links on rename; an intentionally empty room list stays empty
+across restarts. Navigation and standings follow the configured room list.
 
 ## Participant attendance and final rosters
 
