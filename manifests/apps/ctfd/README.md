@@ -171,15 +171,20 @@ need one initial refresh to load the new prompt behavior.
 
 Closing rejects new confirmations even from stale forms and retains recorded
 attendance. Reopening prompts only unconfirmed people. **Organize → Teams**
-persists the maximum group size (default five), previews random provisional
-allocation, tracks personal attendance and shows names/status for each group.
-Close attendance capture before previewing/applying optimization or finalizing
-rosters. **Move to attendance review** also closes capture atomically. Apply the
+persists the maximum group size (default five), tracks personal attendance and
+forms random teams from checked-in eligible people only. Morning registration
+requires no teams or initial allocation. Close attendance capture before
+previewing/applying grouping or finalizing rosters. **Move to attendance review**
+also closes capture atomically. Apply the
 server-bound plan after review; intervening window changes, readiness or roster
 changes invalidate older previews. No-show accounts are kept unassigned.
 
-Any ready member then chooses the final unique team name once. Organizers can
-place late arrivals with a reason or create an additional group if needed.
+By default names are **Team 1, Team 2, Team 3, …**, final and locked against user
+changes. **Let participants choose team names** enables one-time naming by any
+ready teammate before finalization. Enabling after apply opens generated unclaimed
+names only; chosen or organizer-corrected identities never reopen. Disabling locks
+current names without discarding chosen ones. Naming policy freezes at finalization.
+Organizers can place late arrivals with a reason or create an additional group.
 Finalize rosters before starting the competition; membership stays fixed.
 Check-in and naming never start room or event clocks. Native account moderation
 remains available. All ownership and progress remain in native CTFd models;
@@ -188,11 +193,12 @@ See [event operations](https://github.com/Kounex/open-tech-quest/blob/main/docs/
 
 ## Event-day cutoff and post-start arrivals
 
-Close registration and attendance at the cutoff. If random provisional allocation
-has not been done, Preview/Apply initial allocation while in team preparation.
-Then **Move to attendance review → Preview attendance optimization → Apply reviewed
-groups → team name confirmation → Finalize rosters → Start event**. Closing
-windows never performs grouping automatically.
+Close registration and attendance at the cutoff. Then **Move to attendance review
+→ Preview checked-in teams → Apply reviewed teams → Finalize
+rosters → Start event**. Only if participant naming is enabled do members choose
+names before finalization. Repeated previews of unchanged state return the same
+random proposal; readiness, roster, capacity and naming-policy changes invalidate
+it. Closing windows never performs grouping automatically.
 
 After finalization, reopen registration if needed and open late-only attendance
 for unassigned newcomers. They confirm their own attendance; an administrator
