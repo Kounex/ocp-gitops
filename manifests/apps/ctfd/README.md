@@ -140,6 +140,24 @@ native challenges/flags/files and rejects activity or demo ownership. Stable
 slugs preserve links on rename; an intentionally empty room list stays empty
 across restarts. Navigation and standings follow the configured room list.
 
+## Account moderation and retained evidence
+
+**Organize → Users** supports **Return to participant**, safe confirmed deletion
+of unused accounts, and **Ban / Unban account**. Role transitions clear readiness
+and unused provisional assignments. Deletion repairs captain ownership and refuses
+history-bearing or frozen memberships. Bans stop the account's solves from counting
+without deleting the native records; teammates can legitimately re-solve affected
+challenges. Recovery uses a new server timestamp, the same clock/pause/cutoff rules,
+and native grading/rate limits. Unbanning restores eligible original contributions
+without duplicate credit. Published contribution changes require unpublishing.
+
+User actions and allocation previews bind account incarnations so reused IDs cannot
+validate stale requests. Full administrator controls remain native with self/last
+admin and history protections. The Users view links to native submission history;
+original and `quest_recovery` records remain available for investigation. Restore
+matching plugin code with its database; pre-recovery code cannot interpret the
+new native submission subtype.
+
 ## Participant attendance and final rosters
 
 Participants register their own CTFd account. **Organize → Event / Teams →
@@ -167,3 +185,20 @@ Check-in and naming never start room or event clocks. Native account moderation
 remains available. All ownership and progress remain in native CTFd models;
 plugin metadata uses the same backed-up MariaDB database and existing secrets.
 See [event operations](https://github.com/Kounex/open-tech-quest/blob/main/docs/operations.md).
+
+## Event-day cutoff and post-start arrivals
+
+Close registration and attendance at the cutoff. If random provisional allocation
+has not been done, Preview/Apply initial allocation while in team preparation.
+Then **Move to attendance review → Preview attendance optimization → Apply reviewed
+groups → team name confirmation → Finalize rosters → Start event**. Closing
+windows never performs grouping automatically.
+
+After finalization, reopen registration if needed and open late-only attendance
+for unassigned newcomers. They confirm their own attendance; an administrator
+admits them with a reason into a named team with space or an additional agreed
+final-named team. Existing players never move and existing clocks/progress do not
+reset. New teams follow the configured event/room timing policy. Late-only capture
+and admission work in draft/live/paused before cutoff; close/published events
+refuse admission. Checked-in post-finalization arrivals can wait across event
+start once capture is closed; they cannot play until placed.

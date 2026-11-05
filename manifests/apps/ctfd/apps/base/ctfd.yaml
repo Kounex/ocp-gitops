@@ -37,7 +37,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: initialize
-          image: ghcr.io/kounex/open-tech-quest:0.1.12@sha256:31ea1824390317a678a31f6871832470b5cf0d59f870dad998fae8ebd389cad2
+          image: ghcr.io/kounex/open-tech-quest:0.1.14@sha256:352c1f8918052b33cf4735bd54887f8c8fc1d682c7a0c7f31ba8f48dea32d123
           command: [/bin/sh, -ec]
           args:
             - |
@@ -94,7 +94,7 @@ spec:
               readOnly: true
       containers:
         - name: ctfd
-          image: ghcr.io/kounex/open-tech-quest:0.1.12@sha256:31ea1824390317a678a31f6871832470b5cf0d59f870dad998fae8ebd389cad2
+          image: ghcr.io/kounex/open-tech-quest:0.1.14@sha256:352c1f8918052b33cf4735bd54887f8c8fc1d682c7a0c7f31ba8f48dea32d123
           command: [/bin/sh, -ec]
           args:
             - |
