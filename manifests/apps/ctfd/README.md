@@ -1,6 +1,6 @@
 # Open Tech Quest on CTFd
 
-[Open Tech Quest](https://github.com/Kounex/open-tech-quest) extends CTFd
+[Open Tech Quest](https://github.com/open-tech-quest/ctfd-plugin) extends CTFd
 with event-branded sequential team rooms, shared progress, prize timing,
 organizer controls and a 50-team projector. The stack uses MariaDB 10.11
 and Redis 7.4, translated from the
@@ -83,7 +83,7 @@ setting on startup and records changes in the organizer audit log.
 
 ## Application image and event setup
 
-CI in `Kounex/open-tech-quest` builds `ghcr.io/kounex/open-tech-quest`; both
+CI in `open-tech-quest/ctfd-plugin` builds `ghcr.io/open-tech-quest/ctfd-plugin`; both
 initialization and runtime use the same version/digest. The pinned upstream
 CTFd base is extended with a plugin and built React frontend, without a core
 fork. Runtime secrets remain the same Doppler keys above.
@@ -106,6 +106,21 @@ publication snapshots. See the application repository's operations guide.
 Pre-migration private backup on Hetzner:
 `/root/ocp-backups/ctfd/pre-open-tech-quest-2026-11-03/` (SQL and uploads;
 contains credentials, never copy into this public repository).
+
+## Organization image source
+
+The public application repository is **open-tech-quest/ctfd-plugin**. CI derives
+its lowercase registry namespace from the repository owner, publishes versioned
+`ghcr.io/open-tech-quest/ctfd-plugin` images with source/revision labels, and keeps
+the existing `vX.Y.Z` sequence. No personal publish token or Doppler secret is
+needed by CI. The package is public for anonymous pulls by OpenShift and Renovate.
+
+Both containers pin the tested version and index digest above. The previous
+`ghcr.io/kounex/open-tech-quest:0.1.15@sha256:7327e4279f8989129ba3c375911ec8c60d45b291791620e09cf56caf9d4605e2`
+remains available as a historical rollback image. The application URL, namespace,
+plugin identifier, database, PVCs and ExternalSecret retain their existing IDs.
+The organization transfer preserves the repository ID, Git history, tags,
+releases and pull requests; old GitHub source URLs redirect to the new repository.
 
 ## Organizer demo preview
 
@@ -189,7 +204,7 @@ Finalize rosters before starting the competition; membership stays fixed.
 Check-in and naming never start room or event clocks. Native account moderation
 remains available. All ownership and progress remain in native CTFd models;
 plugin metadata uses the same backed-up MariaDB database and existing secrets.
-See [event operations](https://github.com/Kounex/open-tech-quest/blob/main/docs/operations.md).
+See [event operations](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/operations.md).
 
 ## Event-day cutoff and post-start arrivals
 
