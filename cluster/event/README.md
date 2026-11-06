@@ -56,7 +56,8 @@ event overlay, three deployments and persistent storage. Its fixture creates
 Only its bootstrap init container seeds data; normal CTFd endpoints handle the
 subsequent load. The fixture refuses any database except `ctfd_loadtest_test`
 and preserves progress on restarts. `fixture.py --late` adds solve history for
-a later-event polling run without deleting sessions.
+a later-event polling run without deleting sessions. Run it in the test pod
+with `env PYTHONPATH=/opt/CTFd python /loadtest/fixture.py --late`.
 
 The test uses `ClusterSecretStore/doppler-ctfd-loadtest` and bootstrap Secret
 `openshift-operators/ctfd-loadtest-doppler-token`, key `token`. Scope that token

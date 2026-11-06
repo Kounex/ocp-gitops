@@ -83,8 +83,8 @@ setting on startup and records changes in the organizer audit log.
 
 ## Event cluster overlay
 
-`apps/overlays/event` prepares the larger configuration for the next
-400-participant / 50-team load test on a cluster with sufficient capacity.
+`apps/overlays/event` contains the measured steady-traffic profile for
+400 participants in 50 teams, with the burst limitations described below.
 The existing `ctfd-app` continues to select `apps/overlays/prod`; adding this
 overlay does not resize the current deployment.
 
@@ -102,8 +102,14 @@ OpenShift services and other workloads need capacity in addition to the table.
 The initial eight-worker / eight-CPU profile sustained 200 active participants
 but accumulated requests and hit client deadlines at 400 on the workshop
 cluster (CTFd 3.8.9, plugin 0.1.17, 25 challenges and 500 seeded solves).
-The twelve-worker profile increases process parallelism and CPU headroom;
-it remains subject to the full polling, submission and burst test.
+The twelve-worker profile sustained 400 active users for ten minutes at
+about 182 requests/s: 109,011 requests, zero errors, endpoint p95 of
+190–1,047 ms and about 8.7 application CPU cores. Mixed submissions passed.
+A simultaneous 50-team flag burst produced nine 12-second client timeouts
+(the solves committed), and rapid reconnects hit the safety backlog limit.
+A five-minute repeat with 1,030 solves also passed (54,507 requests, no errors).
+Cold downloads completed for all 400 users (7,600 requests, no errors).
+This profile validates steady traffic, not full burst readiness for an event.
 It keeps one replica, `Recreate`, the existing PVC sizes and the base's pinned
 images. It does not seed event content, participants or progress.
 
@@ -151,7 +157,7 @@ the local `database` and `cache` services. Keep that cluster's credentials
 and persistent data independent from the current deployment. The namespace,
 runtime ServiceAccount, SCC binding and NetworkPolicies come from the base.
 
-Before using this profile for the event, repeat the authenticated 400-user
+On each target cluster and after performance changes, repeat the authenticated 400-user
 polling and flag-submission test, including late-event solve history, cold
 arrivals and reconnect bursts. The earlier four-worker tests found CPU
 pressure and event-write lock contention; larger limits alone do not validate
