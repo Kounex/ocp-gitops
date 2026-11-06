@@ -9,8 +9,8 @@ spec:
         - name: ctfd
           resources:
             requests:
-              cpu: "6"
+              cpu: "8"
               memory: 2Gi
             limits:
-              cpu: "8"
+              cpu: "10"
               memory: 4Gi
