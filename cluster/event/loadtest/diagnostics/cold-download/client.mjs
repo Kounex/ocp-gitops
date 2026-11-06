@@ -4,6 +4,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {performance} from 'node:perf_hooks';
 import {createPoller} from './polling.ts';
+import {createAgent,requestText} from './http_transport.mjs';
 
 const ROOT=process.env.OTQ_RUN_ROOT??path.dirname(fileURLToPath(import.meta.url));
 const args=process.argv.slice(2);
@@ -18,7 +19,7 @@ const cfg=JSON.parse(fs.readFileSync(path.join(ROOT,'private-runtime.json')));
 const folder=path.join(ROOT,run);fs.mkdirSync(folder,{recursive:true});
 const csv=fs.openSync(path.join(folder,'requests.csv'),'w');
 const events=fs.openSync(path.join(folder,'events.ndjson'),'w');
-const fields=['phase','scheduled_at','started_at','ended_at','user','kind','method','path','status','outcome','unexpected','latency_ms','schedule_lag_ms','connector_wait_ms','request_body_bytes','request_header_bytes','response_body_bytes','response_header_bytes'];
+const fields=['phase','scheduled_at','started_at','ended_at','user','kind','method','path','status','outcome','unexpected','latency_ms','schedule_lag_ms','connector_wait_ms','request_body_bytes','request_header_bytes','response_body_bytes','response_header_bytes','transport_wire_errors','transport_retries'];
 fs.writeSync(csv,fields.join(',')+'\n');
 let phase='warmup',abort=null,mainHealthBad=0,stopGuard=false,finished=false;
 let maxInflight=0,wallGapMax=0;
@@ -30,6 +31,7 @@ const event=(name,data={})=>fs.writeSync(events,JSON.stringify({timestamp:now(),
 const counts=values=>Object.fromEntries([...new Set(values)].map(x=>[x,values.filter(v=>v===x).length]));
 const flags=new Map(cfg.challenges.flatMap(r=>r.steps.map(s=>[s.id,s.flag])));
 const flagExpectations=new Map();
+const displayAgent=createAgent();
 function safeErrorText(value,user){
  if(typeof value!=='string'&&typeof value!=='number')return null;
  let text=String(value).slice(0,1000);
@@ -44,20 +46,23 @@ const isSuccessful=row=>!row.unexpected&&!isCancelled(row)&&row.status===200;
 
 async function request(user,kind,urlPath,{method='GET',body,signal,owner}={}){
  const begin=now(),currentPhase=phase;
- let status=0,outcome='ok',unexpected=0,bytes=0,headerBytes=0,data;
+ let status=0,outcome='ok',unexpected=0,bytes=0,headerBytes=0,data,wireErrors=0,transportRetries=0;
  const encoded=body===undefined?undefined:JSON.stringify(body);
  const headers={'Accept':'application/json','Accept-Encoding':'identity','X-Quest-Attendance-UI':'1','User-Agent':'OpenTechQuest-production-poller-load-test/20261106'};
  if(freshConnections)headers.Connection='close';
  if(user)headers.Cookie=cfg.cookie_name+'='+cfg.cookies[String(user.index)];
- if(encoded){headers['Content-Type']='application/json';headers['CSRF-Token']=user.nonce;}
+ if(encoded){headers['Content-Type']='application/json';headers['CSRF-Token']=user.nonce;headers['Content-Length']=String(Buffer.byteLength(encoded));}
  const reqBytes=Object.entries(headers).reduce((n,[k,v])=>n+k.length+String(v).length+4,0);
  const token={phase:currentPhase,kind,user:user?.index??-1};pending.add(token);maxInflight=Math.max(maxInflight,pending.size);
  if(pending.size>1200)abort??='outstanding_request_safety_limit';
  try{
-  const response=await fetch(BASE+urlPath,{method,headers,body:encoded,signal:signal??AbortSignal.timeout(12000),redirect:'manual'});
-  status=response.status;const text=await response.text();
-  bytes=Number(response.headers.get('content-length')??Buffer.byteLength(text));
-  headerBytes=[...response.headers].reduce((n,[k,v])=>n+k.length+v.length+4,0);
+  const response=await requestText(BASE+urlPath,{method,headers,body:encoded,signal:signal??AbortSignal.timeout(12000),agent:user?.httpAgent??displayAgent,onWireError:diagnostic=>{
+   wireErrors++;if(diagnostic.will_retry)transportRetries++;
+   event('transport_wire_error',{phase:currentPhase,user:user?.index??-1,kind,method,path:urlPath,intentional_disposal:Boolean(owner?.stopped&&signal?.aborted),...diagnostic});
+  }});
+  status=response.status;const text=response.text;
+  bytes=Number(response.headers['content-length']??Buffer.byteLength(text));
+  headerBytes=Object.entries(response.headers).reduce((n,[k,v])=>n+k.length+String(v).length+4,0);
   if(kind==='reload_html'){
    if(status!==200)throw new Error('html_http_'+status);
   }else{
@@ -73,17 +78,17 @@ async function request(user,kind,urlPath,{method='GET',body,signal,owner}={}){
    }
   }
  }catch(error){
-  if(owner?.stopped&&signal?.aborted&&(error.name==='AbortError'||error===signal.reason||error.cause?.code==='UND_ERR_ABORTED')){outcome='cancelled_on_reload';}
+  if(owner?.stopped&&signal?.aborted&&(error.name==='AbortError'||error===signal.reason||error.cause?.code==='UND_ERR_ABORTED'||error.code==='ABORT_ERR'||error.code==='ECONNRESET')){outcome='cancelled_on_reload';}
   else{
    outcome=error.name+':'+safeErrorText(error.message,user);unexpected=1;
    event('request_error',{phase:currentPhase,user:user?.index??-1,kind,path:urlPath,status,
     error_name:error.name,error_message:safeErrorText(error.message,user),
-    cause_code:safeErrorText(error.cause?.code,user),cause_message:safeErrorText(error.cause?.message,user)});
+    cause_code:safeErrorText(error.cause?.code??error.code,user),cause_message:safeErrorText(error.cause?.message,user)});
   }
  }finally{
   pending.delete(token);
   const end=now();
-  const row={phase:currentPhase,scheduled_at:begin,started_at:begin,ended_at:end,user:user?.index??-1,kind,method,path:urlPath,status,outcome,unexpected,latency_ms:(end-begin)*1000,schedule_lag_ms:0,connector_wait_ms:0,request_body_bytes:encoded?Buffer.byteLength(encoded):0,request_header_bytes:reqBytes,response_body_bytes:bytes,response_header_bytes:headerBytes};
+  const row={phase:currentPhase,scheduled_at:begin,started_at:begin,ended_at:end,user:user?.index??-1,kind,method,path:urlPath,status,outcome,unexpected,latency_ms:(end-begin)*1000,schedule_lag_ms:0,connector_wait_ms:0,request_body_bytes:encoded?Buffer.byteLength(encoded):0,request_header_bytes:reqBytes*(1+transportRetries),response_body_bytes:bytes,response_header_bytes:headerBytes,transport_wire_errors:wireErrors,transport_retries:transportRetries};
   rows.push(row);fs.writeSync(csv,fields.map(k=>'"'+String(row[k]).replaceAll('"','""')+'"').join(',')+'\n');
  }
  if(unexpected)throw new Error(outcome);
@@ -92,7 +97,7 @@ async function request(user,kind,urlPath,{method='GET',body,signal,owner}={}){
 
 class User{
  constructor(index){
-  this.index=index;this.teamId=Math.floor(index/8)+1;this.roomIndex=index%5;
+  this.httpAgent=createAgent();this.index=index;this.teamId=Math.floor(index/8)+1;this.roomIndex=index%5;
   this.rooms=[];this.nonce='';this.resources={};this.stopped=false;this.reloads=0;this.ready=false;
  }
  resource(kind,url,interval,accept=()=>{}){
@@ -185,7 +190,7 @@ function refreshSummaries(){
    by[kind]={requests:a.length,successful:successful.length,cancelled:a.filter(isCancelled).length,
     late_completions:a.filter(r=>r.ended_at>out.ended_at).length,rps:inWindow.length/duration,
     p50_ms:percentile(lat,.5),p95_ms:percentile(lat,.95),p99_ms:percentile(lat,.99),max_ms:lat.length?Math.max(...lat):null,
-    unexpected:a.reduce((n,r)=>n+r.unexpected,0),outcomes:counts(a.map(r=>r.outcome)),status:counts(a.map(r=>r.status))};
+    wire_errors:a.filter(r=>!isCancelled(r)).reduce((n,r)=>n+r.transport_wire_errors,0),transport_retries:a.reduce((n,r)=>n+r.transport_retries,0),unexpected:a.reduce((n,r)=>n+r.unexpected,0),outcomes:counts(a.map(r=>r.outcome)),status:counts(a.map(r=>r.status))};
   }
   const successful=selected.filter(isSuccessful),actualRate=successful.filter(r=>r.ended_at<=out.ended_at).length/duration;
   const errors=selected.reduce((n,r)=>n+r.unexpected,0);
@@ -194,7 +199,7 @@ function refreshSummaries(){
    successful_requests:successful.length,cancelled_requests:selected.filter(isCancelled).length,
    late_completions:selected.filter(r=>r.ended_at>out.ended_at).length,
    pending_requests:[...pending].filter(r=>r.phase===out.name).length,
-   completed_rps:actualRate,unexpected:errors,dropped_schedules:0,by_kind:by,
+   completed_rps:actualRate,wire_errors:selected.filter(r=>!isCancelled(r)).reduce((n,r)=>n+r.transport_wire_errors,0),transport_retries:selected.reduce((n,r)=>n+r.transport_retries,0),unexpected:errors,dropped_schedules:0,by_kind:by,
    request_bytes:selected.reduce((n,r)=>n+r.request_header_bytes+r.request_body_bytes,0),
    response_bytes:selected.reduce((n,r)=>n+r.response_header_bytes+r.response_body_bytes,0),
    schedule_lag_p99_ms:0,performance_passed:performancePassed,
@@ -206,7 +211,7 @@ function refreshSummaries(){
 }
 function saveSummary(){
  refreshSummaries();
- fs.writeFileSync(path.join(folder,'summary.json'),JSON.stringify({run,base:BASE,client:'production-polling.ts',transport:freshConnections?'http1_fresh_connections':'node_fetch_default_pool',users:400,abort,max_inflight:maxInflight,generator_wall_clock_gap_max_s:wallGapMax,finalized:finished&&pending.size===0,pending_requests:pending.size,phases},null,2));
+ fs.writeFileSync(path.join(folder,'summary.json'),JSON.stringify({run,base:BASE,client:'production-polling.ts',transport:freshConnections?'http1_fresh_connections':'http1_per_user_six_socket_pool_reused_get_retry_once',users:400,abort,max_inflight:maxInflight,generator_wall_clock_gap_max_s:wallGapMax,finalized:finished&&pending.size===0,pending_requests:pending.size,phases},null,2));
 }
 function summarize(name,start,end,selected,extra={}){
  const out={name,started_at:start,ended_at:end,...extra};
@@ -285,6 +290,7 @@ try{
  stopGuard=true;clearInterval(progress);await guardPromise;
  const settleUntil=now()+16;while(pending.size&&now()<settleUntil)await sleep(50);
  if(pending.size)abort??='requests_unsettled_on_shutdown';
+ users.forEach(u=>u.httpAgent.destroy());displayAgent.destroy();
  finished=true;saveSummary();
  event('run_end',{abort,duration_s:now()-started});fs.closeSync(csv);fs.closeSync(events);
 }

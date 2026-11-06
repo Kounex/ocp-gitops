@@ -7,5 +7,6 @@ configMapGenerator:
     files:
       - coldcheck.cjs
       - client.mjs
+      - http_transport.mjs
       - polling.ts
       - asset-paths.json
