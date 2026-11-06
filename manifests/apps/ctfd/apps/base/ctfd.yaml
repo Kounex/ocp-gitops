@@ -37,7 +37,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: initialize
-          image: ghcr.io/open-tech-quest/ctfd-plugin:0.1.16@sha256:e3c482115fbd99609068177a8f9fbc9f0c645744f9199fb5733c5eb2ce8bea6d
+          image: ghcr.io/open-tech-quest/ctfd-plugin:0.1.17@sha256:56c7e3bd1ae3c6f8fcbf6e13ba5afeb1544c503085f5cd67fe5b6af781eeac8c
           command: [/bin/sh, -ec]
           args:
             - |
@@ -94,7 +94,7 @@ spec:
               readOnly: true
       containers:
         - name: ctfd
-          image: ghcr.io/open-tech-quest/ctfd-plugin:0.1.16@sha256:e3c482115fbd99609068177a8f9fbc9f0c645744f9199fb5733c5eb2ce8bea6d
+          image: ghcr.io/open-tech-quest/ctfd-plugin:0.1.17@sha256:56c7e3bd1ae3c6f8fcbf6e13ba5afeb1544c503085f5cd67fe5b6af781eeac8c
           command: [/bin/sh, -ec]
           args:
             - |

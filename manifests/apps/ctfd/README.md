@@ -155,6 +155,19 @@ native challenges/flags/files and rejects activity or demo ownership. Stable
 slugs preserve links on rename; an intentionally empty room list stays empty
 across restarts. Navigation and standings follow the configured room list.
 
+## Challenge visibility
+
+The room editor supports native **Hidden**, **Visible** and **Locked** states.
+Hidden challenges are omitted from participant paths, prerequisites and
+unpublished award counts without deleting solves; restoring visibility restores
+eligible credit at its original timestamp. Locked challenges retain their place
+and earned credit but deny content and submissions. Staff can preview both.
+Native CTFd requirements and next links follow the active room path atomically,
+including visibility changes through the stock API. Startup repairs older
+derived dependencies while preserving mappings, starts and submissions. A new
+room clock requires its first non-hidden step to be Visible; existing clocks
+never reset. Published award snapshots stay immutable.
+
 ## Account moderation and retained evidence
 
 **Organize → Users** supports **Return to participant**, safe confirmed deletion
