@@ -6,4 +6,6 @@ configMapGenerator:
   - name: ctfd-cold-diagnostic
     files:
       - coldcheck.cjs
+      - client.mjs
+      - polling.ts
       - asset-paths.json

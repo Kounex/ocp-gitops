@@ -21,6 +21,9 @@ spec:
         - name: generator
           image: docker.io/library/node:26.13.0-slim@sha256:6f3406bb40734a2cbe3c78c3a5d9a467113b41b7a4c653a8d0534a276c67afdf
           command: [node, -e, 'setTimeout(() => {}, 86400000)']
+          env:
+            - name: OTQ_RUN_ROOT
+              value: /work
           resources:
             requests:
               cpu: 250m
@@ -34,10 +37,22 @@ spec:
             capabilities:
               drop: [ALL]
           volumeMounts:
+            - name: work
+              mountPath: /work
+            - name: sessions
+              mountPath: /work/private-runtime.json
+              subPath: private-runtime.json
+              readOnly: true
             - name: source
               mountPath: /loadgen
               readOnly: true
       volumes:
+        - name: work
+          emptyDir: {}
+        - name: sessions
+          secret:
+            secretName: ctfd-loadtest-driver
+            defaultMode: 0440
         - name: source
           configMap:
             name: ctfd-cold-diagnostic
