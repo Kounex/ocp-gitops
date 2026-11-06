@@ -15,7 +15,6 @@ resources:
   - ctfd.yaml
   - network-policy.yaml
   - route.yaml
-  - loadtest.yaml
 configMapGenerator:
   - name: ctfd-config
     literals:
