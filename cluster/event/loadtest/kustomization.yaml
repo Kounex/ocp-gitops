@@ -1,0 +1,47 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ctfd-loadtest
+resources:
+  - ../../../manifests/apps/ctfd/apps/overlays/event
+configMapGenerator:
+  - name: quest-loadtest-fixture
+    files:
+      - fixture.py
+      - metrics.py
+  - name: ctfd-config
+    behavior: merge
+    literals:
+      - CTFD_NAME=DISPOSABLE Open Tech Quest load test
+patches:
+  - path: patches/fixture.yaml
+  - target:
+      kind: Namespace
+      name: ctfd
+    patch: |
+      - op: replace
+        path: /metadata/name
+        value: ctfd-loadtest
+  - target:
+      kind: RoleBinding
+      name: ctfd-nonroot
+    patch: |
+      - op: replace
+        path: /subjects/0/namespace
+        value: ctfd-loadtest
+  - target:
+      kind: ExternalSecret
+      name: ctfd-secrets
+    patch: |
+      - op: replace
+        path: /spec/secretStoreRef/name
+        value: doppler-ctfd-loadtest
+      - op: replace
+        path: /spec/target/template/data/DATABASE_URL
+        value: 'mysql+pymysql://ctfd:{{ .dbPassword }}@database:3306/ctfd_loadtest_test'
+  - target:
+      kind: Deployment
+      name: database
+    patch: |
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: ctfd_loadtest_test

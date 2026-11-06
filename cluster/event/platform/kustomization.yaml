@@ -5,3 +5,4 @@ resources:
   - ../../../manifests/configs/external-secrets/apps
   - project.yaml
   - application.yaml
+  - ../test-platform

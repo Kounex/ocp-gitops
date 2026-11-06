@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ctfd
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: initialize
+          env:
+            - name: QUEST_LOADTEST
+              value: isolated-event-capacity-test
+          args:
+            - |
+              printf '\nSESSION_COOKIE_SECURE =\n' >> /opt/CTFd/CTFd/config.ini
+              python ping.py
+              flask db upgrade
+              PYTHONPATH=/opt/CTFd python /bootstrap/bootstrap.py
+              PYTHONPATH=/opt/CTFd python /loadtest/fixture.py
+          volumeMounts:
+            - name: loadtest-fixture
+              mountPath: /loadtest
+              readOnly: true
+            - name: loadtest-runtime
+              mountPath: /run/quest-loadtest
+      containers:
+        - name: ctfd
+          env:
+            - name: QUEST_LOADTEST
+              value: isolated-event-capacity-test
+          volumeMounts:
+            - name: loadtest-fixture
+              mountPath: /loadtest
+              readOnly: true
+            - name: loadtest-runtime
+              mountPath: /run/quest-loadtest
+      volumes:
+        - name: loadtest-fixture
+          configMap:
+            name: quest-loadtest-fixture
+        - name: loadtest-runtime
+          emptyDir:
+            sizeLimit: 32Mi

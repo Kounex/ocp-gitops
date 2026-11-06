@@ -47,3 +47,24 @@ Bootstrap-only state outside Git: the login credentials/kubeconfig and the
 Doppler service-token Secret. All application resource changes go through Git.
 Removing the event Application with its finalizer also prunes its PVCs; preserve
 backups before storing real event data.
+
+## Disposable capacity test
+
+`test-platform/` adds an independent `ctfd-loadtest` Application using the same
+event overlay, three deployments and persistent storage. Its fixture creates
+400 synthetic users in 50 teams, 25 demo challenges and 500 historical solves.
+Only its bootstrap init container seeds data; normal CTFd endpoints handle the
+subsequent load. The fixture refuses any database except `ctfd_loadtest_test`
+and preserves progress on restarts. `fixture.py --late` adds solve history for
+a later-event polling run without deleting sessions.
+
+The test uses `ClusterSecretStore/doppler-ctfd-loadtest` and bootstrap Secret
+`openshift-operators/ctfd-loadtest-doppler-token`, key `token`. Scope that token
+to a separate Doppler config with fresh values for all five CTFd secrets.
+Never reuse the real event credentials. Private participant credentials are
+written inside the test pod at `/run/quest-loadtest/participants.json`.
+
+Include `../test-platform` in `platform/kustomization.yaml` only while testing.
+Removing that reference lets Argo prune the test Application, namespace and
+PVCs. The clean event Application remains independent. The fixture is a
+synthetic test tool and is never part of the event overlay itself.

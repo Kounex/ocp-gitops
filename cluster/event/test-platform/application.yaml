@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ctfd-event-loadtest
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '210'
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: ctfd-event-loadtest
+  source:
+    repoURL: https://github.com/Kounex/ocp-gitops.git
+    targetRevision: main
+    path: cluster/event/loadtest
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ctfd-loadtest
+  ignoreDifferences:
+    - kind: Namespace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 20
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 2m
