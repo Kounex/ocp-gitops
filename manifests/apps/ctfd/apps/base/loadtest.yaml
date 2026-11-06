@@ -77,7 +77,7 @@ spec:
         app.kubernetes.io/name: ctfd-loadtest
         app.kubernetes.io/part-of: ctfd-loadtest
       annotations:
-        loadtest.open-tech-quest/profile: current
+        loadtest.open-tech-quest/profile: larger
     spec:
       serviceAccountName: ctfd-runtime
       automountServiceAccountToken: false
@@ -147,7 +147,7 @@ spec:
         - name: QUEST_LOADTEST
           value: isolated-20261106
         - name: WORKERS
-          value: '2'
+          value: '4'
         - name: REVERSE_PROXY
           value: 1,1,1,0,0
         - name: SESSION_COOKIE_SECURE
@@ -168,8 +168,8 @@ spec:
             cpu: 100m
             memory: 256Mi
           limits:
-            cpu: '2'
-            memory: 1Gi
+            cpu: '4'
+            memory: 4Gi
         startupProbe:
           httpGet:
             path: /login
@@ -220,7 +220,7 @@ spec:
             memory: 256Mi
           limits:
             cpu: '2'
-            memory: 1Gi
+            memory: 2Gi
         volumeMounts:
         - name: runtime
           mountPath: /runtime
@@ -253,7 +253,7 @@ spec:
             cpu: 25m
             memory: 64Mi
           limits:
-            cpu: '1'
+            cpu: 500m
             memory: 256Mi
         volumeMounts:
         - name: runtime
@@ -280,6 +280,7 @@ spec:
       - name: fixture
         configMap:
           name: ctfd-loadtest-fixture
+  paused: true
 ---
 apiVersion: v1
 kind: Service
