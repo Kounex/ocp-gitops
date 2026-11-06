@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: ctfd-event
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '190'
+spec:
+  description: Open Tech Quest event instance on this cluster
+  sourceRepos:
+    - https://github.com/Kounex/ocp-gitops.git
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: ctfd
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'

@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ctfd-event
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '200'
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: ctfd-event
+  source:
+    repoURL: https://github.com/Kounex/ocp-gitops.git
+    targetRevision: main
+    path: manifests/apps/ctfd/apps/overlays/event
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ctfd
+  ignoreDifferences:
+    - kind: Namespace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 20
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 2m

@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ctfd-event-platform
+  namespace: openshift-gitops
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Kounex/ocp-gitops.git
+    targetRevision: main
+    path: cluster/event/platform
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 20
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 2m
