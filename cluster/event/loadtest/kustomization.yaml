@@ -2,7 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: ctfd-loadtest
 resources:
-  - diagnostics/cold-download
   - ../../../manifests/apps/ctfd/apps/overlays/event
 configMapGenerator:
   - name: quest-loadtest-fixture
@@ -14,7 +13,6 @@ configMapGenerator:
     literals:
       - CTFD_NAME=DISPOSABLE Open Tech Quest load test
 patches:
-  - path: patches/capacity.yaml
   - path: patches/fixture.yaml
   - target:
       kind: Namespace
@@ -47,7 +45,3 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/env/0/value
         value: ctfd_loadtest_test
-images:
-  - name: ghcr.io/open-tech-quest/ctfd-plugin
-    newTag: 0.1.18
-    digest: sha256:d2628964afc6eb1858791ca4459bd5bfe529c2471d7e8a58078b7ade95b41c6e

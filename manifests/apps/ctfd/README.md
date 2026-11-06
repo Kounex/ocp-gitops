@@ -83,35 +83,41 @@ setting on startup and records changes in the organizer audit log.
 
 ## Event cluster overlay
 
-`apps/overlays/event` contains the measured steady-traffic profile for
-400 participants in 50 teams, with the burst limitations described below.
-The existing `ctfd-app` continues to select `apps/overlays/prod`; adding this
-overlay does not resize the current deployment.
+`apps/overlays/event` contains the measured plugin 0.1.18 / CTFd 3.8.9 profile
+for 400 active participants in 50 teams. It pins the optimized plugin image;
+`ctfd-app` still selects `apps/overlays/prod`, whose image/resources are unchanged.
 
 | Component | CPU request / limit | Memory request / limit |
 |---|---|---|
-| CTFd, 12 Gunicorn workers in one pod | 10 / 12 cores | 2 GiB / 4 GiB |
+| CTFd, 12 Gunicorn workers in one pod | 8 / 10 cores | 2 GiB / 4 GiB |
 | MariaDB | 1 / 2 cores | 1 GiB / 2 GiB |
 | Redis | 250m / 500m | 128 MiB / 256 MiB |
-| **Total** | **11.25 / 14.5 cores** | **3.125 GiB / 6.25 GiB** |
+| **Total** | **9.25 / 12.5 cores** | **3.125 GiB / 6.25 GiB** |
 
-The initialization container retains the base's smaller allocation and runs
-before the web container, so it does not add to these steady-state totals.
-The CTFd pod needs a node that can admit its full 10-CPU / 2-GiB request;
-OpenShift services and other workloads need capacity in addition to the table.
-The initial eight-worker / eight-CPU profile sustained 200 active participants
-but accumulated requests and hit client deadlines at 400 on the workshop
-cluster (CTFd 3.8.9, plugin 0.1.17, 25 challenges and 500 seeded solves).
-The twelve-worker profile sustained 400 active users for ten minutes at
-about 182 requests/s: 109,011 requests, zero errors, endpoint p95 of
-190–1,047 ms and about 8.7 application CPU cores. Mixed submissions passed.
-A simultaneous 50-team flag burst produced nine 12-second client timeouts
-(the solves committed), and rapid reconnects hit the safety backlog limit.
-A five-minute repeat with 1,030 solves also passed (54,507 requests, no errors).
-Cold downloads completed for all 400 users (7,600 requests, no errors).
-This profile validates steady traffic, not full burst readiness for an event.
-It keeps one replica, `Recreate`, the existing PVC sizes and the base's pinned
-images. It does not seed event content, participants or progress.
+The init container runs before the web container and does not add to steady
+requests. The CTFd pod needs a node with room for its eight-CPU / two-GiB request;
+allow additional capacity for OpenShift. Twelve workers are processes; the
+10-CPU cap limits their combined execution. One replica, `Recreate`, and existing
+RWO PVC sizes remain. No sample content or participants enter the event overlay.
+
+On 16-vCPU AMD EPYC workshop nodes, scoped history reads and GET-local reuse
+reduced app CPU from 8.7 to 6.6 cores in the unchanged 182-requests/s replay.
+The shipped scheduler coalesces refreshes, adds jitter and backs off failures.
+A 10-minute later-history hold (1,070 solves, 400 native sessions) through the
+public HTTPS Route from a test pod completed 109,089 requests with zero unrecovered errors,
+about 6.0 app CPU cores and endpoint p95 up to 0.37s.
+Four stale-connection GET retries were recorded; no POST was retried.
+All 50 simultaneous flags succeeded (p95 7.9s), all 400 members observed
+their solve, and 400 return/reload actions each completed. An 8-CPU cap exceeded
+the 2s steady endpoint-p95 target. The shared event write lock still queues flag
+bursts for several seconds; it has not been removed.
+
+In-cluster cold HTML/assets passed 7,600 requests. External Mac connection stress
+exposed socket closures and connection deadlines while application CPU had room.
+This qualifies origin HTTP capacity, not venue Wi-Fi/WAN or 400 browser renderers.
+The older replay that adds startup traffic while retaining old polls still hits
+the backlog guard; it is an overload control, unlike a real reload. Repeat tests
+with your event's challenge/history sizes, flag bursts and actual network.
 
 The overlay merges `WORKERS=12` and `SQLALCHEMY_MAX_OVERFLOW=0` into
 `ctfd-config`. For the pinned CTFd 3.8.9 / Flask-SQLAlchemy MySQL pool, each

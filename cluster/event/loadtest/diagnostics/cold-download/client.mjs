@@ -46,7 +46,7 @@ const isSuccessful=row=>!row.unexpected&&!isCancelled(row)&&row.status===200;
 
 async function request(user,kind,urlPath,{method='GET',body,signal,owner}={}){
  const begin=now(),currentPhase=phase;
- let status=0,outcome='ok',unexpected=0,bytes=0,headerBytes=0,data,wireErrors=0,transportRetries=0;
+ let status=0,outcome='ok',unexpected=0,bytes=0,headerBytes=0,data,wireErrors=0,transportRetries=0,terminalFailureDisposal=null;
  const encoded=body===undefined?undefined:JSON.stringify(body);
  const headers={'Accept':'application/json','Accept-Encoding':'identity','X-Quest-Attendance-UI':'1','User-Agent':'OpenTechQuest-production-poller-load-test/20261106'};
  if(freshConnections)headers.Connection='close';
@@ -57,8 +57,10 @@ async function request(user,kind,urlPath,{method='GET',body,signal,owner}={}){
  if(pending.size>1200)abort??='outstanding_request_safety_limit';
  try{
   const response=await requestText(BASE+urlPath,{method,headers,body:encoded,signal:signal??AbortSignal.timeout(12000),agent:user?.httpAgent??displayAgent,onWireError:diagnostic=>{
-   wireErrors++;if(diagnostic.will_retry)transportRetries++;
-   event('transport_wire_error',{phase:currentPhase,user:user?.index??-1,kind,method,path:urlPath,intentional_disposal:Boolean(owner?.stopped&&signal?.aborted),...diagnostic});
+   const disposed=Boolean(owner?.stopped&&signal?.aborted);
+   if(!disposed)wireErrors++;if(diagnostic.will_retry)transportRetries++;
+   if(!diagnostic.will_retry)terminalFailureDisposal=disposed;
+   event('transport_wire_error',{phase:currentPhase,user:user?.index??-1,kind,method,path:urlPath,intentional_disposal:disposed,...diagnostic});
   }});
   status=response.status;const text=response.text;
   bytes=Number(response.headers['content-length']??Buffer.byteLength(text));
@@ -78,7 +80,7 @@ async function request(user,kind,urlPath,{method='GET',body,signal,owner}={}){
    }
   }
  }catch(error){
-  if(owner?.stopped&&signal?.aborted&&(error.name==='AbortError'||error===signal.reason||error.cause?.code==='UND_ERR_ABORTED'||error.code==='ABORT_ERR'||error.code==='ECONNRESET')){outcome='cancelled_on_reload';}
+  if(terminalFailureDisposal===true||(terminalFailureDisposal===null&&owner?.stopped&&signal?.aborted&&error===signal.reason)){outcome='cancelled_on_reload';}
   else{
    outcome=error.name+':'+safeErrorText(error.message,user);unexpected=1;
    event('request_error',{phase:currentPhase,user:user?.index??-1,kind,path:urlPath,status,
@@ -190,7 +192,7 @@ function refreshSummaries(){
    by[kind]={requests:a.length,successful:successful.length,cancelled:a.filter(isCancelled).length,
     late_completions:a.filter(r=>r.ended_at>out.ended_at).length,rps:inWindow.length/duration,
     p50_ms:percentile(lat,.5),p95_ms:percentile(lat,.95),p99_ms:percentile(lat,.99),max_ms:lat.length?Math.max(...lat):null,
-    wire_errors:a.filter(r=>!isCancelled(r)).reduce((n,r)=>n+r.transport_wire_errors,0),transport_retries:a.reduce((n,r)=>n+r.transport_retries,0),unexpected:a.reduce((n,r)=>n+r.unexpected,0),outcomes:counts(a.map(r=>r.outcome)),status:counts(a.map(r=>r.status))};
+    wire_errors:a.reduce((n,r)=>n+r.transport_wire_errors,0),transport_retries:a.reduce((n,r)=>n+r.transport_retries,0),unexpected:a.reduce((n,r)=>n+r.unexpected,0),outcomes:counts(a.map(r=>r.outcome)),status:counts(a.map(r=>r.status))};
   }
   const successful=selected.filter(isSuccessful),actualRate=successful.filter(r=>r.ended_at<=out.ended_at).length/duration;
   const errors=selected.reduce((n,r)=>n+r.unexpected,0);
@@ -199,7 +201,7 @@ function refreshSummaries(){
    successful_requests:successful.length,cancelled_requests:selected.filter(isCancelled).length,
    late_completions:selected.filter(r=>r.ended_at>out.ended_at).length,
    pending_requests:[...pending].filter(r=>r.phase===out.name).length,
-   completed_rps:actualRate,wire_errors:selected.filter(r=>!isCancelled(r)).reduce((n,r)=>n+r.transport_wire_errors,0),transport_retries:selected.reduce((n,r)=>n+r.transport_retries,0),unexpected:errors,dropped_schedules:0,by_kind:by,
+   completed_rps:actualRate,wire_errors:selected.reduce((n,r)=>n+r.transport_wire_errors,0),transport_retries:selected.reduce((n,r)=>n+r.transport_retries,0),unexpected:errors,dropped_schedules:0,by_kind:by,
    request_bytes:selected.reduce((n,r)=>n+r.request_header_bytes+r.request_body_bytes,0),
    response_bytes:selected.reduce((n,r)=>n+r.response_header_bytes+r.response_body_bytes,0),
    schedule_lag_p99_ms:0,performance_passed:performancePassed,

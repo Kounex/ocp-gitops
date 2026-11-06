@@ -6,7 +6,7 @@ No existing cluster entrypoint references this directory.
 
 Use an explicit kubeconfig for the intended cluster for every command. The
 cluster needs a default RWO StorageClass and enough per-node CPU for the event
-overlay's ten-CPU application request, in addition to platform workloads.
+overlay's eight-CPU application request, in addition to platform workloads.
 
 ## Bootstrap
 
@@ -69,3 +69,33 @@ Include `../test-platform` in `platform/kustomization.yaml` only while testing.
 Removing that reference lets Argo prune the test Application, namespace and
 PVCs. The clean event Application remains independent. The fixture is a
 synthetic test tool and is never part of the event overlay itself.
+
+### Optional Route diagnostics
+
+`loadtest/diagnostics/cold-download` is an optional generator, excluded from the
+normal event and disposable fixture. Add it to the disposable kustomization only
+while measuring. Its idle Node container runs an anonymous cold HTML/static
+check with `node /loadgen/coldcheck.cjs` through the public HTTPS Route.
+`client.mjs` also runs 400 native protocol clients using the shipped `polling.ts`;
+its copy must match the plugin image under test. Set the client URL constants
+to the disposable Route and clean health Route before testing another cluster. This measures HTTP capacity,
+not browser rendering. The scheduler preserves normal healthy polling intervals.
+
+Before enabling the generator, provision temporary Secret `ctfd-loadtest-driver` in the disposable
+namespace, file/key `private-runtime.json`, containing test-only native sessions.
+Provision it privately; never commit credentials or include it in result archives.
+Set `OTQ_RUN_ROOT=/work` and invoke `node /loadgen/client.mjs --run <name> --hold 600`.
+Results go to `/work/<name>`. Collect request CSVs, final summaries, server CPU /
+RAM / throttling, network counters, DB lock waits and pools. Count raw wire
+failures and bounded GET retries separately from unrecovered requests; capture
+disposal provenance at socket failure and retain late responses. Require finalized
+outcomes, zero unexpected errors, all 50 correct flag acknowledgments, all 400
+members observing their team solve, and all 400 return/reload actions. Steady
+qualification used at least 172.6 successful requests/s and endpoint p95 <=2s.
+
+Retain failed runs. A fixed-rate replay that retains old polls while adding
+startup calls is an overload control; actual reloads dispose the old resources.
+External connection limits and browser rendering need separate checks even when
+origin capacity passes. Remove the diagnostic reference after testing; removing
+`../test-platform` prunes its namespace, private session Secret and PVCs. Revoke
+and remove the separate bootstrap service token in `openshift-operators` too.

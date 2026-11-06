@@ -9,10 +9,10 @@ spec:
         - name: ctfd
           resources:
             requests:
-              cpu: '10'
+              cpu: '8'
               memory: 2Gi
             limits:
-              cpu: '12'
+              cpu: '10'
               memory: 4Gi
 ---
 apiVersion: apps/v1

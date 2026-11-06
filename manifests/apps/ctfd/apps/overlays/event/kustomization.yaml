@@ -13,3 +13,7 @@ configMapGenerator:
       - SQLALCHEMY_MAX_OVERFLOW=0
 patches:
   - path: patches/resources.yaml
+images:
+  - name: ghcr.io/open-tech-quest/ctfd-plugin
+    newTag: 0.1.18
+    digest: sha256:d2628964afc6eb1858791ca4459bd5bfe529c2471d7e8a58078b7ade95b41c6e

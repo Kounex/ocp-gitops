@@ -32,13 +32,22 @@ export function createTransport(request = https.request) {
             if (settled) return;
             settled = true;
             const socket = req?.socket;
-            reject({
-              error,
-              reusedSocket: req?.reusedSocket === true,
-              responseHeadersReceived,
-              bytesRead: socket?.bytesRead,
-              bytesWritten: socket?.bytesWritten,
-            });
+            const willRetry = index === 0 && method === 'GET'
+              && req?.reusedSocket === true && error?.code === 'ECONNRESET'
+              && responseHeadersReceived === false && !signal?.aborted;
+            // Emit synchronously with the socket failure. A later page disposal
+            // must not turn a preceding real failure into a cancellation.
+            const diagnostic = {
+              attempt: index + 1,
+              code: typeof error?.code === 'string' ? error.code : 'UNKNOWN',
+              reused_socket: req?.reusedSocket === true,
+              will_retry: willRetry,
+              ...(typeof socket?.bytesRead === 'number' ? {bytes_read: socket.bytesRead} : {}),
+              ...(typeof socket?.bytesWritten === 'number' ? {bytes_written: socket.bytesWritten} : {}),
+            };
+            wireErrors.push(diagnostic);
+            onWireError?.(diagnostic);
+            reject({error, willRetry});
           }
           try {
             req = request(target, {method, headers, agent, signal}, response => {
@@ -73,22 +82,7 @@ export function createTransport(request = https.request) {
         });
         return {...result, attempts: index + 1, wire_errors: wireErrors};
       } catch (failure) {
-        const {error, reusedSocket, responseHeadersReceived, bytesRead, bytesWritten} = failure;
-        const willRetry = index === 0 && method === 'GET'
-          && reusedSocket === true && error?.code === 'ECONNRESET'
-          && responseHeadersReceived === false && !signal?.aborted;
-        // Diagnostic data deliberately excludes message, URL, address, headers,
-        // cookies and payload. Socket byte counters include prior socket reuse.
-        const diagnostic = {
-          attempt: index + 1,
-          code: typeof error?.code === 'string' ? error.code : 'UNKNOWN',
-          reused_socket: reusedSocket === true,
-          will_retry: willRetry,
-          ...(typeof bytesRead === 'number' ? {bytes_read: bytesRead} : {}),
-          ...(typeof bytesWritten === 'number' ? {bytes_written: bytesWritten} : {}),
-        };
-        wireErrors.push(diagnostic);
-        onWireError?.(diagnostic);
+        const {error, willRetry} = failure;
         if (!willRetry) throw error;
         // Only a reused-socket reset before response headers is replayed.
         // The original AbortSignal is reused, never replaced or extended.
