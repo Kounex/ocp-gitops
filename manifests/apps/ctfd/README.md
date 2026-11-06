@@ -90,23 +90,27 @@ overlay does not resize the current deployment.
 
 | Component | CPU request / limit | Memory request / limit |
 |---|---|---|
-| CTFd, 8 Gunicorn workers in one pod | 6 / 8 cores | 2 GiB / 4 GiB |
+| CTFd, 12 Gunicorn workers in one pod | 10 / 12 cores | 2 GiB / 4 GiB |
 | MariaDB | 1 / 2 cores | 1 GiB / 2 GiB |
 | Redis | 250m / 500m | 128 MiB / 256 MiB |
-| **Total** | **7.25 / 10.5 cores** | **3.125 GiB / 6.25 GiB** |
+| **Total** | **11.25 / 14.5 cores** | **3.125 GiB / 6.25 GiB** |
 
 The initialization container retains the base's smaller allocation and runs
 before the web container, so it does not add to these steady-state totals.
-The CTFd pod needs a node that can admit its full 6-CPU / 2-GiB request;
+The CTFd pod needs a node that can admit its full 10-CPU / 2-GiB request;
 OpenShift services and other workloads need capacity in addition to the table.
-This is a configuration to validate, not a proven 400-user capacity guarantee.
+The initial eight-worker / eight-CPU profile sustained 200 active participants
+but accumulated requests and hit client deadlines at 400 on the workshop
+cluster (CTFd 3.8.9, plugin 0.1.17, 25 challenges and 500 seeded solves).
+The twelve-worker profile increases process parallelism and CPU headroom;
+it remains subject to the full polling, submission and burst test.
 It keeps one replica, `Recreate`, the existing PVC sizes and the base's pinned
 images. It does not seed event content, participants or progress.
 
-The overlay merges `WORKERS=8` and `SQLALCHEMY_MAX_OVERFLOW=5` into
+The overlay merges `WORKERS=12` and `SQLALCHEMY_MAX_OVERFLOW=0` into
 `ctfd-config`. For the pinned CTFd 3.8.9 / Flask-SQLAlchemy MySQL pool, each
-worker can keep up to 10 pooled connections plus at most 5 overflow connections:
-120 application connections across eight workers. MariaDB's default limit
+worker can keep up to 10 pooled connections with overflow disabled:
+120 application connections across twelve workers. MariaDB's default limit
 is 151, leaving room for initialization and operations. CTFd already exposes
 the overflow setting in its optional configuration section; no application
 image or startup-command changes are needed. Recheck pool defaults when

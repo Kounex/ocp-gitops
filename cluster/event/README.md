@@ -6,7 +6,7 @@ No existing cluster entrypoint references this directory.
 
 Use an explicit kubeconfig for the intended cluster for every command. The
 cluster needs a default RWO StorageClass and enough per-node CPU for the event
-overlay's six-CPU application request, in addition to platform workloads.
+overlay's ten-CPU application request, in addition to platform workloads.
 
 ## Bootstrap
 
