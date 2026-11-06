@@ -14,7 +14,14 @@
   suppressNotifications: ['prIgnoreNotification'],
   rebaseWhen: 'conflicted',
   schedule: ['on saturday'],
+  // Supply-chain cooldown (2026-11-06): nothing is proposed before it has
+  // been public this long, so a compromised release is usually pulled first.
+  minimumReleaseAge: '3 days',
   packageRules: [
+    {
+      matchUpdateTypes: ['minor', 'major'],
+      minimumReleaseAge: '7 days',
+    },
     {
       // Merged straight to main once the validate workflow passes.
       matchUpdateTypes: ['minor', 'patch', 'digest'],
