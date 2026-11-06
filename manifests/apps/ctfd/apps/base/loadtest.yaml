@@ -51,7 +51,7 @@ data:
   metrics.py: "\"\"\"Small sampler executed only in the disposable app container.\"\"\"\nimport json\n\
     import os\nimport time\nfrom pathlib import Path\nimport pymysql\nimport redis\n\ndef read(path):\n\
     \    try:\n        return Path(path).read_text().strip()\n    except OSError:\n        return None\n\
-    \nout={'timestamp':time.time(),'cgroup':{n:read('/sys/fs/cgroup/'+n) for n in [\n    'cpu.stat','cpu.max','memory.current','memory.peak','memory.events','memory.stat','memory.max','io.stat'\n\
+    \nout={'timestamp':time.time(),'cgroup':{n:read('/sys/fs/cgroup/'+n) for n in [\n    'cpu.stat','cpu.max','cpu.weight','memory.current','memory.peak','memory.events','memory.stat','memory.max','io.stat'\n\
     ]}}\ntry:\n    conn=pymysql.connect(host='127.0.0.1',user='ctfd_loadtest',password=read('/runtime/db-password'),database='quest_loadtest_test',connect_timeout=2,read_timeout=2)\n\
     \    with conn.cursor() as c:\n        c.execute(\"SHOW GLOBAL STATUS WHERE Variable_name IN ('Questions','Queries','Threads_connected','Threads_running','Max_used_connections','Slow_queries','Innodb_row_lock_waits','Innodb_row_lock_time','Innodb_buffer_pool_reads','Innodb_buffer_pool_read_requests','Bytes_received','Bytes_sent','Aborted_connects')\"\
     )\n        out['database']={k:int(v) for k,v in c.fetchall()}\n    conn.close()\nexcept Exception\
@@ -77,7 +77,7 @@ spec:
         app.kubernetes.io/name: ctfd-loadtest
         app.kubernetes.io/part-of: ctfd-loadtest
       annotations:
-        loadtest.open-tech-quest/profile: larger
+        loadtest.open-tech-quest/profile: larger-reserved
     spec:
       serviceAccountName: ctfd-runtime
       automountServiceAccountToken: false
@@ -165,8 +165,8 @@ spec:
           containerPort: 8000
         resources:
           requests:
-            cpu: 100m
-            memory: 256Mi
+            cpu: '2'
+            memory: 2Gi
           limits:
             cpu: '4'
             memory: 4Gi
