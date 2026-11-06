@@ -13,6 +13,7 @@ configMapGenerator:
     literals:
       - CTFD_NAME=DISPOSABLE Open Tech Quest load test
 patches:
+  - path: patches/capacity.yaml
   - path: patches/fixture.yaml
   - target:
       kind: Namespace

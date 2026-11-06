@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ctfd
+spec:
+  template:
+    spec:
+      containers:
+        - name: ctfd
+          resources:
+            requests:
+              cpu: "6"
+              memory: 2Gi
+            limits:
+              cpu: "8"
+              memory: 4Gi
