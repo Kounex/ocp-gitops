@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+configMapGenerator:
+  - name: ctfd-config
+    behavior: merge
+    literals:
+      - WORKERS=8
+      # CTFd 3.8.9 / Flask-SQLAlchemy uses a 10-connection MySQL pool.
+      # Eight workers can open at most 8 * (10 + 5) = 120 connections,
+      # leaving room below MariaDB's default max_connections of 151.
+      - SQLALCHEMY_MAX_OVERFLOW=5
+patches:
+  - path: patches/resources.yaml

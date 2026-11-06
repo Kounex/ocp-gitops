@@ -81,6 +81,79 @@ Closing signup blocks new native-form accounts; existing users can still log in
 and check in where attendance permits. This control preserves CTFd’s existing
 setting on startup and records changes in the organizer audit log.
 
+## Event cluster overlay
+
+`apps/overlays/event` prepares the larger configuration for the next
+400-participant / 50-team load test on a cluster with sufficient capacity.
+The existing `ctfd-app` continues to select `apps/overlays/prod`; adding this
+overlay does not resize the current deployment.
+
+| Component | CPU request / limit | Memory request / limit |
+|---|---|---|
+| CTFd, 8 Gunicorn workers in one pod | 6 / 8 cores | 2 GiB / 4 GiB |
+| MariaDB | 1 / 2 cores | 1 GiB / 2 GiB |
+| Redis | 250m / 500m | 128 MiB / 256 MiB |
+| **Total** | **7.25 / 10.5 cores** | **3.125 GiB / 6.25 GiB** |
+
+The initialization container retains the base's smaller allocation and runs
+before the web container, so it does not add to these steady-state totals.
+The CTFd pod needs a node that can admit its full 6-CPU / 2-GiB request;
+OpenShift services and other workloads need capacity in addition to the table.
+This is a configuration to validate, not a proven 400-user capacity guarantee.
+It keeps one replica, `Recreate`, the existing PVC sizes and the base's pinned
+images. It does not seed event content, participants or progress.
+
+The overlay merges `WORKERS=8` and `SQLALCHEMY_MAX_OVERFLOW=5` into
+`ctfd-config`. For the pinned CTFd 3.8.9 / Flask-SQLAlchemy MySQL pool, each
+worker can keep up to 10 pooled connections plus at most 5 overflow connections:
+120 application connections across eight workers. MariaDB's default limit
+is 151, leaving room for initialization and operations. CTFd already exposes
+the overflow setting in its optional configuration section; no application
+image or startup-command changes are needed. Recheck pool defaults when
+updating the upstream CTFd/Flask-SQLAlchemy base.
+
+Build it independently:
+
+```sh
+kustomize build manifests/apps/ctfd/apps/overlays/event
+```
+
+On the new cluster, configure its Argo CD Application with these source and
+destination fields, using a project that permits namespace `ctfd`:
+
+```yaml
+spec:
+  source:
+    repoURL: https://github.com/Kounex/ocp-gitops.git
+    targetRevision: main
+    path: manifests/apps/ctfd/apps/overlays/event
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ctfd
+```
+
+The event overlay builds directly from `base`, so it does not inherit the
+Hetzner `lvms-vg1` storage class or `otq.apps.ocp.kounex.com` hostname. The
+new cluster must have a default StorageClass for the three RWO PVCs. With no
+explicit Route host, OpenShift assigns one under that cluster's ingress
+domain. Inspect `oc -n ctfd get route ctfd` after sync. Add cluster-specific
+storage-class or Route-host patches there if required once those values are
+known.
+
+Install External Secrets and provision `ClusterSecretStore/doppler` on the
+new cluster before syncing this app. Use an event-specific Doppler config
+with the five `CTFD_*` keys listed above; the ExternalSecret builds URLs for
+the local `database` and `cache` services. Keep that cluster's credentials
+and persistent data independent from the current deployment. The namespace,
+runtime ServiceAccount, SCC binding and NetworkPolicies come from the base.
+
+Before using this profile for the event, repeat the authenticated 400-user
+polling and flag-submission test, including late-event solve history, cold
+arrivals and reconnect bursts. The earlier four-worker tests found CPU
+pressure and event-write lock contention; larger limits alone do not validate
+those paths. Monitor database pool occupancy as well as latency, errors,
+traffic, CPU throttling, memory and restarts.
+
 ## Application image and event setup
 
 CI in `open-tech-quest/ctfd-plugin` builds `ghcr.io/open-tech-quest/ctfd-plugin`; both
