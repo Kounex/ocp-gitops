@@ -13,7 +13,7 @@ to HTTPS. CTFd handles participant and administrator authentication.
 This hostname uses the OpenShift router directly, as requested, rather
 than the fleet's usual Cloudflare Tunnel.
 
-The `prod` overlay is the small playground instance: plugin 0.1.20, two workers,
+The `prod` overlay is the small playground instance: plugin 0.1.21, two workers,
 with the existing 225m total CPU request and 576 MiB memory request. It does not
 use the 400-attendee allocation described under the event overlay below.
 
@@ -87,9 +87,9 @@ setting on startup and records changes in the organizer audit log.
 
 ## Event cluster overlay
 
-`apps/overlays/event` runs plugin 0.1.20 / CTFd 3.8.9, qualified for the measured
-400 active participants in 50 teams. `ctfd-app` still selects `apps/overlays/prod`;
-its image and resources are unchanged.
+`apps/overlays/event` runs plugin 0.1.21 / CTFd 3.8.9, using the resource
+profile measured on 0.1.20 for 400 active participants in 50 teams. `ctfd-app`
+selects `apps/overlays/prod` and retains its smaller playground allocation.
 
 | Component | CPU request / limit | Memory request / limit |
 |---|---|---|
