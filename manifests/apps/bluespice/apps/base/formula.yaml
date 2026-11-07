@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
         - name: formula
-          image: bluespice/formula:5.2.7
+          image: bluespice/formula:5.2.7.2
           ports:
             - containerPort: 8080
               name: http
