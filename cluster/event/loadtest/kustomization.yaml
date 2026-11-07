@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: ctfd-loadtest
 resources:
   - ../../../manifests/apps/ctfd/apps/overlays/event
+  - diagnostics/cold-download
 configMapGenerator:
   - name: quest-loadtest-fixture
     files:
