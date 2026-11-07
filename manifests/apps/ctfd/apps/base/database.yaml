@@ -36,7 +36,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: mariadb
-          image: docker.io/library/mariadb:10.11.19@sha256:d769e37960821dfdcf096954f6e7ac89f747e116c1bba98e48edd265dfc7deae
+          image: docker.io/library/mariadb:12.3.3@sha256:d46e102fa8b9b72bfcdeb56f9dd538742092119dc8b11f31fe662605cd234cd9
           args:
             - --character-set-server=utf8mb4
             - --collation-server=utf8mb4_unicode_ci

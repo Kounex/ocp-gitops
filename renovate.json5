@@ -38,6 +38,12 @@
       automerge: false,
     },
     {
+      // MariaDB: LTS lines only (10.11, 11.4, 11.8, and x.3 from 12 on).
+      // Rolling releases (12.0-12.2, 13.0, ...) lose support within months.
+      matchPackageNames: ['docker.io/library/mariadb', 'mariadb'],
+      allowedVersions: '/^(10\\.11|11\\.4|11\\.8|(1[2-9]|[2-9][0-9])\\.3)\\.[0-9]+$/',
+    },
+    {
       // Review application upgrades on the playground before the event.
       matchPackageNames: ['ghcr.io/open-tech-quest/ctfd-plugin'],
       automerge: false,

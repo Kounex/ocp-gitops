@@ -67,6 +67,14 @@ tools/validate.sh
 kustomize build manifests/apps/ctfd/apps/overlays/event
 ```
 
+MariaDB follows LTS lines only (Renovate `allowedVersions`: 10.11, 11.4, 11.8,
+then x.3 from 12 on). The playground runs **12.3 LTS** (in-place upgrade from
+10.11 on 2026-11-07, via `MARIADB_AUTO_UPGRADE`). The event overlay pins
+**10.11 LTS** (supported to 2028-02) in `patches/resources.yaml` until its own
+upgrade is decided. A major upgrade can't be undone by reverting the image:
+rolling back means emptying the database PVC and restoring a dump, so take one on
+the target cluster first.
+
 Back up MariaDB and uploads before upgrades, then commit/push and check the
 corresponding Argo application is Synced/Healthy. Use an explicit kubeconfig when
 checking pods, PVCs, ExternalSecret and Route in `ctfd`. Verify `/login` and
