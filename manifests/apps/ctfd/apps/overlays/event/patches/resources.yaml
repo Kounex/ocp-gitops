@@ -24,9 +24,10 @@ spec:
     spec:
       containers:
         - name: mariadb
-          # The event cluster stays on MariaDB 10.11 LTS (supported to 2028-02)
-          # until its own upgrade is decided: back up its database on that
-          # cluster first, because a 12.x data directory can't go back to 10.11.
+          # The event cluster stays on MariaDB 10.11 LTS (supported to 2028-02):
+          # CTFd's migrations fail on an empty 12.x database (CTFd#2916), which
+          # would break fresh installs here and in cluster/event/loadtest. See
+          # the ctfd README. A 12.x data directory can't go back to 10.11.
           image: docker.io/library/mariadb:10.11.19@sha256:d769e37960821dfdcf096954f6e7ac89f747e116c1bba98e48edd265dfc7deae
           resources:
             requests:
