@@ -114,9 +114,14 @@ export function createPoller<T>(options: PollingOptions<T>) {
     })();
   }
   return {
-    start() {
+    start(initialDelay = 0) {
       automaticPending = true;
-      launch();
+      if (initialDelay > 0) {
+        timer = setTimer(() => {
+          timer = null;
+          launch();
+        }, initialDelay);
+      } else launch();
     },
     refresh(): Promise<void> {
       if (stopped) return Promise.resolve();

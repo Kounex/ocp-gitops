@@ -4,6 +4,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {performance} from 'node:perf_hooks';
 import {createPoller} from './polling.ts';
+import {createQuestSession} from './quest-session.ts';
 import {createAgent,requestText} from './http_transport.mjs';
 
 const ROOT=process.env.OTQ_RUN_ROOT??path.dirname(fileURLToPath(import.meta.url));
@@ -48,7 +49,7 @@ async function request(user,kind,urlPath,{method='GET',body,signal,owner}={}){
  const begin=now(),currentPhase=phase;
  let status=0,outcome='ok',unexpected=0,bytes=0,headerBytes=0,data,wireErrors=0,transportRetries=0,terminalFailureDisposal=null;
  const encoded=body===undefined?undefined:JSON.stringify(body);
- const headers={'Accept':'application/json','Accept-Encoding':'identity','X-Quest-Attendance-UI':'1','User-Agent':'OpenTechQuest-production-poller-load-test/20261106'};
+ const headers={'Accept':'application/json','Accept-Encoding':'identity','X-Quest-Attendance-UI':'1','User-Agent':'OpenTechQuest-production-poller-load-test/20261107'};
  if(freshConnections)headers.Connection='close';
  if(user)headers.Cookie=cfg.cookie_name+'='+cfg.cookies[String(user.index)];
  if(encoded){headers['Content-Type']='application/json';headers['CSRF-Token']=user.nonce;headers['Content-Length']=String(Buffer.byteLength(encoded));}
@@ -70,7 +71,7 @@ async function request(user,kind,urlPath,{method='GET',body,signal,owner}={}){
   }else{
    const envelope=JSON.parse(text);data=envelope.data;
    if(status!==200||envelope.success!==true)throw new Error('http_or_application_'+status);
-   if(kind==='bootstrap'){
+   if((kind==='bootstrap'||kind==='sync')&&user){
     if(!data.viewer.authenticated||data.viewer.team_id!==user.teamId)throw new Error('wrong_native_session_or_team');
    }
    if(kind==='onboarding'&&data.team?.id!==user.teamId)throw new Error('wrong_onboarding_team');
@@ -125,29 +126,44 @@ class User{
  start(){
   this.stopped=false;this.ready=false;
   this.bootstrapReady=this.onboardingReady=this.standingsReady=this.roomReady=this.challengeReady=false;
-  this.resource('bootstrap','/api/v1/quest/bootstrap',10000,data=>{
-   this.rooms=data.rooms;this.nonce=data.csrfNonce;this.bootstrapReady=true;this.bootstrapAcceptedAt=now();
-   const room=this.rooms[this.roomIndex];this.slug=room.slug;
-   if(!this.resources.onboarding)this.resource('onboarding','/api/v1/quest/onboarding',5000,()=>{this.onboardingReady=true;});
-   if(this.index%10===9){
-    if(!this.resources.standings)this.resource('standings','/api/v1/quest/standings',10000,()=>{this.standingsReady=true;});
-   }else if(!this.resources.room)this.resource('room','/api/v1/quest/rooms/'+this.slug,7000,data=>{this.roomReady=true;this.roomChoice(data);});
+  this.sessionOwner={stopped:false};this.lastLive=null;this.lastFullRooms=null;
+  this.session=createQuestSession({
+   active:()=>!this.stopped,
+   loadBootstrap:signal=>request(this,'bootstrap','/api/v1/quest/bootstrap',{signal,owner:this.sessionOwner}),
+   loadSync:signal=>request(this,'sync','/api/v1/quest/sync',{signal,owner:this.sessionOwner}),
+   publish:state=>{
+    if(this.stopped)return;
+    if(state.live&&state.live!==this.lastLive){
+     this.lastLive=state.live;this.nonce=state.live.csrfNonce;this.syncAcceptedAt=now();
+     this.onboardingReady=state.live.onboarding?.team?.id===this.teamId;
+    }
+    const data=state.data;
+    if(data&&data.rooms!==this.lastFullRooms){
+     this.lastFullRooms=data.rooms;this.rooms=data.rooms;this.bootstrapReady=true;this.bootstrapAcceptedAt=now();
+     const room=this.rooms[this.roomIndex];this.slug=room.slug;
+     if(this.index%10===9){
+      if(!this.resources.standings)this.resource('standings','/api/v1/quest/standings',10000,()=>{this.standingsReady=true;});
+     }else if(!this.resources.room)this.resource('room','/api/v1/quest/rooms/'+this.slug,7000,data=>{this.roomReady=true;this.roomChoice(data);});
+    }
+    this.checkReady();
+   }
   });
+  this.session.start();
  }
  stopResource(kind){const r=this.resources[kind];if(r){r.owner.stopped=true;r.poller.stop();delete this.resources[kind];}}
- stop(){this.stopped=true;for(const kind of Object.keys(this.resources))this.stopResource(kind);}
+ stop(){this.stopped=true;if(this.sessionOwner)this.sessionOwner.stopped=true;this.session?.stop();for(const kind of Object.keys(this.resources))this.stopResource(kind);}
  reconnect(){
   // One network return often emits all three browser events. The production
   // scheduler coalesces them rather than issuing three copies per resource.
   this.reconnectedAt=now();
-  for(let i=0;i<3;i++)for(const r of Object.values(this.resources))r.poller.activity();
+  for(let i=0;i<3;i++){this.session.activity();for(const r of Object.values(this.resources))r.poller.activity();}
  }
  async reload(){
   this.stop();await request(this,'reload_html','/quest/rooms/'+this.slug);
   this.start();this.reloads++;
  }
  async prepareFlag(){
-  await this.resources.bootstrap.poller.refresh();
+  await this.session.navigation();
   const available=r=>r.steps.some(s=>s.state==='available');
   const room=this.rooms.find(r=>r.slug===this.slug&&available(r))??this.rooms.find(available);
   if(!room)throw new Error('No fresh challenge for team '+this.teamId);
@@ -176,7 +192,7 @@ class User{
   expected.status=result.status;expected.acknowledged_at=now();
   if(result.status==='correct'){
    await content?.poller.refresh();
-   await Promise.all([this.resources.room?.poller.refresh(),this.resources.bootstrap.poller.refresh()]);
+   await Promise.all([this.resources.room?.poller.refresh(),this.session.refresh()]);
   }
  }
 
@@ -196,7 +212,7 @@ function refreshSummaries(){
   }
   const successful=selected.filter(isSuccessful),actualRate=successful.filter(r=>r.ended_at<=out.ended_at).length/duration;
   const errors=selected.reduce((n,r)=>n+r.unexpected,0);
-  const performancePassed=errors===0&&(out.name!=='polling_400'||(actualRate>=172.6&&Object.values(by).every(x=>x.p95_ms!==null&&x.p95_ms<=2000)));
+  const performancePassed=errors===0&&(out.name!=='polling_400'||(actualRate>=134.6&&Object.values(by).every(x=>x.p95_ms!==null&&x.p95_ms<=2000&&x.p99_ms!==null&&x.p99_ms<=2000)));
   Object.assign(out,{duration_s:duration,offered_duration_s:duration,requests:selected.length,
    successful_requests:successful.length,cancelled_requests:selected.filter(isCancelled).length,
    late_completions:selected.filter(r=>r.ended_at>out.ended_at).length,
@@ -213,7 +229,7 @@ function refreshSummaries(){
 }
 function saveSummary(){
  refreshSummaries();
- fs.writeFileSync(path.join(folder,'summary.json'),JSON.stringify({run,base:BASE,client:'production-polling.ts',transport:freshConnections?'http1_fresh_connections':'http1_per_user_six_socket_pool_reused_get_retry_once',users:400,abort,max_inflight:maxInflight,generator_wall_clock_gap_max_s:wallGapMax,finalized:finished&&pending.size===0,pending_requests:pending.size,phases},null,2));
+ fs.writeFileSync(path.join(folder,'summary.json'),JSON.stringify({run,base:BASE,client:'production-quest-session.ts+polling.ts',transport:freshConnections?'http1_fresh_connections':'http1_per_user_six_socket_pool_reused_get_retry_once',users:400,abort,max_inflight:maxInflight,generator_wall_clock_gap_max_s:wallGapMax,finalized:finished&&pending.size===0,pending_requests:pending.size,phases},null,2));
 }
 function summarize(name,start,end,selected,extra={}){
  const out={name,started_at:start,ended_at:end,...extra};
@@ -247,7 +263,7 @@ async function phaseRun(name,duration,{soft=false,reload=false,flag=false}={}){
  await sleep(1000);
  const end=now(),selected=rows.filter(r=>r.phase===name&&r.ended_at<=end);
  const actionFailures=actionResults.filter(x=>x.status==='rejected').length;
- const freshUsers=users.filter(u=>u.ready&&(!soft||Object.values(u.resources).every(r=>(r.owner.acceptedAt??0)>=u.reconnectedAt))).length;
+ const freshUsers=users.filter(u=>u.ready&&(!soft||(u.syncAcceptedAt>=u.reconnectedAt&&Object.values(u.resources).every(r=>(r.owner.acceptedAt??0)>=u.reconnectedAt)))).length;
  const flagRows=selected.filter(r=>r.kind==='flag');
  const sharedProgress=flag?users.filter(u=>{
   const expected=flagExpectations.get(u.teamId);
@@ -273,12 +289,17 @@ async function guard(){
 const started=now();const guardPromise=guard();
 const progress=setInterval(()=>console.log(JSON.stringify({phase,inflight:pending.size,ready_users:users.filter(u=>u.ready).length,requests:rows.length,abort})),10000);
 try{
- event('run_start',{client:'production-polling.ts',hold,fresh_connections:freshConnections});
+ event('run_start',{client:'production-quest-session.ts+polling.ts',hold,fresh_connections:freshConnections});
  const warmStart=now();
  await Promise.all(users.map((u,i)=>(async()=>{await sleep(i*25);if(!abort)u.start();})()));
  for(let i=0;i<300&&!users.every(u=>u.ready)&&!abort;i++)await wait(100);
  if(!users.every(u=>u.ready))abort??='cohort_did_not_become_ready';
  summarize('warmup',warmStart,now(),rows.filter(r=>r.phase==='warmup'),{ready_users:users.filter(u=>u.ready).length,functional_validation_passed:users.every(u=>u.ready)});
+ const stageOwner={stopped:false};
+ const stageSession=createQuestSession({active:()=>true,
+  loadBootstrap:signal=>request(null,'stage_bootstrap','/api/v1/quest/bootstrap',{signal,owner:stageOwner}),
+  loadSync:signal=>request(null,'stage_sync','/api/v1/quest/sync',{signal,owner:stageOwner}),publish:()=>{}});
+ displays.push({owner:stageOwner,poller:{stop:()=>stageSession.stop()}});stageSession.start();
  for(const kind of ['standings','projector']){
   const owner={stopped:false};const poller=createPoller({interval:8000,active:()=>true,load:signal=>request(null,kind,'/api/v1/quest/'+kind,{signal,owner}),accept:()=>{},reject:()=>{}});displays.push({poller,owner});poller.start();
  }
