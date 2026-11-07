@@ -15,6 +15,7 @@ configMapGenerator:
       - CTFD_NAME=DISPOSABLE Open Tech Quest load test
 patches:
   - path: patches/fixture.yaml
+  - path: patches/capacity.yaml
   - target:
       kind: Namespace
       name: ctfd
@@ -46,3 +47,9 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/env/0/value
         value: ctfd_loadtest_test
+
+images:
+  - name: ghcr.io/open-tech-quest/ctfd-plugin
+    newName: ghcr.io/open-tech-quest/ctfd-plugin
+    newTag: 0.1.20
+    digest: sha256:bd876fb40d30888675184ddd659e3600c3cc6892f7edee4b51890304a4c7f544
