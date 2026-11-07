@@ -1,9 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - https://github.com/open-tech-quest/ctfd-plugin.git//deploy/overlays/openshift?ref=v0.1.22
-components:
-  - ../../components/site
+  - ../../base
 patches:
   - target:
       kind: PersistentVolumeClaim
@@ -21,6 +19,6 @@ patches:
         path: /spec/host
         value: otq.apps.ocp.kounex.com
 images:
-  - name: ghcr.io/open-tech-quest/ctfd-plugin
-    newTag: 0.1.22
-    digest: sha256:0adc8d3c86f9c3e630e39797e3d7afd2d6ffcf0a8729aacb03a174bb09217403
+  - name: ctfd
+    newName: ghcr.io/open-tech-quest/ctfd-plugin
+    newTag: 0.1.22@sha256:0adc8d3c86f9c3e630e39797e3d7afd2d6ffcf0a8729aacb03a174bb09217403

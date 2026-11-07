@@ -9,7 +9,6 @@ spec:
   description: Disposable Open Tech Quest capacity test, separate from event data
   sourceRepos:
     - https://github.com/Kounex/ocp-gitops.git
-    - https://github.com/open-tech-quest/ctfd-plugin.git
   destinations:
     - server: https://kubernetes.default.svc
       namespace: ctfd-loadtest

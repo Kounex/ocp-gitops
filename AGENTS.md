@@ -26,9 +26,9 @@ State (2026-10-29): OpenShift 4.22.19, OpenShift GitOps 1.22 (Argo CD 3.5),
   pushing when you can. Renovate automerges minor/patch updates only after it
   passes.
 - **Image tags:** exact, readable versions, never `latest` (workspace rule in
-  `~/agent/AGENTS.md`). Renovate reads the raw `image:` lines. CTFd releases are promoted with
-  `tools/update-ctfd-release.py VERSION --overlay prod|event|all` so the upstream
-  manifest tag and image digest stay aligned; independent updates are disabled.
+  `~/agent/AGENTS.md`). CTFd overlays pin `newTag: X.Y.Z@sha256:...` for
+  init and runtime together. Renovate proposes image updates; CTFd changes require
+  review and testing on the playground before event promotion.
 - **Updates:** Renovate (Saturdays) automerges minor/patch/digest image and
   chart updates after CI; majors and the BlueSpice group wait as PRs. The
   OpenShift version itself is never updated by anything: z-streams on channel
@@ -100,8 +100,7 @@ Bootstrap chain (manual steps only on a fresh cluster, see README):
 | configs | `external-secrets` (ExternalSecretsConfig + Doppler store), `oauth` (htpasswd IdP + login pages built from `apps/login-theme/*.html`), `gitops` (ArgoCD CR, GitopsService, ntfy notifications), `cert-manager` (Let's Encrypt via Cloudflare DNS, API + wildcard certs), `lvm-storage`, `cloudflared` (Cloudflare Tunnel `ocp`, rules in `apps/config.yaml`) |
 | apps | `bluespice` (wiki, `wiki.apps.ocp.kounex.com`), `it-tools`, `ctfd` (`otq.apps.ocp.kounex.com`, Open Tech Quest frontend/plugin on CTFd + MariaDB + Redis; see its README) |
 
-Projects: `apps` permits this repo and the upstream `open-tech-quest/ctfd-plugin`
-manifest source. It may deploy to `openshift-gitops` and
+Projects: `apps` permits this repo. It may deploy to `openshift-gitops` and
 `bluespice` and `ctfd`, and create Namespaces and ClusterRoleBindings. Each child app has
 its own project (e.g. `it-tools`: the bjw-s chart repo, its own namespace). A
 new app needs its namespace added to `apps` if the parent deploys into it.

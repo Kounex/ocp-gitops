@@ -19,15 +19,6 @@
   minimumReleaseAge: '3 days',
   packageRules: [
     {
-      // The upstream manifest tag and image digest are promoted together.
-      // Use tools/update-ctfd-release.py after testing the release.
-      matchFileNames: [
-        'manifests/apps/ctfd/apps/overlays/prod/kustomization.yaml',
-        'manifests/apps/ctfd/apps/overlays/event/kustomization.yaml',
-      ],
-      enabled: false,
-    },
-    {
       matchUpdateTypes: ['minor', 'major'],
       minimumReleaseAge: '7 days',
     },
@@ -44,6 +35,11 @@
       matchPackageNames: ['bluespice/**'],
       groupName: 'BlueSpice',
       versioning: 'loose', // hotfix tags like 5.2.7.1
+      automerge: false,
+    },
+    {
+      // Review application upgrades on the playground before the event.
+      matchPackageNames: ['ghcr.io/open-tech-quest/ctfd-plugin'],
       automerge: false,
     },
   ],

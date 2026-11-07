@@ -5,9 +5,8 @@ with event-branded sequential team rooms, shared progress, prize timing,
 organizer controls and a 50-team projector. The stack uses MariaDB 10.11
 and Redis 8.10, translated from the
 [upstream Compose deployment](https://docs.ctfd.io/docs/deployment/installation/).
-Argo CD deploys `apps/overlays/prod` into namespace `ctfd`. The reusable stack
-comes from a tagged release of the plugin repository; this repository supplies
-site configuration through `apps/components/site`.
+Argo CD deploys `apps/overlays/prod` into namespace `ctfd`. All OpenShift
+resources, bootstrap and site configuration are maintained in this repository.
 
 Public URL: https://otq.apps.ocp.kounex.com. The edge-terminated Route uses
 the ingress controller's existing wildcard certificate and redirects HTTP
@@ -87,48 +86,27 @@ Closing signup blocks new native-form accounts; existing users can still log in
 and check in where attendance permits. This control preserves CTFd’s existing
 setting on startup and records changes in the organizer audit log.
 
-## Release references and upgrades
+## Deployment ownership and upgrades
 
-Both `apps/overlays/prod` and `apps/overlays/event` consume the product-owned
-`deploy/overlays/openshift` from an immutable `vX.Y.Z` Git tag. Each overlay pins
-its own matching application image tag and digest, so the playground can test a
-release before the event instance is upgraded. The event overlay also consumes
-the same release's `deploy/components/event-400` sizing component.
+`apps/base` owns the application, database, cache, bootstrap, storage, Secret
+integration, Route and security settings. `apps/overlays/prod` retains the small
+playground allocation and hostname/storage patches. `apps/overlays/event` adds
+its resource/worker configuration locally. Neither consumes remote manifests.
 
-`apps/components/site` contains only the local ExternalSecret, administrator
-email and Argo namespace/SCC synchronization metadata. Hostname and storage-class
-patches remain in the prod overlay. The product base, bootstrap, Deployments,
-Services, PVC templates and platform security live upstream. Both Argo
-Applications keep their existing source paths and resource ownership.
+Each overlay independently pins the application as `newTag: X.Y.Z@sha256:...`;
+Kustomize applies that one reference to both init and runtime containers.
+Renovate can propose updates, but CTFd image changes require review. Validate the
+playground before promoting the event. Use the version/digest from the plugin's
+release notes, run `tools/validate.sh`, inspect the diff, commit/push and verify
+Argo health. Keep existing Application paths and resource ownership.
 
-For standalone installation or reusable platform details, see the product's
-[deployment guide](https://github.com/open-tech-quest/ctfd-plugin/blob/v0.1.22/docs/deployment.md).
-The tagged deployment layout starts at **v0.1.22**; earlier application tags do
-not contain it.
-
-Promote a published release with:
-
-```sh
-python3 tools/update-ctfd-release.py 0.1.22 --overlay prod --dry-run
-python3 tools/update-ctfd-release.py 0.1.22 --overlay prod
-tools/validate.sh
-git diff
-```
-
-The helper checks `release.json`, the Git tag's commit, the image digest and OCI
-version/revision before changing the manifest reference and image together.
-Commit/push the reviewed change and verify the playground before repeating with
-`--overlay event`. Use `--overlay all` for an intentional combined promotion.
-Workers, resources, storage and other site patches are retained. Renovate updates
-for these two version-bearing files are disabled to avoid independent changes.
-
-Before migration or upgrades, back up SQL/uploads and compare rendered resource
-identities, selectors, PVCs and pod settings. Keep the same Applications and
-namespace. During the first migration, rollback means reverting to the prior
-GitOps revision with its inline stack and image; there is no pre-v0.1.22 remote
-base. Subsequent compatible rollbacks can promote an older tagged deployment
-release and its digest together. Restore a matching backup if a schema change
-requires it.
+For application requirements and measured resources, see the plugin's
+[hosting guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/deployment.md)
+and [sizing guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/sizing.md).
+Before upgrades, back up SQL/uploads and preserve Secret keys, PVCs and selectors.
+Rollback uses a prior GitOps revision and compatible image; a schema change may
+require restoring its matching backup. No upstream manifest tag or release
+promotion helper is required.
 
 ## Event cluster overlay
 

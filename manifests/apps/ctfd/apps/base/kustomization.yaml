@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ctfd
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: ctfd
+      app.kubernetes.io/managed-by: kustomize
+resources:
+  - namespace.yaml
+  - rbac.yaml
+  - external-secret.yaml
+  - storage.yaml
+  - database.yaml
+  - cache.yaml
+  - ctfd.yaml
+  - network-policy.yaml
+  - route.yaml
+configMapGenerator:
+  - name: ctfd-config
+    literals:
+      - UPLOAD_FOLDER=/var/uploads
+      - LOG_FOLDER=/var/log/CTFd
+      - WORKERS=2
+      - ACCESS_LOG=-
+      - ERROR_LOG=-
+      - REVERSE_PROXY=1,1,1,0,0
+      - SESSION_COOKIE_SECURE=true
+      - CTFD_ADMIN_NAME=admin
+      - CTFD_ADMIN_EMAIL=contact@kounex.com
+      - CTFD_NAME=Open Tech Quest
+  - name: ctfd-bootstrap
+    files:
+      - bootstrap.py

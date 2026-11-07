@@ -10,7 +10,6 @@ spec:
     and AppProjects, or deploy an app directly (bluespice).
   sourceRepos:
     - https://github.com/Kounex/ocp-gitops.git
-    - https://github.com/open-tech-quest/ctfd-plugin.git
     - https://github.com/Kounex/ocp-gitops
   destinations:
     - server: https://kubernetes.default.svc

@@ -9,7 +9,6 @@ spec:
   description: Open Tech Quest event instance on this cluster
   sourceRepos:
     - https://github.com/Kounex/ocp-gitops.git
-    - https://github.com/open-tech-quest/ctfd-plugin.git
   destinations:
     - server: https://kubernetes.default.svc
       namespace: ctfd

@@ -100,12 +100,14 @@ origin capacity passes. Remove the diagnostic reference after testing; removing
 `../test-platform` prunes its namespace, private session Secret and PVCs. Revoke
 and remove the separate bootstrap service token in `openshift-operators` too.
 
-## Application release source
+## Application ownership and updates
 
-The `ctfd-event` Application keeps its source path in this repository, while its
-workload overlay consumes a tagged `open-tech-quest/ctfd-plugin` deployment plus
-the same release's event-400 component. Native resources and bootstrap are owned
-upstream; External Secrets, Argo resources and cluster integration remain here.
-Use `tools/update-ctfd-release.py VERSION --overlay event` to update the upstream
-reference and image digest together, validate, commit/push and verify Argo health.
-The prod overlay has an independent release pin and retains its small allocation.
+The `ctfd-event` Application uses this repository's local event overlay, which
+contains the eight-worker/resource settings and inherits the complete local
+stack. OpenShift resources, bootstrap and secrets integration live here; the
+plugin repository supplies the application image and hosting/sizing guidance.
+
+Prod and event independently pin the image version and digest. Review proposed
+image updates and validate the playground before event promotion. Run
+`tools/validate.sh`, commit/push, and verify Argo health. No remote deployment
+package or manifest/image version pairing is involved.
