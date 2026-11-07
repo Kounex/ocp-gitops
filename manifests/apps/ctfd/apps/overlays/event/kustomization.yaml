@@ -6,14 +6,14 @@ configMapGenerator:
   - name: ctfd-config
     behavior: merge
     literals:
-      - WORKERS=12
+      - WORKERS=8
       # CTFd 3.8.9 / Flask-SQLAlchemy uses a 10-connection MySQL pool.
-      # Twelve workers can open at most 12 * 10 = 120 connections,
+      # Eight workers can open at most 8 * 10 = 80 connections,
       # leaving room below MariaDB's default max_connections of 151.
       - SQLALCHEMY_MAX_OVERFLOW=0
 patches:
   - path: patches/resources.yaml
 images:
   - name: ghcr.io/open-tech-quest/ctfd-plugin
-    newTag: 0.1.19
-    digest: sha256:502ab46130b690ef994d249036dd200b4f1d8ffebd3808b788819f7218fd706e
+    newTag: 0.1.20
+    digest: sha256:bd876fb40d30888675184ddd659e3600c3cc6892f7edee4b51890304a4c7f544

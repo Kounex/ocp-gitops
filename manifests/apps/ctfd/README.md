@@ -83,52 +83,42 @@ setting on startup and records changes in the organizer audit log.
 
 ## Event cluster overlay
 
-`apps/overlays/event` runs plugin 0.1.19 / CTFd 3.8.9 with the resource profile
-measured on plugin 0.1.18 for 400 active participants in 50 teams. The new UI
-keeps long challenge paths readable and adapts projected progress to the space
-available. It retains the measured workers, pools and resource allocations;
-`ctfd-app` still selects `apps/overlays/prod`, whose image/resources are unchanged.
+`apps/overlays/event` runs plugin 0.1.20 / CTFd 3.8.9, qualified for the measured
+400 active participants in 50 teams. `ctfd-app` still selects `apps/overlays/prod`;
+its image and resources are unchanged.
 
 | Component | CPU request / limit | Memory request / limit |
 |---|---|---|
-| CTFd, 12 Gunicorn workers in one pod | 8 / 10 cores | 2 GiB / 4 GiB |
-| MariaDB | 1 / 2 cores | 1 GiB / 2 GiB |
-| Redis | 250m / 500m | 128 MiB / 256 MiB |
-| **Total** | **9.25 / 12.5 cores** | **3.125 GiB / 6.25 GiB** |
+| CTFd, 8 Gunicorn workers in one pod | 4 / 6 cores | 1 / 2 GiB |
+| MariaDB | 500m / 1 core | 512 MiB / 1 GiB |
+| Redis | 250m / 500m | 128 / 256 MiB |
+| **Total** | **4.75 / 7.5 cores** | **1.625 / 3.25 GiB** |
 
-The init container runs before the web container and does not add to steady
-requests. The CTFd pod needs a node with room for its eight-CPU / two-GiB request;
-allow additional capacity for OpenShift. Twelve workers are processes; the
-10-CPU cap limits their combined execution. One replica, `Recreate`, and existing
-RWO PVC sizes remain. No sample content or participants enter the event overlay.
+The init container precedes the web container and does not add to steady requests.
+The CTFd node needs room for its full 4-CPU / 1-GiB request, plus OpenShift.
+One replica, `Recreate` and the existing 10/10/1-GiB RWO PVCs remain. The event
+overlay never seeds sample challenges, participants or progress.
 
-On 16-vCPU AMD EPYC workshop nodes, scoped history reads and GET-local reuse
-reduced app CPU from 8.7 to 6.6 cores in the unchanged 182-requests/s replay.
-The shipped scheduler coalesces refreshes, adds jitter and backs off failures.
-A 10-minute later-history hold (1,070 solves, 400 native sessions) through the
-public HTTPS Route from a test pod completed 109,089 requests with zero unrecovered errors,
-about 6.0 app CPU cores and endpoint p95 up to 0.37s.
-Four stale-connection GET retries were recorded; no POST was retried.
-All 50 simultaneous flags succeeded (p95 7.9s), all 400 members observed
-their solve, and 400 return/reload actions each completed. An 8-CPU cap exceeded
-the 2s steady endpoint-p95 target. The shared event write lock still queues flag
-bursts for several seconds; it has not been removed.
+On 16-vCPU AMD EPYC workshop nodes, a paired unchanged-client comparison reduced
+CTFd CPU from 5.16 to 3.38 cores. The shipped five-second lightweight sync and
+versioned shared read cache reduce the active-page mix from ~181 to ~142 API
+requests/s. The ten-minute 400-native-session test, with 25 challenges and 1,070
+historical solves, completed 85,155 steady requests with zero unrecovered errors;
+CTFd averaged 2.77 cores. All 50 simultaneous flags succeeded (p95
+8.34s); all 400 members saw their team's solve. All 400 reconnects and 400 reloads
+became ready. Native solve reconciliation confirmed exactly 50 added records.
 
-In-cluster cold HTML/assets passed 7,600 requests. External Mac connection stress
-exposed socket closures and connection deadlines while application CPU had room.
-This qualifies origin HTTP capacity, not venue Wi-Fi/WAN or 400 browser renderers.
-The older replay that adds startup traffic while retaining old polls still hits
-the backlog guard; it is an overload control, unlike a real reload. Repeat tests
-with your event's challenge/history sizes, flag bursts and actual network.
+A four-core cap passed steady polling but throttled and slowed initial reads;
+six cores retain burst headroom. The shared event write lock still queues flags.
+These protocol clients ran inside the isolated namespace through the public
+HTTPS Route, not 400 rendered browsers. Previous external connection stress
+showed failures, so venue Wi-Fi/WAN needs separate validation. Repeat with your
+own challenge/history sizes and simultaneous team submissions.
 
-The overlay merges `WORKERS=12` and `SQLALCHEMY_MAX_OVERFLOW=0` into
-`ctfd-config`. For the pinned CTFd 3.8.9 / Flask-SQLAlchemy MySQL pool, each
-worker can keep up to 10 pooled connections with overflow disabled:
-120 application connections across twelve workers. MariaDB's default limit
-is 151, leaving room for initialization and operations. CTFd already exposes
-the overflow setting in its optional configuration section; no application
-image or startup-command changes are needed. Recheck pool defaults when
-updating the upstream CTFd/Flask-SQLAlchemy base.
+`WORKERS=8` and `SQLALCHEMY_MAX_OVERFLOW=0` allow at most 80 application DB
+connections (ten per worker), below MariaDB's default 151. Leave capacity for
+administration/migrations and recheck the pool budget when changing workers or
+the pinned CTFd/Flask-SQLAlchemy base.
 
 Build it independently:
 

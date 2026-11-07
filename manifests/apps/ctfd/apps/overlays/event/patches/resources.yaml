@@ -9,11 +9,11 @@ spec:
         - name: ctfd
           resources:
             requests:
-              cpu: '8'
-              memory: 2Gi
+              cpu: '4'
+              memory: 1Gi
             limits:
-              cpu: '10'
-              memory: 4Gi
+              cpu: '6'
+              memory: 2Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -26,11 +26,11 @@ spec:
         - name: mariadb
           resources:
             requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
               cpu: '1'
               memory: 1Gi
-            limits:
-              cpu: '2'
-              memory: 2Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
