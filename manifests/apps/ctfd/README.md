@@ -13,6 +13,10 @@ to HTTPS. CTFd handles participant and administrator authentication.
 This hostname uses the OpenShift router directly, as requested, rather
 than the fleet's usual Cloudflare Tunnel.
 
+The `prod` overlay is the small playground instance: plugin 0.1.20, two workers,
+with the existing 225m total CPU request and 576 MiB memory request. It does not
+use the 400-attendee allocation described under the event overlay below.
+
 ## Storage and startup
 
 Three `lvms-vg1` RWO PVCs persist uploads and CTFd audit logs (10 GiB),
