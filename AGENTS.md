@@ -157,6 +157,10 @@ not just Cursor. Keep them and this file in sync. In short:
   (base, no overlay pin: no drift while testing) and stay on 10.11; Renovate
   offers only 10.11 patches until CTFd#2916 is fixed (CTFd's migrations fail on
   an empty 12.x database, see the ctfd README). Then move both together.
+- **The event cluster is temporary** (`cluster/event/`, overlay `event`, Argo
+  `ctfd-event` on its own cluster): it goes away after the event, with those
+  paths. Don't plan long-term work or proposals around it, and don't remove
+  its paths while it still syncs from `main`.
 
 ## Gotchas
 

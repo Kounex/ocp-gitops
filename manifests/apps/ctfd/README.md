@@ -11,7 +11,7 @@ Both instances use namespace `ctfd` on separate clusters.
 | Overlay / Argo application | Workers | Total CPU request / limit | Total memory request / limit |
 |---|---:|---|---|
 | [prod](apps/overlays/prod) / `ctfd-app` — playground | 2 | 225m / 5 cores | 576 MiB / 2.25 GiB |
-| [event](apps/overlays/event) / `ctfd-event` — 400-attendee profile | 8 | 4.75 / 7.5 cores | 1.625 / 3.25 GiB |
+| [event](apps/overlays/event) / `ctfd-event` — 400-attendee profile, **temporary** (removed after the event) | 8 | 4.75 / 7.5 cores | 1.625 / 3.25 GiB |
 
 - [apps/base](apps/base) contains the shared stack, startup, storage and security.
 - The playground uses **https://otq.apps.ocp.kounex.com** and storage class
@@ -69,9 +69,11 @@ kustomize build manifests/apps/ctfd/apps/overlays/event
 
 Playground and event run **the same MariaDB, 10.11 LTS** (supported to
 2028-02), set once in `apps/base/database.yaml`, so what is tested on the
-playground holds for the event. Don't pin it per overlay. Renovate offers only
+playground holds for the event. Don't pin it per overlay. The event cluster is
+temporary; after it is gone this is simply the playground's version. Renovate offers only
 10.11 patches until CTFd#2916 (below) is fixed; after that, LTS lines only
-(10.11, 11.4, 11.8, x.3 from 12 on), moved on both clusters together. A major
+(10.11, 11.4, 11.8, x.3 from 12 on), moved on both clusters together while the
+event still exists. A major
 upgrade can't be undone by reverting the image: rolling back means emptying the
 database PVC and restoring a dump, so take one on the target cluster first.
 History: the playground ran 12.3.3 for a few hours on 2026-11-07 and was put

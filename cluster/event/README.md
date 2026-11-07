@@ -1,5 +1,12 @@
 # Independent event cluster
 
+**Temporary.** The event cluster and its `ctfd-event` deployment exist only for
+the Open Tech Quest event and are removed afterwards, together with this
+directory and `manifests/apps/ctfd/apps/overlays/event/`. Until then the cluster
+syncs from `main`: don't delete or move these paths while it runs, and remember
+that a change to `manifests/apps/ctfd/apps/base` reaches it too. Don't build
+anything long-lived on it.
+
 This entrypoint installs only the Open Tech Quest event platform. It does not
 bootstrap the personal cluster's OAuth, certificates, LVM storage or other apps.
 No existing cluster entrypoint references this directory.
