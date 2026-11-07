@@ -1,49 +1,48 @@
-# Open Tech Quest on CTFd
+# Hosting Open Tech Quest
 
-[Open Tech Quest](https://github.com/open-tech-quest/ctfd-plugin) extends CTFd
-with event-branded sequential team rooms, shared progress, prize timing,
-organizer controls and a 50-team projector. The stack uses MariaDB 10.11
-and Redis 8.10, translated from the
-[upstream Compose deployment](https://docs.ctfd.io/docs/deployment/installation/).
-Argo CD deploys `apps/overlays/prod` into namespace `ctfd`. All OpenShift
-resources, bootstrap and site configuration are maintained in this repository.
+OpenShift deployment of [Open Tech Quest](https://github.com/open-tech-quest/ctfd-plugin)
+with CTFd, MariaDB and Redis. This repository owns the manifests, bootstrap and
+cluster integration; the plugin repository owns the application image and docs.
 
-Public URL: https://otq.apps.ocp.kounex.com. The edge-terminated Route uses
-the ingress controller's existing wildcard certificate and redirects HTTP
-to HTTPS. CTFd handles participant and administrator authentication.
-This hostname uses the OpenShift router directly, as requested, rather
-than the fleet's usual Cloudflare Tunnel.
+## Deployments
 
-The `prod` overlay is the small playground instance: plugin 0.1.22, two workers,
-with the existing 225m total CPU request and 576 MiB memory request. It does not
-use the 400-attendee allocation described under the event overlay below.
+Both instances use namespace `ctfd` on separate clusters.
+
+| Overlay / Argo application | Workers | Total CPU request / limit | Total memory request / limit |
+|---|---:|---|---|
+| [prod](apps/overlays/prod) / `ctfd-app` — playground | 2 | 225m / 5 cores | 576 MiB / 2.25 GiB |
+| [event](apps/overlays/event) / `ctfd-event` — 400-attendee profile | 8 | 4.75 / 7.5 cores | 1.625 / 3.25 GiB |
+
+- [apps/base](apps/base) contains the shared stack, startup, storage and security.
+- The playground uses **https://otq.apps.ocp.kounex.com** and storage class
+  `lvms-vg1`. Its Route uses the cluster wildcard certificate and redirects HTTP
+  to HTTPS.
+- The event overlay uses its cluster's default RWO storage class and an assigned
+  Route hostname. Follow the [event cluster runbook](../../../cluster/event/README.md)
+  for bootstrap and disposable load testing.
+
+The event allocation comes from the plugin's 0.1.20 measurements. See the
+[sizing guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/sizing.md)
+for results, limits and retesting guidance. Declared image versions and resource
+settings live in the overlays; init and runtime share the same image pin.
 
 ## Storage and startup
 
-Three `lvms-vg1` RWO PVCs persist uploads and CTFd audit logs (10 GiB),
-MariaDB (10 GiB), and Redis AOF (1 GiB). Each deployment uses `Recreate`
-to avoid concurrent writers. This is a single-node deployment with brief
-downtime during upgrades.
+Three RWO PVCs hold uploads/logs (10 GiB), MariaDB (10 GiB) and Redis AOF (1 GiB).
+Each component has one replica and uses `Recreate`; upgrades can interrupt service.
+Containers use the namespace-scoped `nonroot-v2` grant. NetworkPolicies restrict
+web ingress to the OpenShift router and database/cache ingress to CTFd.
 
-The init container waits for MariaDB, applies CTFd migrations, then runs
-the upstream setup flow once. It creates the `admin` account (email
-`contact@kounex.com`), an event named `Open Tech Quest`, team user mode,
-and public registration. Customize the event through the admin UI.
-On subsequent starts it preserves existing accounts and settings, renaming
-only the stock `CTFd` placeholder title. The
-web server starts only after setup succeeds, preventing public takeover
-of an unclaimed installation. The bootstrap password is not passed to
-the web server container.
-
-The dedicated runtime ServiceAccount may use `nonroot-v2` in this namespace
-to support upstream fixed UIDs. Containers run without root, additional
-capabilities, privilege escalation, or mounted API tokens. NetworkPolicies
-restrict web ingress to the router and database/cache ingress to CTFd.
+The init container waits for MariaDB, runs migrations and performs native setup
+once, creating the initial administrator with team mode and public registration.
+Existing accounts/settings are preserved. The web server starts after setup;
+the administrator bootstrap password is only supplied to the init container.
 
 ## Secrets
 
-ExternalSecret `ctfd-secrets` uses `ClusterSecretStore/doppler`, project
-`ocp`, config `main`, with these keys:
+ExternalSecret [`ctfd-secrets`](apps/base/external-secret.yaml) reads from
+`ClusterSecretStore/doppler`: project `ocp`, config `main` on the playground and
+an independent `event` config on the event cluster. Required keys:
 
 - `CTFD_SECRET_KEY`
 - `CTFD_DB_PASSWORD`
@@ -51,296 +50,34 @@ ExternalSecret `ctfd-secrets` uses `ClusterSecretStore/doppler`, project
 - `CTFD_REDIS_PASSWORD`
 - `CTFD_ADMIN_PASSWORD`
 
-Passwords are generated as URL-safe hex, since database and Redis URLs
-are composed by the ExternalSecret template. Preserve this format when
-rotating them. Database password changes also require updating the live
-database account; environment variables initialize credentials only on
-an empty data directory. Restart the affected deployments after rotating
-secrets. Changing the bootstrap password does not reset an existing admin;
-use CTFd's account settings for that.
+Use URL-safe hex passwords because the template builds database/cache URLs.
+Database credential rotation must update the live database account as well as
+Doppler; initialization variables do not change an existing account. Restart
+affected deployments after rotation. Changing `CTFD_ADMIN_PASSWORD` does not
+reset an existing administrator; use native CTFd account settings instead.
 
-Retrieve the initial administrator password locally (do not paste it into
-Git or logs):
+## Updates and checks
 
-```sh
-doppler secrets get CTFD_ADMIN_PASSWORD --plain --project ocp --config main
-```
-
-## Operations
-
-Check `ctfd-app` in Argo CD and the pods, PVCs, ExternalSecret and Route
-in namespace `ctfd`. Initial resource requests total 225m CPU and 576 MiB
-RAM; the init container replaces rather than adds to the web allocation.
-Images are version/digest pinned and tracked by Renovate.
-
-Persistent volumes survive pod restarts, but no scheduled off-cluster
-backup is configured for this app. Before storing important event data,
-arrange backups covering both MariaDB and uploads. A CTFd admin export
-provides a portable event snapshot. Removing this app from the root
-kustomization prunes its resources, including all three PVCs.
-
-SMTP is not configured; configure it in CTFd before relying on password
-reset or email verification. Registration does not require email verification.
-Use **Organize → Event → Public registration** to open or close self-signup.
-Closing signup blocks new native-form accounts; existing users can still log in
-and check in where attendance permits. This control preserves CTFd’s existing
-setting on startup and records changes in the organizer audit log.
-
-## Deployment ownership and upgrades
-
-`apps/base` owns the application, database, cache, bootstrap, storage, Secret
-integration, Route and security settings. `apps/overlays/prod` retains the small
-playground allocation and hostname/storage patches. `apps/overlays/event` adds
-its resource/worker configuration locally. Neither consumes remote manifests.
-
-Each overlay independently pins the application as `newTag: X.Y.Z@sha256:...`;
-Kustomize applies that one reference to both init and runtime containers.
-Renovate can propose updates, but CTFd image changes require review. Validate the
-playground before promoting the event. Use the version/digest from the plugin's
-release notes, run `tools/validate.sh`, inspect the diff, commit/push and verify
-Argo health. Keep existing Application paths and resource ownership.
-
-For application requirements and measured resources, see the plugin's
-[hosting guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/deployment.md)
-and [sizing guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/sizing.md).
-Before upgrades, back up SQL/uploads and preserve Secret keys, PVCs and selectors.
-Rollback uses a prior GitOps revision and compatible image; a schema change may
-require restoring its matching backup. No upstream manifest tag or release
-promotion helper is required.
-
-## Event cluster overlay
-
-`apps/overlays/event` runs plugin 0.1.22 / CTFd 3.8.9, using the resource
-profile measured on 0.1.20 for 400 active participants in 50 teams. `ctfd-app`
-selects `apps/overlays/prod` and retains its smaller playground allocation.
-
-| Component | CPU request / limit | Memory request / limit |
-|---|---|---|
-| CTFd, 8 Gunicorn workers in one pod | 4 / 6 cores | 1 / 2 GiB |
-| MariaDB | 500m / 1 core | 512 MiB / 1 GiB |
-| Redis | 250m / 500m | 128 / 256 MiB |
-| **Total** | **4.75 / 7.5 cores** | **1.625 / 3.25 GiB** |
-
-The init container precedes the web container and does not add to steady requests.
-The CTFd node needs room for its full 4-CPU / 1-GiB request, plus OpenShift.
-One replica, `Recreate` and the existing 10/10/1-GiB RWO PVCs remain. The event
-overlay never seeds sample challenges, participants or progress.
-
-On 16-vCPU AMD EPYC workshop nodes, a paired unchanged-client comparison reduced
-CTFd CPU from 5.16 to 3.38 cores. The shipped five-second lightweight sync and
-versioned shared read cache reduce the active-page mix from ~181 to ~142 API
-requests/s. The ten-minute 400-native-session test, with 25 challenges and 1,070
-historical solves, completed 85,155 steady requests with zero unrecovered errors;
-CTFd averaged 2.77 cores. All 50 simultaneous flags succeeded (p95
-8.34s); all 400 members saw their team's solve. All 400 reconnects and 400 reloads
-became ready. Native solve reconciliation confirmed exactly 50 added records.
-
-A four-core cap passed steady polling but throttled and slowed initial reads;
-six cores retain burst headroom. The shared event write lock still queues flags.
-These protocol clients ran inside the isolated namespace through the public
-HTTPS Route, not 400 rendered browsers. Previous external connection stress
-showed failures, so venue Wi-Fi/WAN needs separate validation. Repeat with your
-own challenge/history sizes and simultaneous team submissions.
-
-`WORKERS=8` and `SQLALCHEMY_MAX_OVERFLOW=0` allow at most 80 application DB
-connections (ten per worker), below MariaDB's default 151. Leave capacity for
-administration/migrations and recheck the pool budget when changing workers or
-the pinned CTFd/Flask-SQLAlchemy base.
-
-Build it independently:
+Each overlay pins `newTag: X.Y.Z@sha256:...`. Renovate proposes CTFd image updates
+for review. Test the playground before promoting the event, using the version and
+digest from the plugin's release notes. Validate from the repository root:
 
 ```sh
+tools/validate.sh
 kustomize build manifests/apps/ctfd/apps/overlays/event
 ```
 
-On the new cluster, configure its Argo CD Application with these source and
-destination fields, using a project that permits namespace `ctfd`:
+Back up MariaDB and uploads before upgrades, then commit/push and check the
+corresponding Argo application is Synced/Healthy. Use an explicit kubeconfig when
+checking pods, PVCs, ExternalSecret and Route in `ctfd`. Verify `/login` and
+`/quest/admin` after rollout. Preserve Secret keys and PVCs; rollback requires a
+compatible image/database or restoration of the matching backup.
 
-```yaml
-spec:
-  source:
-    repoURL: https://github.com/Kounex/ocp-gitops.git
-    targetRevision: main
-    path: manifests/apps/ctfd/apps/overlays/event
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: ctfd
-```
+These manifests define no scheduled off-cluster backup. **Deleting the Argo
+application with its finalizer prunes its PVCs.** Configure SMTP in CTFd before
+relying on password reset or email verification.
 
-The event overlay builds directly from `base`, so it does not inherit the
-Hetzner `lvms-vg1` storage class or `otq.apps.ocp.kounex.com` hostname. The
-new cluster must have a default StorageClass for the three RWO PVCs. With no
-explicit Route host, OpenShift assigns one under that cluster's ingress
-domain. Inspect `oc -n ctfd get route ctfd` after sync. Add cluster-specific
-storage-class or Route-host patches there if required once those values are
-known.
-
-Install External Secrets and provision `ClusterSecretStore/doppler` on the
-new cluster before syncing this app. Use an event-specific Doppler config
-with the five `CTFD_*` keys listed above; the ExternalSecret builds URLs for
-the local `database` and `cache` services. Keep that cluster's credentials
-and persistent data independent from the current deployment. The namespace,
-runtime ServiceAccount, SCC binding and NetworkPolicies come from the base.
-
-On each target cluster and after performance changes, repeat the authenticated 400-user
-polling and flag-submission test, including late-event solve history, cold
-arrivals and reconnect bursts. The earlier four-worker tests found CPU
-pressure and event-write lock contention; larger limits alone do not validate
-those paths. Monitor database pool occupancy as well as latency, errors,
-traffic, CPU throttling, memory and restarts.
-
-## Application image and event setup
-
-CI in `open-tech-quest/ctfd-plugin` builds `ghcr.io/open-tech-quest/ctfd-plugin`; both
-initialization and runtime use the same version/digest. The pinned upstream
-CTFd base is extended with a plugin and built React frontend, without a core
-fork. Runtime secrets remain the same Doppler keys above.
-
-The plugin creates five empty default rooms in **draft**: OpenShift, Ansible, RHEL,
-Security and AI. No demo participants, flags or challenges enter the image.
-A fresh instance safely switches to team mode; an existing instance with
-individual solves refuses conversion until ownership is explicitly migrated.
-
-- Participant app: `/quest` (also the root redirect).
-- Organizer app: `/quest/admin`, using the existing CTFd admin login.
-- Projector: `/quest/stage`, controlled from the organizer Projector tab.
-- Native challenge authoring: `/admin/challenges`.
-
-Configure challenge order, teams, roster release, timing and selected room
-assets before opening the event. Use quest lifecycle controls rather than
-native time/mode settings; the plugin records pauses/cutoffs and final
-publication snapshots. See the application repository's operations guide.
-
-Pre-migration private backup on Hetzner:
-`/root/ocp-backups/ctfd/pre-open-tech-quest-2026-11-03/` (SQL and uploads;
-contains credentials, never copy into this public repository).
-
-## Organization image source
-
-The public application repository is **open-tech-quest/ctfd-plugin**. CI derives
-its lowercase registry namespace from the repository owner, publishes versioned
-`ghcr.io/open-tech-quest/ctfd-plugin` images with source/revision labels, and keeps
-the existing `vX.Y.Z` sequence. No personal publish token or Doppler secret is
-needed by CI. The package is public for anonymous pulls by OpenShift and Renovate.
-
-Both containers pin the tested version and index digest above. The previous
-`ghcr.io/kounex/open-tech-quest:0.1.15@sha256:7327e4279f8989129ba3c375911ec8c60d45b291791620e09cf56caf9d4605e2`
-remains available as a historical rollback image. The application URL, namespace,
-plugin identifier, database, PVCs and ExternalSecret retain their existing IDs.
-The organization transfer preserves the repository ID, Git history, tags,
-releases and pull requests; old GitHub source URLs redirect to the new repository.
-
-## Organizer demo preview
-
-The organizer Event tab offers explicit **Load demo content** / **Remove demo
-content** controls: 25 self-contained practice challenges and Markdown room
-introductions. Startup never seeds them. Loading requires draft and unmapped
-rooms; durable batch ownership supports targeted cleanup and restoration of
-previous introductions without removing real challenges or participant data.
-The competition cannot start while demo content is active. See the application
-operations guide for preview/removal behavior. The app also supplies the event
-Q favicon on participant, login and native administration pages.
-
-## Staff and room authoring
-
-Use **Organize → Users** as a full administrator to promote self-registered
-accounts to **Challenge maintainer**. Full administrators remain managed in
-native CTFd. Maintainers get only Rooms in Organize and no privileged event,
-participant, team or role administration. They are excluded from attendance,
-team allocation and play; promotion clears readiness and detaches an unused
-provisional assignment. Recorded competition activity prevents conversion.
-
-Both staff roles can create standard flag challenges directly in Rooms, edit
-Markdown descriptions and accepted static flags, check answers without progress,
-and manage the prerequisite order. Authoring is restricted to Draft without
-recorded activity; an administrator must remove the loaded demo before real
-challenge authoring. Flags stay in the database and authorized editor responses,
-never Git or public bootstrap/audit payloads.
-
-The five topic rooms remain defaults. Room managers can rename display titles,
-add custom rooms with a generic theme and remove unused rooms. Removal preserves
-native challenges/flags/files and rejects activity or demo ownership. Stable
-slugs preserve links on rename; an intentionally empty room list stays empty
-across restarts. Navigation and standings follow the configured room list.
-
-## Challenge visibility
-
-The room editor supports native **Hidden**, **Visible** and **Locked** states.
-Hidden challenges are omitted from participant paths, prerequisites and
-unpublished award counts without deleting solves; restoring visibility restores
-eligible credit at its original timestamp. Locked challenges retain their place
-and earned credit but deny content and submissions. Staff can preview both.
-Native CTFd requirements and next links follow the active room path atomically,
-including visibility changes through the stock API. Startup repairs older
-derived dependencies while preserving mappings, starts and submissions. A new
-room clock requires its first non-hidden step to be Visible; existing clocks
-never reset. Published award snapshots stay immutable.
-
-## Account moderation and retained evidence
-
-**Organize → Users** supports **Return to participant**, safe confirmed deletion
-of unused accounts, and **Ban / Unban account**. Role transitions clear readiness
-and unused provisional assignments. Deletion repairs captain ownership and refuses
-history-bearing or frozen memberships. Bans stop the account's solves from counting
-without deleting the native records; teammates can legitimately re-solve affected
-challenges. Recovery uses a new server timestamp, the same clock/pause/cutoff rules,
-and native grading/rate limits. Unbanning restores eligible original contributions
-without duplicate credit. Published contribution changes require unpublishing.
-
-User actions and allocation previews bind account incarnations so reused IDs cannot
-validate stale requests. Full administrator controls remain native with self/last
-admin and history protections. The Users view links to native submission history;
-original and `quest_recovery` records remain available for investigation. Restore
-matching plugin code with its database; pre-recovery code cannot interpret the
-new native submission subtype.
-
-## Participant attendance and final rosters
-
-Participants register their own CTFd account. **Organize → Event / Teams →
-Attendance check-in** independently controls when they can confirm **I'm ready
-to quest**; capture starts off on installation and this upgrade. Keep it closed
-while collecting early registrations. Opening prompts unconfirmed signed-in
-participants across Quest within five seconds and on returning to a tab; signup
-during the window leads directly to the same prompt. Native account pages show
-a link notice without discarding edits. Pages held open from before this release
-need one initial refresh to load the new prompt behavior.
-
-Closing rejects new confirmations even from stale forms and retains recorded
-attendance. Reopening prompts only unconfirmed people. **Organize → Teams**
-persists the maximum group size (default five), tracks personal attendance and
-forms random teams from checked-in eligible people only. Morning registration
-requires no teams or initial allocation. Close attendance capture before
-previewing/applying grouping or finalizing rosters. **Move to attendance review**
-also closes capture atomically. Apply the
-server-bound plan after review; intervening window changes, readiness or roster
-changes invalidate older previews. No-show accounts are kept unassigned.
-
-By default names are **Team 1, Team 2, Team 3, …**, final and locked against user
-changes. **Let participants choose team names** enables one-time naming by any
-ready teammate before finalization. Enabling after apply opens generated unclaimed
-names only; chosen or organizer-corrected identities never reopen. Disabling locks
-current names without discarding chosen ones. Naming policy freezes at finalization.
-Organizers can place late arrivals with a reason or create an additional group.
-Finalize rosters before starting the competition; membership stays fixed.
-Check-in and naming never start room or event clocks. Native account moderation
-remains available. All ownership and progress remain in native CTFd models;
-plugin metadata uses the same backed-up MariaDB database and existing secrets.
-See [event operations](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/operations.md).
-
-## Event-day cutoff and post-start arrivals
-
-Close registration and attendance at the cutoff. Then **Move to attendance review
-→ Preview checked-in teams → Apply reviewed teams → Finalize
-rosters → Start event**. Only if participant naming is enabled do members choose
-names before finalization. Repeated previews of unchanged state return the same
-random proposal; readiness, roster, capacity and naming-policy changes invalidate
-it. Closing windows never performs grouping automatically.
-
-After finalization, reopen registration if needed and open late-only attendance
-for unassigned newcomers. They confirm their own attendance; an administrator
-admits them with a reason into a named team with space or an additional agreed
-final-named team. Existing players never move and existing clocks/progress do not
-reset. New teams follow the configured event/room timing policy. Late-only capture
-and admission work in draft/live/paused before cutoff; close/published events
-refuse admission. Checked-in post-finalization arrivals can wait across event
-start once capture is closed; they cannot play until placed.
+For application configuration, use the plugin's
+[hosting guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/deployment.md).
+For signup, attendance, authoring, demos and running the event, use its
+[operations guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/operations.md).
