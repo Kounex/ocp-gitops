@@ -72,7 +72,7 @@ async function request(user,kind,urlPath,{method='GET',body,signal,owner}={}){
    const envelope=JSON.parse(text);data=envelope.data;
    if(status!==200||envelope.success!==true)throw new Error('http_or_application_'+status);
    if((kind==='bootstrap'||kind==='sync')&&user){
-    if(!data.viewer.authenticated||data.viewer.team_id!==user.teamId)throw new Error('wrong_native_session_or_team');
+    if(!data.viewer.authenticated||data.viewer.id!==user.index+2||data.viewer.team_id!==user.teamId)throw new Error('wrong_native_session_or_team');
    }
    if(kind==='onboarding'&&data.team?.id!==user.teamId)throw new Error('wrong_onboarding_team');
    if(kind==='flag'){
@@ -122,7 +122,7 @@ class User{
   this.stopResource('challenge');this.challengeReady=false;this.challengeId=step.id;
   this.resource('challenge',url,60000,()=>{this.challengeReady=true;});
  }
- checkReady(){this.ready=Boolean(this.bootstrapReady&&this.onboardingReady&&(this.index%10===9?this.standingsReady:this.roomReady&&this.challengeReady));}
+ checkReady(){const before=this.ready;this.ready=Boolean(this.bootstrapReady&&this.onboardingReady&&(this.index%10===9?this.standingsReady:this.roomReady&&this.challengeReady));if(this.ready&&!before&&this.reloadStartedAt)this.reloadReadyAt=now();}
  start(){
   this.stopped=false;this.ready=false;
   this.bootstrapReady=this.onboardingReady=this.standingsReady=this.roomReady=this.challengeReady=false;
@@ -159,7 +159,7 @@ class User{
   for(let i=0;i<3;i++){this.session.activity();for(const r of Object.values(this.resources))r.poller.activity();}
  }
  async reload(){
-  this.stop();await request(this,'reload_html','/quest/rooms/'+this.slug);
+  this.reloadStartedAt=now();this.stop();await request(this,'reload_html','/quest/rooms/'+this.slug);
   this.start();this.reloads++;
  }
  async prepareFlag(){
@@ -269,9 +269,20 @@ async function phaseRun(name,duration,{soft=false,reload=false,flag=false}={}){
   const expected=flagExpectations.get(u.teamId);
   return expected?.status==='correct'&&u.bootstrapAcceptedAt>=expected.sent_at&&u.rooms.some(r=>r.id===expected.room_id&&r.steps.some(s=>s.id===expected.challenge_id&&s.state==='solved'));
  }).length:null;
+ const memberObservations=flag?users.map(u=>{
+  const expected=flagExpectations.get(u.teamId);
+  const room=u.rooms.find(r=>r.id===expected?.room_id);
+  const step=room?.steps.find(s=>s.id===expected?.challenge_id);
+  return {user:u.index,team_id:u.teamId,room_id:expected?.room_id,challenge_id:expected?.challenge_id,
+   solved:step?.state==='solved',solved_at:step?.solved_at??null,bootstrap_accepted_at:u.bootstrapAcceptedAt,sent_at:expected?.sent_at};
+ }):null;
+ const returnObservations=soft?users.map(u=>({user:u.index,ready:u.ready,reconnected_at:u.reconnectedAt,
+  sync_accepted_at:u.syncAcceptedAt,resources:Object.entries(u.resources).map(([kind,r])=>({kind,accepted_at:r.owner.acceptedAt??null}))})):null;
+ const reloadObservations=reload?users.map(u=>({user:u.index,ready:u.ready,reloads:u.reloads,
+  bootstrap_accepted_at:u.bootstrapAcceptedAt,sync_accepted_at:u.syncAcceptedAt,reload_started_at:u.reloadStartedAt,ready_at:u.reloadReadyAt})):null;
  const validationFailed=actionFailures>0||freshUsers!==400||(flag&&(flagRows.length!==50||flagRows.some(r=>r.outcome!=='correct')||sharedProgress!==400))||(reload&&users.reduce((n,u)=>n+u.reloads,0)!==400);
  if(validationFailed)abort??='functional_phase_validation_failed';
- summarize(name,start,end,selected,{ready_users:users.filter(u=>u.ready).length,fresh_users:freshUsers,reloads_completed:users.reduce((n,u)=>n+u.reloads,0),action_failures:actionFailures,functional_validation_passed:!validationFailed,teammates_observing_submitted_solves:sharedProgress,...(flag?{submitted_challenges:[...flagExpectations.values()]}:{})});
+ summarize(name,start,end,selected,{ready_users:users.filter(u=>u.ready).length,fresh_users:freshUsers,reloads_completed:users.reduce((n,u)=>n+u.reloads,0),action_failures:actionFailures,functional_validation_passed:!validationFailed,teammates_observing_submitted_solves:sharedProgress,...(flag?{submitted_challenges:[...flagExpectations.values()],member_observations:memberObservations}:{}),...(soft?{return_observations:returnObservations}:{}),...(reload?{reload_observations:reloadObservations}:{})});
 }
 async function guard(){
  while(!stopGuard){
