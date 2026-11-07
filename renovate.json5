@@ -38,10 +38,14 @@
       automerge: false,
     },
     {
-      // MariaDB: LTS lines only (10.11, 11.4, 11.8, and x.3 from 12 on).
-      // Rolling releases (12.0-12.2, 13.0, ...) lose support within months.
+      // MariaDB: 10.11 LTS patches only until CTFd#2916 is fixed (CTFd's
+      // migrations fail on an empty 12.x database). A major is a deliberate
+      // move of playground and event together (backup + rehearsal), not a
+      // Renovate PR. Afterwards: LTS lines only, e.g.
+      // '/^(10\\.11|11\\.4|11\\.8|(1[2-9]|[2-9][0-9])\\.3)\\.[0-9]+$/'
+      // (rolling releases like 12.0-12.2 lose support within months).
       matchPackageNames: ['docker.io/library/mariadb', 'mariadb'],
-      allowedVersions: '/^(10\\.11|11\\.4|11\\.8|(1[2-9]|[2-9][0-9])\\.3)\\.[0-9]+$/',
+      allowedVersions: '/^10\\.11\\.[0-9]+$/',
     },
     {
       // Review application upgrades on the playground before the event.

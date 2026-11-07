@@ -153,10 +153,10 @@ not just Cursor. Keep them and this file in sync. In short:
   PR that is merged by hand (database update runs on sync).
 - **MariaDB (CTFd):** Renovate offers LTS lines only (`allowedVersions`). A
   major can't be reverted by the image alone (restore a dump into an empty
-  PVC), so back up and rehearse first. The event overlay pins its own version
-  and stays on 10.11: CTFd's migrations fail on an empty 12.x database (FK
-  naming, CTFd#2916, see the ctfd README), which would break the event's fresh
-  installs and `cluster/event/loadtest`. Don't merge PR #76 until #2916 is fixed.
+  PVC), so back up and rehearse first. Playground and event share one version
+  (base, no overlay pin: no drift while testing) and stay on 10.11; Renovate
+  offers only 10.11 patches until CTFd#2916 is fixed (CTFd's migrations fail on
+  an empty 12.x database, see the ctfd README). Then move both together.
 
 ## Gotchas
 

@@ -67,12 +67,16 @@ tools/validate.sh
 kustomize build manifests/apps/ctfd/apps/overlays/event
 ```
 
-MariaDB follows LTS lines only (Renovate `allowedVersions`: 10.11, 11.4, 11.8,
-then x.3 from 12 on). The playground runs **12.3 LTS** (in-place upgrade from
-10.11 on 2026-11-07, via `MARIADB_AUTO_UPGRADE`). The event overlay pins
-**10.11 LTS** (supported to 2028-02) in `patches/resources.yaml`. A major upgrade
-can't be undone by reverting the image: rolling back means emptying the database
-PVC and restoring a dump, so take one on the target cluster first.
+Playground and event run **the same MariaDB, 10.11 LTS** (supported to
+2028-02), set once in `apps/base/database.yaml`, so what is tested on the
+playground holds for the event. Don't pin it per overlay. Renovate offers only
+10.11 patches until CTFd#2916 (below) is fixed; after that, LTS lines only
+(10.11, 11.4, 11.8, x.3 from 12 on), moved on both clusters together. A major
+upgrade can't be undone by reverting the image: rolling back means emptying the
+database PVC and restoring a dump, so take one on the target cluster first.
+History: the playground ran 12.3.3 for a few hours on 2026-11-07 and was put
+back on 10.11.19 the same evening (empty PVC, pre-upgrade dump restored; no
+data had changed) to avoid drift from the event.
 
 **Fresh installs need MariaDB 10.11 to 11.8, not 12.x.** MariaDB 12.1 and later
 name unnamed foreign keys `1`, `2`, ... instead of `<table>_ibfk_N`, and CTFd's
@@ -82,9 +86,9 @@ migrations fail on an empty 12.x database (upstream
 the plugin's v0.1.22 MariaDB suite fails at that migration on 12.3.3 and passes
 (187 tests) on 10.11.19. A database created on 10.11 and upgraded in place keeps
 its old names and works, and so does restoring a dump (it carries the names).
-So the playground runs fine, but rebuilding it on an empty PVC would fail at the
-init container. The event overlay, and `cluster/event/loadtest` which inherits
-it, stay on 10.11 until CTFd fixes #2916.
+So an upgraded database would run, but any fresh install (a rebuilt playground,
+the event cluster, `cluster/event/loadtest`) would fail at the init container.
+Both clusters stay on 10.11 until CTFd fixes #2916.
 
 Back up MariaDB and uploads before upgrades, then commit/push and check the
 corresponding Argo application is Synced/Healthy. Use an explicit kubeconfig when
