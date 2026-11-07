@@ -12,7 +12,7 @@
             "name": "ctfd",
             "resources": {
               "requests": {
-                "cpu": "3",
+                "cpu": "4",
                 "memory": "1Gi"
               },
               "limits": {
@@ -79,11 +79,11 @@
             "name": "redis",
             "resources": {
               "requests": {
-                "cpu": "125m",
+                "cpu": "250m",
                 "memory": "128Mi"
               },
               "limits": {
-                "cpu": "250m",
+                "cpu": "500m",
                 "memory": "256Mi"
               }
             }
