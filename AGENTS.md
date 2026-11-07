@@ -151,6 +151,10 @@ not just Cursor. Keep them and this file in sync. In short:
   tunnels): `~/agent/it-env/services/cloudflare-tunnels/AGENTS.md`.
 - **Renovate:** dashboard is issue #44. BlueSpice images come as one grouped
   PR that is merged by hand (database update runs on sync).
+- **MariaDB (CTFd):** Renovate offers LTS lines only (`allowedVersions`). A
+  major can't be reverted by the image alone (restore a dump into an empty
+  PVC), so back up and rehearse first. The event overlay pins its own version;
+  its major bump (PR #76) waits for a board decision, so don't merge it as routine.
 
 ## Gotchas
 
