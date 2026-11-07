@@ -3,7 +3,7 @@
 [Open Tech Quest](https://github.com/open-tech-quest/ctfd-plugin) extends CTFd
 with event-branded sequential team rooms, shared progress, prize timing,
 organizer controls and a 50-team projector. The stack uses MariaDB 10.11
-and Redis 7.4, translated from the
+and Redis 8.10, translated from the
 [upstream Compose deployment](https://docs.ctfd.io/docs/deployment/installation/).
 Argo CD deploys `apps/overlays/prod` into namespace `ctfd`.
 
