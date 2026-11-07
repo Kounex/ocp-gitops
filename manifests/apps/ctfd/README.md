@@ -5,7 +5,9 @@ with event-branded sequential team rooms, shared progress, prize timing,
 organizer controls and a 50-team projector. The stack uses MariaDB 10.11
 and Redis 8.10, translated from the
 [upstream Compose deployment](https://docs.ctfd.io/docs/deployment/installation/).
-Argo CD deploys `apps/overlays/prod` into namespace `ctfd`.
+Argo CD deploys `apps/overlays/prod` into namespace `ctfd`. The reusable stack
+comes from a tagged release of the plugin repository; this repository supplies
+site configuration through `apps/components/site`.
 
 Public URL: https://otq.apps.ocp.kounex.com. The edge-terminated Route uses
 the ingress controller's existing wildcard certificate and redirects HTTP
@@ -13,7 +15,7 @@ to HTTPS. CTFd handles participant and administrator authentication.
 This hostname uses the OpenShift router directly, as requested, rather
 than the fleet's usual Cloudflare Tunnel.
 
-The `prod` overlay is the small playground instance: plugin 0.1.21, two workers,
+The `prod` overlay is the small playground instance: plugin 0.1.22, two workers,
 with the existing 225m total CPU request and 576 MiB memory request. It does not
 use the 400-attendee allocation described under the event overlay below.
 
@@ -85,9 +87,52 @@ Closing signup blocks new native-form accounts; existing users can still log in
 and check in where attendance permits. This control preserves CTFd’s existing
 setting on startup and records changes in the organizer audit log.
 
+## Release references and upgrades
+
+Both `apps/overlays/prod` and `apps/overlays/event` consume the product-owned
+`deploy/overlays/openshift` from an immutable `vX.Y.Z` Git tag. Each overlay pins
+its own matching application image tag and digest, so the playground can test a
+release before the event instance is upgraded. The event overlay also consumes
+the same release's `deploy/components/event-400` sizing component.
+
+`apps/components/site` contains only the local ExternalSecret, administrator
+email and Argo namespace/SCC synchronization metadata. Hostname and storage-class
+patches remain in the prod overlay. The product base, bootstrap, Deployments,
+Services, PVC templates and platform security live upstream. Both Argo
+Applications keep their existing source paths and resource ownership.
+
+For standalone installation or reusable platform details, see the product's
+[deployment guide](https://github.com/open-tech-quest/ctfd-plugin/blob/v0.1.22/docs/deployment.md).
+The tagged deployment layout starts at **v0.1.22**; earlier application tags do
+not contain it.
+
+Promote a published release with:
+
+```sh
+python3 tools/update-ctfd-release.py 0.1.22 --overlay prod --dry-run
+python3 tools/update-ctfd-release.py 0.1.22 --overlay prod
+tools/validate.sh
+git diff
+```
+
+The helper checks `release.json`, the Git tag's commit, the image digest and OCI
+version/revision before changing the manifest reference and image together.
+Commit/push the reviewed change and verify the playground before repeating with
+`--overlay event`. Use `--overlay all` for an intentional combined promotion.
+Workers, resources, storage and other site patches are retained. Renovate updates
+for these two version-bearing files are disabled to avoid independent changes.
+
+Before migration or upgrades, back up SQL/uploads and compare rendered resource
+identities, selectors, PVCs and pod settings. Keep the same Applications and
+namespace. During the first migration, rollback means reverting to the prior
+GitOps revision with its inline stack and image; there is no pre-v0.1.22 remote
+base. Subsequent compatible rollbacks can promote an older tagged deployment
+release and its digest together. Restore a matching backup if a schema change
+requires it.
+
 ## Event cluster overlay
 
-`apps/overlays/event` runs plugin 0.1.21 / CTFd 3.8.9, using the resource
+`apps/overlays/event` runs plugin 0.1.22 / CTFd 3.8.9, using the resource
 profile measured on 0.1.20 for 400 active participants in 50 teams. `ctfd-app`
 selects `apps/overlays/prod` and retains its smaller playground allocation.
 
