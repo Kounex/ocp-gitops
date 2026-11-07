@@ -27,7 +27,7 @@ spec:
           # The event cluster stays on MariaDB 10.11 LTS (supported to 2028-02)
           # until its own upgrade is decided: back up its database on that
           # cluster first, because a 12.x data directory can't go back to 10.11.
-          image: docker.io/library/mariadb:10.11.19@sha256:d769e37960821dfdcf096954f6e7ac89f747e116c1bba98e48edd265dfc7deae
+          image: docker.io/library/mariadb:12.3.3@sha256:d46e102fa8b9b72bfcdeb56f9dd538742092119dc8b11f31fe662605cd234cd9
           resources:
             requests:
               cpu: 500m
