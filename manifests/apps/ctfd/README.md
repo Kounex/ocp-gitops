@@ -59,8 +59,10 @@ reset an existing administrator; use native CTFd account settings instead.
 ## Updates and checks
 
 Each overlay pins `newTag: X.Y.Z@sha256:...`. Renovate proposes CTFd image updates
-for review. Test the playground before promoting the event, using the version and
-digest from the plugin's release notes. Validate from the repository root:
+for review. During the current development phase, deploy each tested plugin
+release to the playground first, verify it, then update event to the same version
+and digest. Keep both instances current without changing their resource profiles.
+Use the pins from the plugin's release notes. Validate from the repository root:
 
 ```sh
 tools/validate.sh
