@@ -83,8 +83,10 @@ setting on startup and records changes in the organizer audit log.
 
 ## Event cluster overlay
 
-`apps/overlays/event` contains the measured plugin 0.1.18 / CTFd 3.8.9 profile
-for 400 active participants in 50 teams. It pins the optimized plugin image;
+`apps/overlays/event` runs plugin 0.1.19 / CTFd 3.8.9 with the resource profile
+measured on plugin 0.1.18 for 400 active participants in 50 teams. The new UI
+keeps long challenge paths readable and adapts projected progress to the space
+available. It retains the measured workers, pools and resource allocations;
 `ctfd-app` still selects `apps/overlays/prod`, whose image/resources are unchanged.
 
 | Component | CPU request / limit | Memory request / limit |
