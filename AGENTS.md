@@ -135,13 +135,19 @@ not just Cursor. Keep them and this file in sync. In short:
   fails or an app turns Degraded/Missing (`manifests/configs/gitops/apps/notifications.yml`).
   Test a template: `o -n openshift-gitops exec deploy/openshift-gitops-notifications-controller -- argocd admin notifications template notify ntfy-health <app> --recipient ntfy`
   (that sends a real push).
-- **Backups:** BlueSpice writes a daily zip (SQL dump + uploads) into its own
-  volume at 04:00 UTC. The NAS timer `ocp-bluespice-backup.timer` (units in
-  `tools/backup/systemd/`, installed to `~/.config/systemd/user/`) pulls the
-  newest one to `/volume1/docker/ocp-backups/bluespice` at 07:15, keeps 30
-  days, and alerts via ntfy on failure or a backup older than 48 h. Each zip
-  holds `database.sql` and `filesystem/images/`. A restore has not been
-  rehearsed yet.
+- **Backups: broken since 2026-07-18, no current BlueSpice backup.** The
+  wiki-task container used to write a daily zip (SQL dump + uploads) to
+  `/data/backup` at 04:00 UTC. The 5.2 images no longer do that: upstream
+  moved backups to a `helper` container driven over `docker.sock`
+  (bluespice-deploy 5.2.7, `docker-compose.helper-service.yml`), which can't
+  run here. The newest zip is `bluespice-20260718040134.zip`. The NAS timer
+  `ocp-bluespice-backup.timer` (units in `tools/backup/systemd/`, installed
+  to `~/.config/systemd/user/`) still pulls the newest zip to
+  `/volume1/docker/ocp-backups/bluespice` at 07:15, keeps 30 days, and alerts
+  via ntfy on failure or a backup older than 48 h, so it keeps getting the
+  July zip. A replacement (a CronJob doing a DB dump plus the images) is the
+  fleet board proposal `ocp-gitops:bluespice-backups`. A restore has not
+  been rehearsed yet.
 - **Cluster updates:** channel `stable-4.22`. Before an update take an etcd
   backup (`cluster-backup.sh` on the node, copy to `/root/ocp-backups/` on the
   host; the 2026-10-22 one is there). Move lvm-storage's channel with the
@@ -180,6 +186,16 @@ not just Cursor. Keep them and this file in sync. In short:
 - **OAuth changes restart the OAuth server.** Re-applying OAuth or the login
   Secrets rolls `oauth-openshift`; the authentication operator and the
   ClusterVersion show "not available" for 1–3 minutes.
+- **BlueSpice formula, PDF and wire don't work in the wiki (found
+  2026-11-08).** The wiki pods keep Kubernetes service links on, so
+  `FORMULA_PORT`, `PDF_PORT` and `WIRE_PORT` arrive as `tcp://<ip>:<port>`
+  and `bsAssembleURL()` builds `://:tcp://...` (math shows "Conversion
+  error"). Also the `formula` Service targets 8080, but mathoid listens on
+  10044, and the `pdf` service throws `OutOfMemoryError: Java heap space`
+  on any render at its 512Mi limit (it loads all Noto CJK fonts). The
+  services themselves answer: mathoid on the pod IP port 10044, the diagram
+  editor, and wire (401 without a key). The fix is the fleet board proposal
+  `ocp-gitops:bluespice-service-wiring`.
 - **BlueSpice 5.2.7+** needs `WIKI_ARTICLE_PATH: "wiki"` set explicitly (base
   ConfigMap), or nginx renders `return 301 /` and the probes fail on a redirect
   loop. The installer Job (Sync hook) runs the database update on every sync.
