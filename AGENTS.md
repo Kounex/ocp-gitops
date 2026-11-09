@@ -107,7 +107,7 @@ Bootstrap chain (manual steps only on a fresh cluster, see README):
 | apps | `it-tools`, `ctfd` (`otq.apps.ocp.kounex.com`, Open Tech Quest frontend/plugin on CTFd + MariaDB + Redis; see its README) |
 
 Projects: `apps` permits this repo. It may deploy to `openshift-gitops` and
-`bluespice` and `ctfd`, and create Namespaces and ClusterRoleBindings. Each child app has
+`ctfd`, and create Namespaces. Each child app has
 its own project (e.g. `it-tools`: the bjw-s chart repo, its own namespace). A
 new app needs its namespace added to `apps` if the parent deploys into it.
 

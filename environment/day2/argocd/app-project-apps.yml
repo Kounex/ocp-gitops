@@ -7,7 +7,7 @@ metadata:
     argocd.argoproj.io/sync-wave: '10'
 spec:
   description: Parent apps under manifests/apps. They create child Applications
-    and AppProjects, or deploy an app directly (bluespice).
+    and AppProjects, or deploy an app directly (ctfd).
   sourceRepos:
     - https://github.com/Kounex/ocp-gitops.git
     - https://github.com/Kounex/ocp-gitops
@@ -15,12 +15,7 @@ spec:
     - server: https://kubernetes.default.svc
       namespace: openshift-gitops
     - server: https://kubernetes.default.svc
-      namespace: bluespice
-    - server: https://kubernetes.default.svc
       namespace: ctfd
   clusterResourceWhitelist:
     - group: ''
       kind: Namespace
-    # bluespice binds its service accounts to the anyuid SCC
-    - group: rbac.authorization.k8s.io
-      kind: ClusterRoleBinding
