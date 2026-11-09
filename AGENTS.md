@@ -36,7 +36,7 @@ State (2026-10-29): OpenShift 4.22.19, OpenShift GitOps 1.22 (Argo CD 3.5),
   are Synced/Healthy and both sites report the new version before finishing.
   This standing instruction applies until the owner changes it or event teardown.
 - **Updates:** Renovate (Saturdays) automerges minor/patch/digest image and
-  chart updates after CI; majors and the BlueSpice group wait as PRs. The
+  chart updates after CI; majors wait as PRs. The
   OpenShift version itself is never updated by anything: z-streams on channel
   `stable-4.22` are applied by hand, a new minor is a channel change. Operator
   subscriptions are `Automatic` within their channels. How this fits the rest
@@ -104,7 +104,7 @@ Bootstrap chain (manual steps only on a fresh cluster, see README):
 |---|---|
 | operators | `external-secrets` (Red Hat ESO, `stable-v1`), `cert-manager` (Red Hat), `lvm-storage` (channel follows the OpenShift minor: `stable-4.22`) |
 | configs | `external-secrets` (ExternalSecretsConfig + Doppler store), `oauth` (htpasswd IdP + login pages built from `apps/login-theme/*.html`), `gitops` (ArgoCD CR, GitopsService, ntfy notifications), `cert-manager` (Let's Encrypt via Cloudflare DNS, API + wildcard certs), `lvm-storage`, `cloudflared` (Cloudflare Tunnel `ocp`, rules in `apps/config.yaml`) |
-| apps | `bluespice` (wiki, `wiki.apps.ocp.kounex.com`), `it-tools`, `ctfd` (`otq.apps.ocp.kounex.com`, Open Tech Quest frontend/plugin on CTFd + MariaDB + Redis; see its README) |
+| apps | `it-tools`, `ctfd` (`otq.apps.ocp.kounex.com`, Open Tech Quest frontend/plugin on CTFd + MariaDB + Redis; see its README) |
 
 Projects: `apps` permits this repo. It may deploy to `openshift-gitops` and
 `bluespice` and `ctfd`, and create Namespaces and ClusterRoleBindings. Each child app has
@@ -120,7 +120,7 @@ not just Cursor. Keep them and this file in sync. In short:
 - Sync waves: 200 parent app, 210 AppProject/ServiceAccounts, 220 child apps,
   230 ExternalSecrets and RBAC. Configs and operators use 100–160.
 - Single-image apps use the bjw-s `app-template` chart. Multi-part apps use
-  plain manifests with a Kustomize `overlays/prod` (bluespice).
+  plain manifests with a Kustomize `overlays/prod` (ctfd).
 - Sync policy `automated: {prune: true, selfHeal: true}`, `CreateNamespace=true`.
   Client-side apply by default. Server-side apply only where another
   controller owns fields (ArgoCD CR, APIServer, IngressController, OAuth,
@@ -135,19 +135,6 @@ not just Cursor. Keep them and this file in sync. In short:
   fails or an app turns Degraded/Missing (`manifests/configs/gitops/apps/notifications.yml`).
   Test a template: `o -n openshift-gitops exec deploy/openshift-gitops-notifications-controller -- argocd admin notifications template notify ntfy-health <app> --recipient ntfy`
   (that sends a real push).
-- **Backups: broken since 2026-07-18, no current BlueSpice backup.** The
-  wiki-task container used to write a daily zip (SQL dump + uploads) to
-  `/data/backup` at 04:00 UTC. The 5.2 images no longer do that: upstream
-  moved backups to a `helper` container driven over `docker.sock`
-  (bluespice-deploy 5.2.7, `docker-compose.helper-service.yml`), which can't
-  run here. The newest zip is `bluespice-20260718040134.zip`. The NAS timer
-  `ocp-bluespice-backup.timer` (units in `tools/backup/systemd/`, installed
-  to `~/.config/systemd/user/`) still pulls the newest zip to
-  `/volume1/docker/ocp-backups/bluespice` at 07:15, keeps 30 days, and alerts
-  via ntfy on failure or a backup older than 48 h, so it keeps getting the
-  July zip. A replacement (a CronJob doing a DB dump plus the images) is the
-  fleet board proposal `ocp-gitops:bluespice-backups`. A restore has not
-  been rehearsed yet.
 - **Cluster updates:** channel `stable-4.22`. Before an update take an etcd
   backup (`cluster-backup.sh` on the node, copy to `/root/ocp-backups/` on the
   host; the 2026-10-22 one is there). Move lvm-storage's channel with the
@@ -161,8 +148,7 @@ not just Cursor. Keep them and this file in sync. In short:
   `~/agent/it-env/scripts/tunnel-route.sh add <host> ocp <service> --access|--public`
   on the NAS for the Access app and DNS record. Full guide (all four
   tunnels): `~/agent/it-env/services/cloudflare-tunnels/AGENTS.md`.
-- **Renovate:** dashboard is issue #44. BlueSpice images come as one grouped
-  PR that is merged by hand (database update runs on sync).
+- **Renovate:** dashboard is issue #44.
 - **MariaDB (CTFd):** Renovate offers LTS lines only (`allowedVersions`). A
   major can't be reverted by the image alone (restore a dump into an empty
   PVC), so back up and rehearse first. Playground and event share one version
@@ -186,19 +172,6 @@ not just Cursor. Keep them and this file in sync. In short:
 - **OAuth changes restart the OAuth server.** Re-applying OAuth or the login
   Secrets rolls `oauth-openshift`; the authentication operator and the
   ClusterVersion show "not available" for 1–3 minutes.
-- **BlueSpice formula, PDF and wire don't work in the wiki (found
-  2026-11-08).** The wiki pods keep Kubernetes service links on, so
-  `FORMULA_PORT`, `PDF_PORT` and `WIRE_PORT` arrive as `tcp://<ip>:<port>`
-  and `bsAssembleURL()` builds `://:tcp://...` (math shows "Conversion
-  error"). Also the `formula` Service targets 8080, but mathoid listens on
-  10044, and the `pdf` service throws `OutOfMemoryError: Java heap space`
-  on any render at its 512Mi limit (it loads all Noto CJK fonts). The
-  services themselves answer: mathoid on the pod IP port 10044, the diagram
-  editor, and wire (401 without a key). The fix is the fleet board proposal
-  `ocp-gitops:bluespice-service-wiring`.
-- **BlueSpice 5.2.7+** needs `WIKI_ARTICLE_PATH: "wiki"` set explicitly (base
-  ConfigMap), or nginx renders `return 301 /` and the probes fail on a redirect
-  loop. The installer Job (Sync hook) runs the database update on every sync.
 - **OLM can deadlock on a replace chain** (DevWorkspace 0.42 → 0.43 → 1.0.0 on
   2026-10-22). The CSV status can be stale; read the `olm-operator` log for the
   CSV, then delete the stuck middle CSV.

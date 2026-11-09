@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: bluespice
-  labels:
-    app.kubernetes.io/part-of: bluespice
-  annotations:
-    argocd.argoproj.io/sync-wave: "-2"

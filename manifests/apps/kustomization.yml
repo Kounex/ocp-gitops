@@ -4,6 +4,5 @@ kind: Kustomization
 # One line per app. Removing a line deletes that app from the cluster
 # (see AGENTS.md "Disabling an app").
 resources:
-  - bluespice
   - ctfd
   - it-tools

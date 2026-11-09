@@ -29,15 +29,6 @@
       automergeType: 'branch',
     },
     {
-      // One PR for all BlueSpice images, merged by hand: every BlueSpice
-      // update runs its database update (installer Job) and has needed
-      // config changes before (see AGENTS.md).
-      matchPackageNames: ['bluespice/**'],
-      groupName: 'BlueSpice',
-      versioning: 'loose', // hotfix tags like 5.2.7.1
-      automerge: false,
-    },
-    {
       // MariaDB: 10.11 LTS patches only until CTFd#2916 is fixed (CTFd's
       // migrations fail on an empty 12.x database). A major is a deliberate
       // move of playground and event together (backup + rehearsal), not a
