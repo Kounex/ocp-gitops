@@ -16,4 +16,4 @@ patches:
 images:
   - name: ctfd
     newName: ghcr.io/open-tech-quest/ctfd-plugin
-    newTag: 0.1.36@sha256:a1add25f77b093702dcad708fa7fb9959b036da2b90e55e0adc2d71c7ec8e661
+    newTag: 0.1.37@sha256:3fde7fbe8a14ca9d35ed54e796b3d2dbdd391b20ff646324cd15a2a67ceaf5ef
