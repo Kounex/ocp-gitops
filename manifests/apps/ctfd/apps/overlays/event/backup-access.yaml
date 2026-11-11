@@ -34,7 +34,7 @@ rules:
     resourceNames: ['ctfd-secrets']
     verbs: ['get']
   - apiGroups: ['']
-    resources: ['configmaps', 'persistentvolumeclaims', 'services', 'routes']
+    resources: ['configmaps', 'persistentvolumeclaims', 'services']
     verbs: ['get', 'list']
   - apiGroups: ['route.openshift.io']
     resources: ['routes']

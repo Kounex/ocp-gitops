@@ -100,9 +100,18 @@ checking pods, PVCs, ExternalSecret and Route in `ctfd`. Verify `/login` and
 `/quest/admin` after rollout. Preserve Secret keys and PVCs; rollback requires a
 compatible image/database or restoration of the matching backup.
 
-These manifests define no scheduled off-cluster backup. **Deleting the Argo
-application with its finalizer prunes its PVCs.** Configure SMTP in CTFd before
-relying on password reset or email verification.
+The temporary event has an external backup runner: encrypted, deduplicated
+snapshots every 15 minutes with 10-day retention, daily repository checks and
+isolated restore verification. The event overlay supplies only its dedicated
+`ctfd-backup` access; the scheduler, keys, repository and recovery runbook live in
+the private operator environment, outside the event cluster. Its token deliberately
+survives interactive login expiry and must be revoked at teardown. The playground
+has no corresponding recurring backup configured by these manifests.
+
+**Deleting the Argo application with its finalizer prunes its PVCs.** Take and
+verify a final off-cluster backup before event teardown, then stop both external
+timers and revoke their event credential; retain the backup and decryption key.
+Configure SMTP in CTFd before relying on password reset or email verification.
 
 For application configuration, use the plugin's
 [hosting guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/deployment.md).
