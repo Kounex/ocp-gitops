@@ -30,7 +30,7 @@ overlay's four-CPU application request, in addition to platform workloads.
 2. Create `openshift-operators/doppler-token`, key `token`, with a read-only
    service token scoped to the event's own Doppler config. That config needs
    `CTFD_SECRET_KEY`, `CTFD_DB_PASSWORD`, `CTFD_DB_ROOT_PASSWORD`,
-   `CTFD_REDIS_PASSWORD` and `CTFD_ADMIN_PASSWORD`. Use independent, URL-safe
+   `CTFD_REDIS_PASSWORD`, `CTFD_ADMIN_PASSWORD` and `CTFD_BACKUP_WORKER_TOKEN`. Use independent, URL-safe
    credentials. Keep the token and secret values out of Git and logs.
 
 3. Apply the Argo CD entrypoint:
@@ -69,7 +69,8 @@ with `env PYTHONPATH=/opt/CTFd python /loadtest/fixture.py --late`.
 The test uses `ClusterSecretStore/doppler-ctfd-loadtest` and bootstrap Secret
 `openshift-operators/ctfd-loadtest-doppler-token`, key `token`. Scope that token
 to a separate Doppler config with fresh values for all five CTFd secrets.
-Never reuse the real event credentials. Private participant credentials are
+Never reuse the real event credentials. Recovery integration is removed from
+this fixture; it does not need a backup worker token. Private participant credentials are
 written inside the test pod at `/run/quest-loadtest/participants.json`.
 
 Include `../test-platform` in `platform/kustomization.yaml` only while testing.

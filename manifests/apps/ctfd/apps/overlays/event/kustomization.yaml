@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ../../base
-  - backup-access.yaml
+  - backup-argo.yaml
 configMapGenerator:
   - name: ctfd-config
     behavior: merge

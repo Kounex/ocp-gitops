@@ -1,0 +1,63 @@
+# Disposable fixtures must never inherit a real installation's recovery access.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ctfd
+spec:
+  template:
+    spec:
+      containers:
+        - name: ctfd
+          env:
+            - name: OTQ_BACKUP_WORKER_TOKEN
+              $patch: delete
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ctfd-backup-helper
+$patch: delete
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: ctfd-backup-client
+$patch: delete
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ctfd-backup
+$patch: delete
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ctfd-backup-token
+$patch: delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ctfd-backup
+$patch: delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ctfd-backup
+$patch: delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ctfd-backup-reconcile
+  namespace: openshift-gitops
+$patch: delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ctfd-backup-reconcile
+  namespace: openshift-gitops
+$patch: delete

@@ -12,6 +12,8 @@ spec:
   destinations:
     - server: https://kubernetes.default.svc
       namespace: ctfd
+    - server: https://kubernetes.default.svc
+      namespace: openshift-gitops
   clusterResourceWhitelist:
     - group: ''
       kind: Namespace

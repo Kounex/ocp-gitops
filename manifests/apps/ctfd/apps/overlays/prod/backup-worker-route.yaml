@@ -1,0 +1,48 @@
+# The durable worker binds to the VM's libvirt bridge, outside the cluster.
+# TLS uses the existing router. Requests require a profile token; status tickets
+# grant read-only access to a single job while CTFd is stopped.
+apiVersion: v1
+kind: Service
+metadata:
+  name: ctfd-backup-worker
+  namespace: ctfd
+spec:
+  ports:
+    - name: http
+      port: 9087
+      targetPort: 9087
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: ctfd-backup-worker
+  namespace: ctfd
+  labels:
+    kubernetes.io/service-name: ctfd-backup-worker
+addressType: IPv4
+ports:
+  - name: http
+    protocol: TCP
+    port: 9087
+endpoints:
+  - addresses: ['192.168.50.1']
+    conditions:
+      ready: true
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ctfd-backup-worker
+  namespace: ctfd
+  annotations:
+    haproxy.router.openshift.io/timeout: 10m
+spec:
+  host: otq-backups.apps.ocp.kounex.com
+  to:
+    kind: Service
+    name: ctfd-backup-worker
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

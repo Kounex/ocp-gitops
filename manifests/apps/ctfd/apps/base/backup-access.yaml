@@ -21,8 +21,12 @@ metadata:
 rules:
   - apiGroups: ['apps']
     resources: ['deployments']
-    resourceNames: ['ctfd', 'database', 'cache']
+    resourceNames: ['ctfd', 'database', 'cache', 'ctfd-backup-helper']
     verbs: ['get']
+  - apiGroups: ['apps']
+    resources: ['deployments/scale']
+    resourceNames: ['ctfd', 'ctfd-backup-helper']
+    verbs: ['get', 'patch', 'update']
   - apiGroups: ['']
     resources: ['pods']
     verbs: ['get', 'list']

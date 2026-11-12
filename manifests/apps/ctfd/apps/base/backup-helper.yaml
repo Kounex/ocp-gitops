@@ -1,0 +1,74 @@
+# The external worker starts this only after the web Deployment has stopped.
+# It has no HTTP listener, provider key, mounted API token or standing CPU cost.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ctfd-backup-helper
+spec:
+  replicas: 0
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ctfd-backup-helper
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ctfd-backup-helper
+    spec:
+      serviceAccountName: ctfd-runtime
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: helper
+          image: ctfd
+          command: [python, -c, 'import time; time.sleep(86400)']
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          envFrom:
+            - configMapRef:
+                name: ctfd-config
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-secrets
+                  key: SECRET_KEY
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-secrets
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-secrets
+                  key: REDIS_URL
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: '1'
+              memory: 512Mi
+          volumeMounts:
+            - name: data
+              mountPath: /var/uploads
+              subPath: uploads
+            - name: data
+              mountPath: /var/quest-backup
+              subPath: backup-control
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: ctfd-data

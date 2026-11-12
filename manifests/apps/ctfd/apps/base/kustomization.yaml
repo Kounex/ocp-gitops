@@ -13,6 +13,9 @@ resources:
   - database.yaml
   - cache.yaml
   - ctfd.yaml
+  - backup-helper.yaml
+  - backup-access.yaml
+  - backup-client.yaml
   - network-policy.yaml
   - route.yaml
 configMapGenerator:
@@ -21,6 +24,8 @@ configMapGenerator:
       - UPLOAD_FOLDER=/var/uploads
       - LOG_FOLDER=/var/log/CTFd
       - WORKERS=2
+      - OTQ_BACKUP_WORKER_URL=https://otq-backups.apps.ocp.kounex.com
+      - OTQ_BACKUP_STATUS_ORIGIN=https://otq-backups.apps.ocp.kounex.com
       - ACCESS_LOG=-
       - ERROR_LOG=-
       - REVERSE_PROXY=1,1,1,0,0

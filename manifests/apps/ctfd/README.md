@@ -28,10 +28,12 @@ settings live in the overlays; init and runtime share the same image pin.
 
 ## Storage and startup
 
-Three RWO PVCs hold uploads/logs (10 GiB), MariaDB (10 GiB) and Redis AOF (1 GiB).
+Three RWO PVCs hold uploads/logs/recovery control (10 GiB), MariaDB (10 GiB) and Redis AOF (1 GiB).
 Each component has one replica and uses `Recreate`; upgrades can interrupt service.
 Containers use the namespace-scoped `nonroot-v2` grant. NetworkPolicies restrict
-web ingress to the OpenShift router and database/cache ingress to CTFd.
+web ingress to the OpenShift router and database/cache ingress to CTFd and its
+temporary recovery helper. The helper has zero replicas outside a full restore;
+the resource totals above are unchanged standing allocations.
 
 The init container waits for MariaDB, runs migrations and performs native setup
 once, creating the initial administrator with team mode and public registration.
@@ -49,6 +51,8 @@ an independent `event` config on the event cluster. Required keys:
 - `CTFD_DB_ROOT_PASSWORD`
 - `CTFD_REDIS_PASSWORD`
 - `CTFD_ADMIN_PASSWORD`
+- `CTFD_BACKUP_WORKER_TOKEN` — independent per instance, exposed only through
+  separate ExternalSecret `ctfd-backup-client`, outside captured app credentials
 
 Use URL-safe hex passwords because the template builds database/cache URLs.
 Database credential rotation must update the live database account as well as
@@ -100,13 +104,24 @@ checking pods, PVCs, ExternalSecret and Route in `ctfd`. Verify `/login` and
 `/quest/admin` after rollout. Preserve Secret keys and PVCs; rollback requires a
 compatible image/database or restoration of the matching backup.
 
-The temporary event has an external backup runner: encrypted, deduplicated
+Both instances connect to an external backup/restore worker through
+`otq-backups.apps.ocp.kounex.com`; the prod overlay routes TLS to the host's
+private libvirt listener. Its keys, job journal and encrypted repository remain
+outside restored SQL/uploads. Named RBAC permits it to read/capture, suspend only
+the owning Argo app and scale only CTFd/its helper. The persistent maintenance
+marker blocks requests while recovery verifies data; health probes use
+`/healthcheck`. Hosting bootstrap skips writes while fenced. Disposable load tests
+explicitly remove recovery credentials and integration.
+
+The temporary event retains encrypted, deduplicated
 snapshots every 15 minutes with 10-day retention, daily repository checks and
-isolated restore verification. The event overlay supplies only its dedicated
-`ctfd-backup` access; the scheduler, keys, repository and recovery runbook live in
-the private operator environment, outside the event cluster. Its token deliberately
-survives interactive login expiry and must be revoked at teardown. The playground
-has no corresponding recurring backup configured by these manifests.
+isolated restore verification. Playground backups are on demand. Organizer's
+**Backup & Restore** uses the same engine/repository as the schedule, and performs
+reviewed full replacement only for qualified snapshots; granular/legacy recovery
+stays operator-managed. See the plugin's
+[backup guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/backups.md).
+Worker installation, private profiles and recovery procedures live in the operator
+environment. Event access survives interactive login expiry; revoke it at teardown.
 
 **Deleting the Argo application with its finalizer prunes its PVCs.** Take and
 verify a final off-cluster backup before event teardown, then stop both external

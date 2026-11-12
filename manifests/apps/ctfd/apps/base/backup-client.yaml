@@ -1,0 +1,19 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: ctfd-backup-client
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: doppler
+  target:
+    name: ctfd-backup-client
+    creationPolicy: Owner
+  data:
+    - secretKey: token
+      remoteRef:
+        key: CTFD_BACKUP_WORKER_TOKEN
