@@ -1,5 +1,13 @@
 """Run CTFd's setup once, before the web server can accept public traffic."""
 import os
+from pathlib import Path
+import sys
+
+# Recovery already contains the complete initialized database. Do not run setup
+# or rename defaults while the external worker verifies that restored state.
+if Path(os.environ.get("OTQ_BACKUP_MAINTENANCE_FILE", "/var/quest-backup/maintenance.json")).exists():
+    print("Backup recovery maintenance: preserving the restored setup.")
+    sys.exit(0)
 
 from CTFd import create_app
 from CTFd.models import Admins

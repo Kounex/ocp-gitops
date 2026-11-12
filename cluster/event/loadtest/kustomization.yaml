@@ -12,8 +12,11 @@ configMapGenerator:
     behavior: merge
     literals:
       - CTFD_NAME=DISPOSABLE Open Tech Quest load test
+      - OTQ_BACKUP_WORKER_URL=
+      - OTQ_BACKUP_STATUS_ORIGIN=
 patches:
   - path: patches/fixture.yaml
+  - path: patches/without-backups.yaml
   - target:
       kind: Namespace
       name: ctfd

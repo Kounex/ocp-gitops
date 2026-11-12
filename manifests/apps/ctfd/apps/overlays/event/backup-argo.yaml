@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ctfd-backup-reconcile
+  namespace: openshift-gitops
+rules:
+  - apiGroups: ['argoproj.io']
+    resources: ['applications']
+    resourceNames: [ctfd-event]
+    verbs: ['get', 'patch']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ctfd-backup-reconcile
+  namespace: openshift-gitops
+subjects:
+  - kind: ServiceAccount
+    name: ctfd-backup
+    namespace: ctfd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ctfd-backup-reconcile
