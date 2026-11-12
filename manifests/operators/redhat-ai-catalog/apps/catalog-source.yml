@@ -1,0 +1,23 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: redhat-ai-operators
+  namespace: openshift-marketplace
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+spec:
+  displayName: Red Hat Operators 4.22 - AI lab
+  publisher: Red Hat
+  sourceType: grpc
+  image: registry.redhat.io/redhat/redhat-operator-index:v4.22
+  grpcPodConfig:
+    extractContent:
+      cacheDir: /tmp/cache
+      catalogDir: /configs
+    memoryTarget: 30Mi
+    nodeSelector:
+      kubernetes.io/os: linux
+    securityContextConfig: restricted
+  updateStrategy:
+    registryPoll:
+      interval: 240m

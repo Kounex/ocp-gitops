@@ -13,7 +13,7 @@ Agents and anyone operating the cluster: read [AGENTS.md](AGENTS.md) first.
 | `_init/` | One-time bootstrap: the OpenShift GitOps operator Subscription and cluster-wide rights for the Argo controller. |
 | `cluster/` | One-time bootstrap: the three `bootstrap-*` Applications. |
 | `environment/` | AppProjects and the three "manager" Applications that read `manifests/`. |
-| `manifests/operators/` | Operator Subscriptions (cert-manager, External Secrets, LVM Storage). |
+| `manifests/operators/` | Operator Subscriptions (cert-manager, External Secrets, LVM Storage) and an [additional AI lab catalog](manifests/operators/redhat-ai-catalog/README.md). |
 | `manifests/configs/` | Cluster configuration: OAuth and login page, certificates, Argo CD itself, secret store, storage, Cloudflare Tunnel. |
 | `manifests/apps/` | Workloads: IT-Tools, [CTFd](manifests/apps/ctfd/README.md). |
 | `tools/` | Manifest validation (also run in CI) and the off-cluster backup job. |
