@@ -29,12 +29,12 @@ State (2026-11-09): OpenShift 5.0.1 (channel `fast-5.0`), OpenShift GitOps 1.22 
   `~/agent/AGENTS.md`). CTFd overlays pin `newTag: X.Y.Z@sha256:...` for
   init and runtime together. Renovate proposes image updates; CTFd changes require
   review and testing on the playground before event promotion.
-- **Current CTFd rollout policy (owner, 2026-11-07):** after each tested plugin
-  release, update both playground (`prod`) and `event` overlays without asking
-  again. Roll out and verify the playground first, then the event. Keep exact
-  version/digest pins and existing resource allocations. Verify both Argo apps
-  are Synced/Healthy and both sites report the new version before finishing.
-  This standing instruction applies until the owner changes it or event teardown.
+- **Current CTFd rollout policy (owner, 2026-11-17):** deploy each tested
+  plugin release to playground (`prod`) and verify it. Event is actively used:
+  promote its `event` overlay only after explicit owner approval for that release.
+  Keep exact version/digest pins and existing resource allocations. Verify the
+  authorized target's Argo app is Synced/Healthy and its site serves the new
+  version. Leave the event pin and workloads unchanged while approval is pending.
 - **Updates:** Renovate (Saturdays) automerges minor/patch/digest image and
   chart updates after CI; majors wait as PRs. The
   OpenShift version itself is never updated by anything: z-streams on channel
