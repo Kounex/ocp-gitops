@@ -28,13 +28,12 @@ State (2026-11-09): OpenShift 5.0.1 (channel `fast-5.0`), OpenShift GitOps 1.22 
 - **Image tags:** exact, readable versions, never `latest` (workspace rule in
   `~/agent/AGENTS.md`). CTFd overlays pin `newTag: X.Y.Z@sha256:...` for
   init and runtime together. Renovate proposes image updates; CTFd changes require
-  review and testing on the playground before event promotion.
-- **Current CTFd rollout policy (owner, 2026-11-17):** deploy each tested
-  plugin release to playground (`prod`) and verify it. Event is actively used:
-  promote its `event` overlay only after explicit owner approval for that release.
-  Keep exact version/digest pins and existing resource allocations. Verify the
-  authorized target's Argo app is Synced/Healthy and its site serves the new
-  version. Leave the event pin and workloads unchanged while approval is pending.
+  review and testing on the maintained playground.
+- **Current CTFd rollout policy (owner, 2026-11-20):** playground (`prod`,
+  `ctfd-app`) is the maintained instance and holds the completed-event living
+  snapshot. Deploy tested releases there only, preserving stored event data,
+  exact image pins and resources; verify Argo and site version. No rehearsal is
+  active. The old workshop is retired as an operational/promotion target.
 - **Updates:** Renovate (Saturdays) automerges minor/patch/digest image and
   chart updates after CI; majors wait as PRs. The
   OpenShift version itself is never updated by anything: z-streams on channel
@@ -150,16 +149,16 @@ not just Cursor. Keep them and this file in sync. In short:
   on the NAS for the Access app and DNS record. Full guide (all four
   tunnels): `~/agent/it-env/services/cloudflare-tunnels/AGENTS.md`.
 - **Renovate:** dashboard is issue #44.
-- **MariaDB (CTFd):** Renovate offers LTS lines only (`allowedVersions`). A
-  major can't be reverted by the image alone (restore a dump into an empty
-  PVC), so back up and rehearse first. Playground and event share one version
-  (base, no overlay pin: no drift while testing) and stay on 10.11; Renovate
-  offers only 10.11 patches until CTFd#2916 is fixed (CTFd's migrations fail on
-  an empty 12.x database, see the ctfd README). Then move both together.
-- **The event cluster is temporary** (`cluster/event/`, overlay `event`, Argo
-  `ctfd-event` on its own cluster): it goes away after the event, with those
-  paths. Don't plan long-term work or proposals around it, and don't remove
-  its paths while it still syncs from `main`.
+- **MariaDB (CTFd):** stay on the base's 10.11 line until the native fresh-install
+  migration issue is resolved; Renovate offers only 10.11 patches. A major cannot
+  be undone by an image revert: qualify recovery from a dump first.
+- **Retired workshop scaffolding:** `cluster/event/` and overlay `event` remain
+  until the external workshop cluster expires or its Argo is deliberately
+  detached. Do not delete paths it may still use. No routine rollout/status work
+  targets it. The event backup schedule/profile/access are retired; recovery and
+  remaining infrastructure cleanup are recorded in private
+  `it-env/docs/ctfd-backup-worker.md`. Preserve the personal entrypoint and prod
+  resources when eventually removing those historical paths.
 
 ## Gotchas
 

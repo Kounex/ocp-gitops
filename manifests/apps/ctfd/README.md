@@ -1,134 +1,88 @@
 # Hosting Open Tech Quest
 
-OpenShift deployment of [Open Tech Quest](https://github.com/open-tech-quest/ctfd-plugin)
-with CTFd, MariaDB and Redis. This repository owns the manifests, bootstrap and
-cluster integration; the plugin repository owns the application image and docs.
+This repository owns OpenShift manifests for
+[Open Tech Quest](https://github.com/open-tech-quest/ctfd-plugin), CTFd, MariaDB and
+Redis. The plugin repository owns application images and public behavior/docs.
 
-## Deployments
+## Maintained deployment
 
-Both instances use namespace `ctfd` on separate clusters.
+[Playground](https://otq.apps.ocp.kounex.com) uses namespace `ctfd`, Argo application
+`ctfd-app` and overlay [prod](apps/overlays/prod). It now preserves the completed
+17 November 2026 event as a living snapshot; resetting or seeding needs explicit
+owner intent. Runtime versions are pinned in the overlay, not this README.
 
-| Overlay / Argo application | Workers | Total CPU request / limit | Total memory request / limit |
-|---|---:|---|---|
-| [prod](apps/overlays/prod) / `ctfd-app` — playground | 2 | 225m / 5 cores | 576 MiB / 2.25 GiB |
-| [event](apps/overlays/event) / `ctfd-event` — 400-attendee profile, **temporary** (removed after the event) | 8 | 4.75 / 7.5 cores | 1.625 / 3.25 GiB |
+| Workers | Total CPU request / limit | Total memory request / limit |
+|---:|---|---|
+| 2 | 225m / 5 cores | 576 MiB / 2.25 GiB |
 
-- [apps/base](apps/base) contains the shared stack, startup, storage and security.
-- The playground uses **https://otq.apps.ocp.kounex.com** and storage class
-  `lvms-vg1`. Its Route uses the cluster wildcard certificate and redirects HTTP
-  to HTTPS.
-- The event overlay uses its cluster's default RWO storage class and an assigned
-  Route hostname. Follow the [event cluster runbook](../../../cluster/event/README.md)
-  for bootstrap and disposable load testing.
+[apps/base](apps/base) contains startup, storage and security. Prod uses
+`lvms-vg1` storage and an HTTPS Route with the cluster wildcard certificate.
+For measured event capacity and retesting, see the plugin's
+[sizing guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/sizing.md).
 
-The event allocation comes from the plugin's 0.1.20 measurements. See the
-[sizing guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/sizing.md)
-for results, limits and retesting guidance. Declared image versions and resource
-settings live in the overlays; init and runtime share the same image pin.
+## Storage, startup and secrets
 
-## Storage and startup
+Three RWO PVCs hold uploads/logs/recovery control (10 GiB), MariaDB (10 GiB) and
+Redis AOF (1 GiB). Each component is a single replica using `Recreate`; rollouts
+interrupt service. The recovery helper normally has zero replicas. Containers
+use the namespace-scoped `nonroot-v2` grant, with NetworkPolicies limiting web,
+database/cache and temporary recovery-helper ingress.
 
-Three RWO PVCs hold uploads/logs/recovery control (10 GiB), MariaDB (10 GiB) and Redis AOF (1 GiB).
-Each component has one replica and uses `Recreate`; upgrades can interrupt service.
-Containers use the namespace-scoped `nonroot-v2` grant. NetworkPolicies restrict
-web ingress to the OpenShift router and database/cache ingress to CTFd and its
-temporary recovery helper. The helper has zero replicas outside a full restore;
-the resource totals above are unchanged standing allocations.
+Initialization waits for MariaDB, runs migrations and performs native CTFd setup
+once. Existing accounts/settings survive startup. The bootstrap administrator
+password is supplied only to initialization; changing it does not reset an
+existing/restored account. Use native account settings for that.
 
-The init container waits for MariaDB, runs migrations and performs native setup
-once, creating the initial administrator with team mode and public registration.
-Existing accounts/settings are preserved. The web server starts after setup;
-the administrator bootstrap password is only supplied to the init container.
+ExternalSecrets read from `ClusterSecretStore/doppler`, project `ocp`, config
+`main`. Required keys: `CTFD_SECRET_KEY`, `CTFD_DB_PASSWORD`,
+`CTFD_DB_ROOT_PASSWORD`, `CTFD_REDIS_PASSWORD`, `CTFD_ADMIN_PASSWORD`, and separate
+`CTFD_BACKUP_WORKER_TOKEN`. The latter is exposed through `ctfd-backup-client`,
+outside captured application credentials. Use URL-safe hex values for generated
+credential URLs. Database rotation must update the live account as well as the
+secret manager; initialization variables do not rotate existing accounts.
 
-## Secrets
+## Updates and recovery
 
-ExternalSecret [`ctfd-secrets`](apps/base/external-secret.yaml) reads from
-`ClusterSecretStore/doppler`: project `ocp`, config `main` on the playground and
-an independent `event` config on the event cluster. Required keys:
+The overlay pins `newTag: X.Y.Z@sha256:...` for init/runtime/helper together.
+Renovate proposes CTFd changes for review. Deploy tested releases to playground,
+keep its data/resources, then verify `ctfd-app` is Synced/Healthy, pods/PVCs and
+ExternalSecrets are ready, `/login` works and the site serves the expected version.
+Validate from the repository root with `tools/validate.sh` and
+`kustomize build manifests/apps/ctfd/apps/overlays/prod`.
 
-- `CTFD_SECRET_KEY`
-- `CTFD_DB_PASSWORD`
-- `CTFD_DB_ROOT_PASSWORD`
-- `CTFD_REDIS_PASSWORD`
-- `CTFD_ADMIN_PASSWORD`
-- `CTFD_BACKUP_WORKER_TOKEN` — independent per instance, exposed only through
-  separate ExternalSecret `ctfd-backup-client`, outside captured app credentials
+MariaDB stays on 10.11 in `apps/base/database.yaml`, with no overlay pin. Native
+CTFd migrations rely on historical foreign-key names and fail on fresh MariaDB
+12.x databases; see [CTFd#2916](https://github.com/CTFd/CTFd/issues/2916). Qualify
+an upgrade and restore path before changing that line. Reverting an image alone
+cannot undo a database major upgrade. Preserve PVCs and secrets during updates.
 
-Use URL-safe hex passwords because the template builds database/cache URLs.
-Database credential rotation must update the live database account as well as
-Doppler; initialization variables do not change an existing account. Restart
-affected deployments after rotation. Changing `CTFD_ADMIN_PASSWORD` does not
-reset an existing administrator; use native CTFd account settings instead.
+Playground connects to the external backup worker through
+`otq-backups.apps.ocp.kounex.com`; prod routes TLS to the host's private listener.
+Worker keys, journals and repository stay outside restored SQL/uploads. Scoped
+RBAC lets it capture, suspend only the owning Argo app and scale CTFd/its helper.
+The persistent maintenance marker blocks writers during full recovery;
+`/healthcheck` remains available for probes and bootstrap skips writes while fenced.
 
-## Updates and checks
-
-Each overlay pins `newTag: X.Y.Z@sha256:...`. Renovate proposes CTFd image updates
-for review. Deploy each tested plugin release to playground and verify it.
-The event instance is actively used: promote it only after explicit owner approval
-for that release, using the same tested version/digest. Keep resource profiles unchanged.
-Use the pins from the plugin's release notes. Validate from the repository root:
-
-```sh
-tools/validate.sh
-kustomize build manifests/apps/ctfd/apps/overlays/event
-```
-
-Playground and event run **the same MariaDB, 10.11 LTS** (supported to
-2028-02), set once in `apps/base/database.yaml`, so what is tested on the
-playground holds for the event. Don't pin it per overlay. The event cluster is
-temporary; after it is gone this is simply the playground's version. Renovate offers only
-10.11 patches until CTFd#2916 (below) is fixed; after that, LTS lines only
-(10.11, 11.4, 11.8, x.3 from 12 on), moved on both clusters together while the
-event still exists. A major
-upgrade can't be undone by reverting the image: rolling back means emptying the
-database PVC and restoring a dump, so take one on the target cluster first.
-History: the playground ran 12.3.3 for a few hours on 2026-11-07 and was put
-back on 10.11.19 the same evening (empty PVC, pre-upgrade dump restored; no
-data had changed) to avoid drift from the event.
-
-**Fresh installs need MariaDB 10.11 to 11.8, not 12.x.** MariaDB 12.1 and later
-name unnamed foreign keys `1`, `2`, ... instead of `<table>_ibfk_N`, and CTFd's
-migration `b295b033364d` drops `awards_ibfk_1` by name, so the init container's
-migrations fail on an empty 12.x database (upstream
-[CTFd#2916](https://github.com/CTFd/CTFd/issues/2916), open). Checked 2026-11-07:
-the plugin's v0.1.22 MariaDB suite fails at that migration on 12.3.3 and passes
-(187 tests) on 10.11.19. A database created on 10.11 and upgraded in place keeps
-its old names and works, and so does restoring a dump (it carries the names).
-So an upgraded database would run, but any fresh install (a rebuilt playground,
-the event cluster, `cluster/event/loadtest`) would fail at the init container.
-Both clusters stay on 10.11 until CTFd fixes #2916.
-
-Back up MariaDB and uploads before upgrades, then commit/push and check the
-corresponding Argo application is Synced/Healthy. Use an explicit kubeconfig when
-checking pods, PVCs, ExternalSecret and Route in `ctfd`. Verify `/login` and
-`/quest/admin` after rollout. Preserve Secret keys and PVCs; rollback requires a
-compatible image/database or restoration of the matching backup.
-
-Both instances connect to an external backup/restore worker through
-`otq-backups.apps.ocp.kounex.com`; the prod overlay routes TLS to the host's
-private libvirt listener. Its keys, job journal and encrypted repository remain
-outside restored SQL/uploads. Named RBAC permits it to read/capture, suspend only
-the owning Argo app and scale only CTFd/its helper. The persistent maintenance
-marker blocks requests while recovery verifies data; health probes use
-`/healthcheck`. Hosting bootstrap skips writes while fenced. Disposable load tests
-explicitly remove recovery credentials and integration.
-
-The temporary event retains encrypted, deduplicated
-snapshots every 15 minutes with 10-day retention, daily repository checks and
-isolated restore verification. Playground backups are on demand. Organizer's
-**Backup & Restore** uses the same engine/repository as the schedule, and performs
-reviewed full replacement only for qualified snapshots; granular/legacy recovery
-stays operator-managed. See the plugin's
+Organizer **Backup & Restore** provides on-demand full signed backups and reviewed
+replacement for qualified sources. Event JSON exports are reports, not recovery
+backups. Two selected 17 November points are retained separately off site; the
+workshop's periodic capture/drill schedules and active worker profile are retired.
+Private installation, retained-point/key locations and restore instructions live
+in the operator environment. Public contract:
 [backup guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/backups.md).
-Worker installation, private profiles and recovery procedures live in the operator
-environment. Event access survives interactive login expiry; revoke it at teardown.
 
-**Deleting the Argo application with its finalizer prunes its PVCs.** Take and
-verify a final off-cluster backup before event teardown, then stop both external
-timers and revoke their event credential; retain the backup and decryption key.
-Configure SMTP in CTFd before relying on password reset or email verification.
+Deleting an Argo application carrying its finalizer prunes its resources,
+**including PVCs**. Backup and verify before intentional removal.
 
-For application configuration, use the plugin's
-[hosting guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/deployment.md).
-For signup, attendance, authoring, demos and running the event, use its
-[operations guide](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/operations.md).
+## Historical workshop paths
+
+`cluster/event/` and [overlay event](apps/overlays/event) remain as historical
+scaffolding until the external workshop expires or its Argo is deliberately
+detached. They are no longer a rollout target; do not remove source paths that
+its Argo may still reference. Playground uses only prod. Disposable load tests
+must remove recovery credentials/integration and use isolated data.
+
+Application configuration and event operations belong in the plugin's
+[hosting](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/deployment.md)
+and [operations](https://github.com/open-tech-quest/ctfd-plugin/blob/main/docs/operations.md)
+guides. Configure SMTP before relying on password-reset emails.
