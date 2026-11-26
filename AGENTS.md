@@ -13,7 +13,7 @@ Secrets come from Doppler through External Secrets
 (gitignored). The audit of 2026-10-22 is `docs/private/audit-2026-10-22.md`
 (local only; its status table says what was done).
 
-State (2026-11-09): OpenShift 5.0.1 (channel `fast-5.0`), OpenShift GitOps 1.22 (Argo CD 3.5),
+State (2026-11-09, still so on 2026-11-26): OpenShift 5.0.1 (channel `fast-5.0`), OpenShift GitOps 1.22 (Argo CD 3.5),
 8 vCPU / 32 GiB.
 
 ## Rules
@@ -38,7 +38,8 @@ State (2026-11-09): OpenShift 5.0.1 (channel `fast-5.0`), OpenShift GitOps 1.22 
   chart updates after CI; majors wait as PRs. The
   OpenShift version itself is never updated by anything: z-streams on channel
   `fast-5.0` are applied by hand (owner moved to 5.0 from the fast channel on
-  2026-11-09; switch to `stable-5.0` once it exists), a new minor is a channel change. Operator
+  2026-11-09; switch to `stable-5.0` once it exists: the cluster offers it
+  since at least 2026-11-26, switching is the owner's call), a new minor is a channel change. Operator
   subscriptions are `Automatic` within their channels. How this fits the rest
   of the fleet (and when a new project should run here rather than on the NAS
   or Hetzner): `docs/version-management.md` and `docs/new-project.md` in the
@@ -46,7 +47,7 @@ State (2026-11-09): OpenShift 5.0.1 (channel `fast-5.0`), OpenShift GitOps 1.22 
 - **CPU budget:** 8 vCPU / 32 GiB, 7.5 CPU allocatable. The scheduler counts
   **requests**, not usage. Check before adding workloads:
   `oc describe node master-0 | grep -A5 "Allocated resources"` (about 5 of 7.5
-  CPU requested on 2026-10-22). Keep requests small; limits can stay generous.
+  CPU requested on 2026-10-22, 6.4 on 2026-11-26). Keep requests small; limits can stay generous.
 - **Removing an app deletes it.** Workload apps (`manifests/apps/*`) carry the
   `resources-finalizer`: deleting the line in `manifests/apps/kustomization.yml`
   deletes the app's resources, **PVCs included**. Config and operator apps do
@@ -196,6 +197,12 @@ Cluster state that this repo does not describe:
   as is).
 - Operators installed from the console: Web Terminal and the DevWorkspace
   operator it needs.
+- Installed by hand on 2026-11-12 for the AI lab (found 2026-11-26, not
+  described here yet): OpenShift AI (`rhods-operator` 3.6.0-ea.2, channel
+  `beta`, from the `redhat-ai-operators` catalog), OpenShift Lightspeed
+  (`lightspeed-operator` 2.0.1), and namespaces `showcase-app`,
+  `showcase-models`, `showcase-preview`, `rhoai-model-registries`. They
+  count against the CPU budget above.
 - The VM size and CPU weight (libvirt, see it-env).
 
 ## Git
