@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - namespaces.yml
+  - external-secrets.yml
   - model-storage.yml
   - registry.yml
   - model-serving.yml

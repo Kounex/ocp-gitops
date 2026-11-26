@@ -3,4 +3,5 @@ kind: Kustomization
 
 resources:
   - cpu-threads.yml
+  - external-secret.yml
   - olsconfig.yml
