@@ -43,6 +43,13 @@
       matchPackageNames: ['ghcr.io/open-tech-quest/ctfd-plugin'],
       automerge: false,
     },
+    {
+      // AI lab (adopted 2026-11-26): images are pinned by digest only, and
+      // several sit in completed Jobs whose spec is immutable. A digest bump
+      // would fail the sync or swap the model runtime, so update them by hand.
+      matchFileNames: ['manifests/configs/ai-showcase/**', 'manifests/configs/openshift-ai/**'],
+      enabled: false,
+    },
   ],
   argocd: {
     // Chart versions in Argo CD Applications (app-template, ...).

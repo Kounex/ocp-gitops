@@ -198,9 +198,11 @@ adopted into Git on 2026-11-26 (apps `openshift-ai-operator-app`,
 - **`model-catalog-sources`** is also applied by the model registry
   operator. If Argo and the operator start fighting over it, add a targeted
   `ignoreDifferences` (+ `RespectIgnoreDifferences=true`) as `oauth-app` does.
-- **Images are pinned by digest only** (as installed). Renovate skips them.
+- **Images are pinned by digest only** (as installed), and `renovate.json5`
+  disables Renovate for `manifests/configs/{ai-showcase,openshift-ai}/`: a
+  digest bump would hit immutable Job specs or swap the model runtime.
   Moving to readable `tag@sha256` pins restarts those pods; do it with the
-  next deliberate model/runtime change.
+  next deliberate model/runtime change, by hand.
 - **Secrets (not in Git):** see "Not in Git". The OLSConfig references
   `showcase-model-credentials` by name only.
 - **Fresh cluster:** not rehearsed. Order: catalog → operators (wait for the
