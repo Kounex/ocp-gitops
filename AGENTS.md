@@ -203,10 +203,22 @@ adopted into Git on 2026-11-26 (apps `openshift-ai-operator-app`,
   digest bump would hit immutable Job specs or swap the model runtime.
   Moving to readable `tag@sha256` pins restarts those pods; do it with the
   next deliberate model/runtime change, by hand.
-- **Secrets (not in Git):** see "Not in Git". The OLSConfig references
-  `showcase-model-credentials` by name only.
+- **Secrets come from Doppler** (since 2026-11-26; created by hand on
+  2026-11-12, then adopted by ESO with the same values). Doppler `ocp/main`:
+  `AI_LAB_MODEL_API_KEY` (one key, shared by
+  `showcase-models/model-api-key` key `api-key` and
+  `openshift-lightspeed/showcase-model-credentials` keys `apitoken` and
+  `OPENAI_API_KEY`) and `AI_LAB_REGISTRY_DB_PASSWORD`
+  (`rhoai-model-registries/showcase-registry-db` key `database-password`).
+  ExternalSecrets: `ai-showcase/apps/external-secrets.yml` (wave 105) and
+  `lightspeed/apps/external-secret.yml` (wave 130). **Rotating:** change the
+  value in Doppler; ESO refreshes within the hour (or annotate the
+  ExternalSecret `force-sync=$(date +%s)`). Then restart the predictor and the
+  Lightspeed app server for the API key; the registry DB password also has
+  to be changed inside PostgreSQL first.
 - **Fresh cluster:** not rehearsed. Order: catalog → operators (wait for the
-  CSVs and CRDs) → the three Secrets → `openshift-ai-app` →
+  CSVs and CRDs) → `openshift-ai-app` (creates `rhoai-model-registries`,
+  which the registry ExternalSecret needs; Argo retries until it exists) →
   `ai-showcase-app` → `lightspeed-app`. CRs carry
   `SkipDryRunOnMissingResource=true`; `rhoai-model-registries` is created
   by the operator from the DSC, not by Git.
@@ -249,24 +261,6 @@ Cluster state that this repo does not describe:
   as is).
 - Operators installed from the console: Web Terminal and the DevWorkspace
   operator it needs.
-- The AI lab's three Secrets (created by hand on 2026-11-12; the stack
-  itself is in Git since 2026-11-26, see "AI lab"):
-  - `openshift-lightspeed/showcase-model-credentials`, keys `apitoken` and
-    `OPENAI_API_KEY`: Lightspeed's LLM credential, referenced by the OLSConfig
-    and the smoke test.
-  - `showcase-models/model-api-key`, key `api-key`: the llama.cpp server's
-    API key. Same value as the credential above; rotate both together, then
-    restart the predictor and the Lightspeed app server.
-  - `rhoai-model-registries/showcase-registry-db`, key `database-password`:
-    the registry PostgreSQL password (read by the DB Deployment and the
-    ModelRegistry). Changing it needs the password changed inside the DB too.
-
-  The values exist only in these Secrets and a private local file (where:
-  `docs/private/ai-lab.md`). To recreate: generate a random key, then
-  `o -n showcase-models create secret generic model-api-key --from-literal=api-key=<key>`,
-  `o -n openshift-lightspeed create secret generic showcase-model-credentials --from-literal=apitoken=<key> --from-literal=OPENAI_API_KEY=<key>`,
-  `o -n rhoai-model-registries create secret generic showcase-registry-db --from-literal=database-password=<pw>`.
-  Moving them to Doppler/ExternalSecrets is open.
 - The VM size and CPU weight (libvirt, see it-env).
 
 ## Git
