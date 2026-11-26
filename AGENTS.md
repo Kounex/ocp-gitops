@@ -13,8 +13,9 @@ Secrets come from Doppler through External Secrets
 (gitignored). The audit of 2026-10-22 is `docs/private/audit-2026-10-22.md`
 (local only; its status table says what was done).
 
-State (2026-11-09, still so on 2026-11-26): OpenShift 5.0.1 (channel `fast-5.0`), OpenShift GitOps 1.22 (Argo CD 3.5),
-8 vCPU / 32 GiB.
+8 vCPU / 32 GiB. On the OpenShift 5 minor since 2026-11-09, update channel
+`stable-5.0` since 2026-11-26. Read current versions live
+(`o get clusterversion`, `o get csv -A`); this file does not track them.
 
 ## Rules
 
@@ -36,10 +37,10 @@ State (2026-11-09, still so on 2026-11-26): OpenShift 5.0.1 (channel `fast-5.0`)
   active. The old workshop is retired as an operational/promotion target.
 - **Updates:** Renovate (Saturdays) automerges minor/patch/digest image and
   chart updates after CI; majors wait as PRs. The
-  OpenShift version itself is never updated by anything: z-streams on channel
-  `fast-5.0` are applied by hand (owner moved to 5.0 from the fast channel on
-  2026-11-09; switch to `stable-5.0` once it exists: the cluster offers it
-  since at least 2026-11-26, switching is the owner's call), a new minor is a channel change. Operator
+  OpenShift version itself is never updated by anything: z-streams on the
+  ClusterVersion channel are applied by hand (owner moved to 5.0 via
+  `fast-5.0` on 2026-11-09 and switched to `stable-5.0` on 2026-11-26), a new
+  minor is a channel change. Operator
   subscriptions are `Automatic` within their channels. How this fits the rest
   of the fleet (and when a new project should run here rather than on the NAS
   or Hetzner): `docs/version-management.md` and `docs/new-project.md` in the
@@ -136,7 +137,7 @@ not just Cursor. Keep them and this file in sync. In short:
   fails or an app turns Degraded/Missing (`manifests/configs/gitops/apps/notifications.yml`).
   Test a template: `o -n openshift-gitops exec deploy/openshift-gitops-notifications-controller -- argocd admin notifications template notify ntfy-health <app> --recipient ntfy`
   (that sends a real push).
-- **Cluster updates:** channel `fast-5.0`. Before an update take an etcd
+- **Cluster updates:** channel `stable-5.0` (since 2026-11-26). Before an update take an etcd
   backup (`cluster-backup.sh` on the node, copy to `/root/ocp-backups/` on the
   host; the 2026-10-22 one is there). Move lvm-storage's channel with the
   OpenShift minor. On one node the API drops several times during an update;
@@ -191,7 +192,9 @@ Cluster state that this repo does not describe:
 - Argo's local `admin` account and its non-expiring API token (issued
   2026-05-29), most likely used by Cursor's Argo MCP. A dedicated account with
   its own token would be cleaner; it needs a Cursor config change.
-- The ClusterVersion channel (`fast-5.0`) and the GitOps Subscription's
+- The ClusterVersion channel (`stable-5.0` since 2026-11-26, set with
+  `o patch clusterversion version --type merge -p '{"spec":{"channel":"stable-5.0"}}'`)
+  and the GitOps Subscription's
   live object (`_init/` describes it, but `_init` is not synced by Argo).
 - Namespace `hm-playground` (a playground deployed by hand, May 2026; stays
   as is).
