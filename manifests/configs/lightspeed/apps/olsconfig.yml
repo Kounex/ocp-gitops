@@ -1,0 +1,111 @@
+apiVersion: ols.openshift.io/v1alpha1
+kind: OLSConfig
+metadata:
+  name: cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: '140'
+    argocd.argoproj.io/sync-options: Prune=false,SkipDryRunOnMissingResource=true
+spec:
+  featureGates:
+    - ToolFiltering
+  llm:
+    providers:
+      - credentialsSecretRef:
+          name: showcase-model-credentials
+        models:
+          - contextWindowSize: 8192
+            name: Qwen/Qwen3-0.6B
+            parameters:
+              maxTokensForResponse: 256
+              temperature: 0.2
+        name: showcase-rhoai
+        type: openai
+        url: https://qwen3-cpu-showcase-models.apps.ocp.kounex.com/v1
+  ols:
+    byokRAGOnly: true
+    conversationCache:
+      postgres:
+        maxConnections: 50
+        sharedBuffers: 64MB
+    defaultModel: Qwen/Qwen3-0.6B
+    defaultProvider: showcase-rhoai
+    deployment:
+      agenticConsole:
+        resources:
+          limits:
+            cpu: 250m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 32Mi
+      alertsAdapter:
+        resources:
+          limits:
+            cpu: 250m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 32Mi
+      api:
+        resources:
+          limits:
+            cpu: '1'
+            memory: 1536Mi
+          requests:
+            cpu: 100m
+            memory: 512Mi
+      console:
+        resources:
+          limits:
+            cpu: 250m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 32Mi
+      database:
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 25m
+            memory: 192Mi
+      mcpServer:
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 25m
+            memory: 64Mi
+      otelCollector:
+        resources:
+          limits:
+            cpu: 250m
+            memory: 192Mi
+          requests:
+            cpu: 25m
+            memory: 64Mi
+      rhokp:
+        resources:
+          limits:
+            cpu: '1'
+            memory: 2Gi
+          requests:
+            cpu: 100m
+            memory: 1536Mi
+    introspectionEnabled: true
+    maxIterations: 3
+    storage:
+      class: lvms-vg1
+      size: 2Gi
+    toolFilteringConfig:
+      alpha: 0.8
+      threshold: 0.01
+      topK: 3
+    toolsApprovalConfig:
+      approvalTimeout: 600
+      approvalType: always
+    userDataCollection:
+      feedbackDisabled: true
+      transcriptsDisabled: true

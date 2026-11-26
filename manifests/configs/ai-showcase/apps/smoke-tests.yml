@@ -1,0 +1,182 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: showcase-smoke-test
+  namespace: openshift-lightspeed
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: showcase-smoke-test
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: lightspeed-operator-query-access
+subjects:
+  - kind: ServiceAccount
+    name: showcase-smoke-test
+    namespace: openshift-lightspeed
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: showcase-smoke-test
+  namespace: openshift-lightspeed
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: showcase-smoke-test
+      ports:
+        - port: 8443
+          protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: lightspeed-service-api
+  policyTypes:
+    - Ingress
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: showcase-smoke-checks-8d2chmthth
+  namespace: openshift-lightspeed
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+data:
+  check-stack.py: |
+    """Read-only end-to-end acceptance test. Credentials never leave process memory."""
+    import json
+    from pathlib import Path
+    import ssl
+    import time
+    import urllib.error
+    import urllib.request
+
+    model_url = 'https://qwen3-cpu-showcase-models.apps.ocp.kounex.com/v1'
+    model_name = 'Qwen/Qwen3-0.6B'
+    key = Path('/model-credential/apitoken').read_text().strip()
+    service_token = Path('/var/run/secrets/kubernetes.io/serviceaccount/token').read_text().strip()
+    service_context = ssl.create_default_context(cafile='/service-ca/service-ca.crt')
+
+    def request(url, token=None, body=None, context=None, timeout=240):
+        headers = {'Content-Type': 'application/json'}
+        if token:
+            headers['Authorization'] = 'Bearer ' + token
+        req = urllib.request.Request(url, data=json.dumps(body).encode() if body is not None else None, headers=headers)
+        try:
+            with urllib.request.urlopen(req, context=context, timeout=timeout) as response:
+                return json.load(response)
+        except urllib.error.HTTPError as error:
+            raise RuntimeError(f'HTTP {error.code}: {error.read(1500).decode()}') from None
+
+    for attempt in range(30):
+        try:
+            models = request(model_url + '/models', key, timeout=10)
+            assert model_name in [item['id'] for item in models['data']]
+            break
+        except Exception as error:
+            if attempt == 29:
+                raise
+            print(f'Waiting for inference: {type(error).__name__}', flush=True)
+            time.sleep(10)
+    else:
+        raise RuntimeError('Inference did not become ready')
+
+    try:
+        request(model_url + '/models', timeout=10)
+    except RuntimeError as error:
+        assert str(error).startswith('HTTP 401'), str(error)
+    else:
+        raise AssertionError('Unauthenticated inference must be rejected')
+    print('PASS: authenticated model listing; unauthenticated requests return 401', flush=True)
+
+    prompt = 'What is an OpenShift project? Answer in one short sentence.'
+    started = time.monotonic()
+    chat = request(model_url + '/chat/completions', key, {
+        'model': model_name, 'messages': [{'role': 'user', 'content': prompt}],
+        'max_tokens': 96, 'temperature': 0.2,
+    })
+    answer = chat['choices'][0]['message'].get('content', '').strip()
+    assert answer, 'Direct model response was empty'
+    print(json.dumps({'check': 'direct-model', 'seconds': round(time.monotonic()-started, 1), 'answer': answer}), flush=True)
+
+    ols_url = 'https://lightspeed-app-server.openshift-lightspeed.svc:8443'
+    for attempt in range(30):
+        try:
+            request(ols_url + '/readiness', service_token, context=service_context, timeout=15)
+            break
+        except Exception:
+            if attempt == 29:
+                raise
+            print('Waiting for Lightspeed readiness', flush=True)
+            time.sleep(10)
+    started = time.monotonic()
+    result = request(ols_url + '/v1/query', service_token, {
+        'query': prompt, 'provider': 'showcase-rhoai', 'model': model_name,
+    }, context=service_context)
+    answer = result.get('response', '')
+    assert isinstance(answer, str) and answer.strip(), json.dumps(result)[:1000]
+    print(json.dumps({'check': 'lightspeed-query', 'seconds': round(time.monotonic()-started, 1), 'answer': answer}), flush=True)
+    print('PASS: model → Lightspeed end-to-end answer', flush=True)
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: showcase-smoke-test-v4
+  namespace: openshift-lightspeed
+  annotations:
+    argocd.argoproj.io/sync-wave: '160'
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  activeDeadlineSeconds: 1800
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: showcase-smoke-test
+    spec:
+      containers:
+        - command:
+            - python3
+            - -u
+            - /checks/check-stack.py
+          image: registry.access.redhat.com/ubi9/python-312@sha256:b93a97b7a4728f6cf2df2e760837a429290ba77f3d41cb495f5f3f7090a0ea7b
+          name: check
+          resources:
+            limits:
+              cpu: 250m
+              memory: 192Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+          volumeMounts:
+            - mountPath: /checks
+              name: checks
+              readOnly: true
+            - mountPath: /model-credential
+              name: credential
+              readOnly: true
+            - mountPath: /service-ca
+              name: service-ca
+              readOnly: true
+      restartPolicy: Never
+      serviceAccountName: showcase-smoke-test
+      volumes:
+        - configMap:
+            name: showcase-smoke-checks-8d2chmthth
+          name: checks
+        - name: credential
+          secret:
+            secretName: showcase-model-credentials
+        - configMap:
+            name: openshift-service-ca.crt
+          name: service-ca

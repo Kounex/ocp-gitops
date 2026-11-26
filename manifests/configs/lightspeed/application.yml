@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: lightspeed-app
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: '100'
+spec:
+  # Adopted from a hand install (2026-11-12). No automated sync until the live diff is proven empty.
+  source:
+    path: manifests/configs/lightspeed/apps
+    repoURL: https://github.com/Kounex/ocp-gitops.git
+    targetRevision: main
+  destination:
+    namespace: openshift-gitops
+    server: https://kubernetes.default.svc
+  project: configs

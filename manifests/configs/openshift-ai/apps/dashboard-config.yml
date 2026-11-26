@@ -1,0 +1,12 @@
+apiVersion: opendatahub.io/v1alpha
+kind: OdhDashboardConfig
+metadata:
+  name: odh-dashboard-config
+  namespace: redhat-ods-applications
+  annotations:
+    argocd.argoproj.io/sync-wave: '140'
+    argocd.argoproj.io/sync-options: Prune=false,SkipDryRunOnMissingResource=true
+spec:
+  dashboardConfig:
+    mcpCatalog: true
+    mcpRegistry: true

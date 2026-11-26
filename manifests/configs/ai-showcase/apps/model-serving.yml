@@ -1,0 +1,224 @@
+---
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  name: llamacpp-cpu
+  namespace: showcase-models
+  labels:
+    opendatahub.io/dashboard: 'true'
+  annotations:
+    opendatahub.io/accelerator-name: ''
+    opendatahub.io/apiProtocol: REST
+    opendatahub.io/model-type: generative
+    opendatahub.io/serving-runtime-scope: global
+    opendatahub.io/template-display-name: llama.cpp CPU — Qwen3 Q8 (lab)
+    opendatahub.io/template-name: llamacpp-cpu
+    openshift.io/display-name: llama.cpp CPU — Qwen3 Q8 (lab)
+    argocd.argoproj.io/sync-wave: '130'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  containers:
+    - args:
+        - --model
+        - /mnt/models/Qwen3-0.6B-Q8_0.gguf
+        - --alias
+        - Qwen/Qwen3-0.6B
+        - --host
+        - 0.0.0.0
+        - --port
+        - '8000'
+        - --ctx-size
+        - '8192'
+        - --threads
+        - '2'
+        - --threads-batch
+        - '2'
+        - --parallel
+        - '1'
+        - --batch-size
+        - '256'
+        - --ubatch-size
+        - '128'
+        - --jinja
+        - --chat-template-kwargs
+        - '{"enable_thinking":false}'
+        - --reasoning-budget
+        - '0'
+        - --no-webui
+      command:
+        - /app/llama-server
+      env:
+        - name: LLAMA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: api-key
+              name: model-api-key
+        - name: HOME
+          value: /tmp
+      image: ghcr.io/ggml-org/llama.cpp@sha256:2a371435461d0ce320c7103960c673b1976e07b230f470d9714fd0bec5a31d4e
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 8000
+        periodSeconds: 30
+        timeoutSeconds: 5
+      name: kserve-container
+      ports:
+        - containerPort: 8000
+          name: http1
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: 8000
+        periodSeconds: 10
+        timeoutSeconds: 5
+      resources:
+        limits:
+          cpu: '2'
+          memory: 2Gi
+        requests:
+          cpu: 200m
+          memory: 1Gi
+      startupProbe:
+        failureThreshold: 120
+        httpGet:
+          path: /health
+          port: 8000
+        periodSeconds: 10
+  multiModel: false
+  supportedModelFormats:
+    - autoSelect: true
+      name: GGUF
+---
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: qwen3-cpu
+  namespace: showcase-models
+  labels:
+    opendatahub.io/dashboard: 'true'
+  annotations:
+    modelFormat: GGUF
+    opendatahub.io/managed: 'true'
+    opendatahub.io/model-type: generative
+    openshift.io/display-name: Qwen3 0.6B — CPU smoke test
+    security.opendatahub.io/enable-auth: 'false'
+    serving.kserve.io/deploymentMode: Standard
+    serving.kserve.io/enable-prometheus-scraping: 'false'
+    serving.kserve.io/stop: 'false'
+    argocd.argoproj.io/sync-wave: '140'
+    argocd.argoproj.io/sync-options: Prune=false,SkipDryRunOnMissingResource=true
+spec:
+  predictor:
+    deploymentStrategy:
+      type: Recreate
+    initContainers:
+      - command:
+          - python3
+          - -u
+          - -c
+          - |-
+            from pathlib import Path
+            import time
+            p = Path('/model-ready/qwen3-0.6b-gguf/.download-revision')
+            while not p.exists() or p.read_text().strip() != '23749fefcc72300e3a2ad315e1317431b06b590a':
+                print('Waiting for pinned quantized model download')
+                time.sleep(10)
+            print('Pinned quantized model ready')
+        image: registry.access.redhat.com/ubi9/python-312@sha256:b93a97b7a4728f6cf2df2e760837a429290ba77f3d41cb495f5f3f7090a0ea7b
+        name: wait-for-pinned-model
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 32Mi
+        volumeMounts:
+          - mountPath: /model-ready
+            name: model-ready
+            readOnly: true
+    maxReplicas: 1
+    minReplicas: 1
+    model:
+      modelFormat:
+        name: GGUF
+      resources:
+        limits:
+          cpu: '2'
+          memory: 2Gi
+        requests:
+          cpu: 200m
+          memory: 1Gi
+      runtime: llamacpp-cpu
+      storageUri: pvc://qwen3-model/qwen3-0.6b-gguf
+    volumes:
+      - name: model-ready
+        persistentVolumeClaim:
+          claimName: qwen3-model
+          readOnly: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qwen3-cpu-endpoint
+  namespace: showcase-models
+  annotations:
+    argocd.argoproj.io/sync-wave: '140'
+spec:
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+  selector:
+    serving.kserve.io/inferenceservice: qwen3-cpu
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: qwen3-cpu-public
+  namespace: showcase-models
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+    argocd.argoproj.io/sync-wave: '140'
+spec:
+  host: qwen3-cpu-showcase-models.apps.ocp.kounex.com
+  port:
+    targetPort: http
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: qwen3-cpu-endpoint
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: qwen3-inference-ingress
+  namespace: showcase-models
+  annotations:
+    argocd.argoproj.io/sync-wave: '140'
+spec:
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-ingress
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-lightspeed
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: showcase-models
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: redhat-ods-applications
+      ports:
+        - port: 8000
+          protocol: TCP
+  podSelector:
+    matchLabels:
+      serving.kserve.io/inferenceservice: qwen3-cpu
+  policyTypes:
+    - Ingress

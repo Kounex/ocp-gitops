@@ -1,0 +1,86 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qwen3-model
+  namespace: showcase-models
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Gi
+  storageClassName: lvms-vg1
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: download-qwen3-gguf-23749fe-v2
+  namespace: showcase-models
+  annotations:
+    argocd.argoproj.io/sync-wave: '120'
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  activeDeadlineSeconds: 1800
+  backoffLimit: 2
+  template:
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - command:
+            - python3
+            - -u
+            - -c
+            - |
+              from pathlib import Path
+              import hashlib
+              import urllib.request
+
+              revision = "23749fefcc72300e3a2ad315e1317431b06b590a"
+              expected = "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+              folder = Path("/models/qwen3-0.6b-gguf")
+              folder.mkdir(parents=True, exist_ok=True)
+              path = folder / "Qwen3-0.6B-Q8_0.gguf"
+              marker = folder / ".download-revision"
+              def digest(file):
+                  with file.open("rb") as stream:
+                      return hashlib.file_digest(stream, "sha256").hexdigest()
+              if not path.exists() or digest(path) != expected:
+                  url = "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/" + revision + "/" + path.name
+                  partial = path.with_suffix(".part")
+                  checksum = hashlib.sha256()
+                  with urllib.request.urlopen(url, timeout=120) as response, partial.open("wb") as output:
+                      while chunk := response.read(1024 * 1024):
+                          output.write(chunk)
+                          checksum.update(chunk)
+                  if checksum.hexdigest() != expected:
+                      partial.unlink(missing_ok=True)
+                      raise RuntimeError("Model SHA-256 mismatch")
+                  partial.replace(path)
+              marker.write_text(revision + "\n")
+              print("PASS: pinned Qwen Q8 model present; SHA-256 verified")
+          image: registry.access.redhat.com/ubi9/python-312@sha256:b93a97b7a4728f6cf2df2e760837a429290ba77f3d41cb495f5f3f7090a0ea7b
+          name: download
+          resources:
+            limits:
+              cpu: 500m
+              memory: 192Mi
+            requests:
+              cpu: 25m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - mountPath: /models
+              name: models
+      restartPolicy: Never
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: qwen3-model

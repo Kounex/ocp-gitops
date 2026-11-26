@@ -8,3 +8,6 @@ resources:
   - cert-manager
   - lvm-storage
   - cloudflared
+  - openshift-ai
+  - lightspeed
+  - ai-showcase

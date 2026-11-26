@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: showcase-app
+  labels:
+    app.kubernetes.io/part-of: ai-lightspeed-showcase
+  annotations:
+    argocd.argoproj.io/sync-wave: '100'
+    argocd.argoproj.io/sync-options: Prune=false
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: showcase-models
+  labels:
+    app.kubernetes.io/part-of: ai-lightspeed-showcase
+    opendatahub.io/dashboard: 'true'
+  annotations:
+    openshift.io/display-name: Lightspeed CPU model
+    argocd.argoproj.io/sync-wave: '100'
+    argocd.argoproj.io/sync-options: Prune=false
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: showcase-preview
+  labels:
+    app.kubernetes.io/part-of: ai-lightspeed-showcase
+  annotations:
+    argocd.argoproj.io/sync-wave: '100'
+    argocd.argoproj.io/sync-options: Prune=false

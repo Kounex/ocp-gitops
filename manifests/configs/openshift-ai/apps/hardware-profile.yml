@@ -1,0 +1,27 @@
+apiVersion: infrastructure.opendatahub.io/v1
+kind: HardwareProfile
+metadata:
+  name: hetzner-cpu-smoke
+  namespace: redhat-ods-applications
+  annotations:
+    opendatahub.io/dashboard-feature-visibility: '[]'
+    opendatahub.io/description: 'Compact quantized CPU model: one replica, 1 GiB requested, 2 GiB memory limit.'
+    opendatahub.io/disabled: 'false'
+    opendatahub.io/display-name: Hetzner CPU smoke test
+    opendatahub.io/managed: 'false'
+    argocd.argoproj.io/sync-wave: '140'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  identifiers:
+    - defaultCount: 200m
+      displayName: CPU
+      identifier: cpu
+      maxCount: 2
+      minCount: 200m
+      resourceType: CPU
+    - defaultCount: 1Gi
+      displayName: Memory
+      identifier: memory
+      maxCount: 2Gi
+      minCount: 1Gi
+      resourceType: Memory

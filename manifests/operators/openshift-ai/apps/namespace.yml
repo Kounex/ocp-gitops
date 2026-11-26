@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: redhat-ods-operator
+  labels:
+    app.kubernetes.io/part-of: ai-lightspeed-showcase
+    openshift.io/cluster-monitoring: 'true'
+  annotations:
+    argocd.argoproj.io/sync-wave: '100'
+    argocd.argoproj.io/sync-options: Prune=false

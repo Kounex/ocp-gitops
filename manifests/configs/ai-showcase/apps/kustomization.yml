@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespaces.yml
+  - model-storage.yml
+  - registry.yml
+  - model-serving.yml
+  - model-registration.yml
+  - smoke-tests.yml

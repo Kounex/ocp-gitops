@@ -6,3 +6,5 @@ resources:
   - external-secrets
   - cert-manager
   - lvm-storage
+  - openshift-ai
+  - lightspeed

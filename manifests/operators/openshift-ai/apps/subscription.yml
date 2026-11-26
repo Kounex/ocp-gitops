@@ -1,0 +1,23 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: rhods-operator
+  namespace: redhat-ods-operator
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  channel: beta
+  config:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 4Gi
+      requests:
+        cpu: 50m
+        memory: 256Mi
+  installPlanApproval: Automatic
+  name: rhods-operator
+  source: redhat-ai-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: rhods-operator.3.6.0-ea.2

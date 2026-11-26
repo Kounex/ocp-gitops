@@ -1,0 +1,223 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: showcase-registry-bootstrap
+  namespace: rhoai-model-registries
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: showcase-registry-bootstrap
+  namespace: rhoai-model-registries
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: registry-user-showcase-registry
+subjects:
+  - kind: ServiceAccount
+    name: showcase-registry-bootstrap
+    namespace: rhoai-model-registries
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: showcase-registry-link
+  namespace: showcase-models
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+rules:
+  - apiGroups:
+      - serving.kserve.io
+    resourceNames:
+      - qwen3-cpu
+    resources:
+      - inferenceservices
+    verbs:
+      - get
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: showcase-registry-link
+  namespace: showcase-models
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: showcase-registry-link
+subjects:
+  - kind: ServiceAccount
+    name: showcase-registry-bootstrap
+    namespace: rhoai-model-registries
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: showcase-registry-bootstrap-access
+  namespace: rhoai-model-registries
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              batch.kubernetes.io/job-name: register-qwen3-23749fe-q8-v3
+      ports:
+        - port: 8443
+          protocol: TCP
+  podSelector:
+    matchLabels:
+      app: showcase-registry
+      component: model-registry
+  policyTypes:
+    - Ingress
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-bootstrap-56t4h66484
+  namespace: rhoai-model-registries
+  annotations:
+    argocd.argoproj.io/sync-wave: '110'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+data:
+  register-model.py: |
+    """Idempotent registry bootstrap. Kubernetes YAML alone cannot describe registry DB records."""
+    import json
+    from pathlib import Path
+    import ssl
+    import urllib.error
+    import urllib.request
+
+    namespace = 'rhoai-model-registries'
+    registry = 'showcase-registry'
+    name = 'Qwen/Qwen3-0.6B'
+    revision = '23749fefcc72300e3a2ad315e1317431b06b590a'
+    service_account = Path('/var/run/secrets/kubernetes.io/serviceaccount')
+    token = service_account.joinpath('token').read_text().strip()
+    context = ssl.create_default_context(cafile='/service-ca/service-ca.crt')
+    base = f'https://{registry}.{namespace}.svc:8443/api/model_registry/v1alpha3'
+
+    def api(path, payload=None):
+        data = json.dumps(payload).encode() if payload is not None else None
+        request = urllib.request.Request(base + path, data=data, headers={
+            'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json',
+        })
+        try:
+            with urllib.request.urlopen(request, context=context, timeout=60) as response:
+                return json.load(response)
+        except urllib.error.HTTPError as error:
+            raise RuntimeError(f'Registry HTTP {error.code}: {error.read(1000).decode()}') from None
+
+    def find(path, target):
+        # Follow pagination so replays do not create duplicates in a populated registry.
+        page = path
+        while True:
+            response = api(page)
+            for item in response.get('items', []):
+                if item.get('name') == target:
+                    return item
+            cursor = response.get('nextPageToken')
+            if not cursor:
+                return None
+            from urllib.parse import urlencode
+            page = path + '?' + urlencode({'nextPageToken': cursor})
+
+    def prop(value):
+        return {'metadataType': 'MetadataStringValue', 'string_value': value}
+
+    model = find('/registered_models', name)
+    if model is None:
+        model = api('/registered_models', {
+            'name': name,
+            'description': 'CPU end-to-end showcase model, sourced from the custom AI model catalog.',
+            'customProperties': {'catalog_source_id': prop('hetzner_cpu_lab'),
+                                 'source_repository': prop('https://huggingface.co/Qwen/Qwen3-0.6B-GGUF')},
+        })
+    versions = f'/registered_models/{model["id"]}/versions'
+    version_name = revision[:12] + '-q8-cpu'
+    version = find(versions, version_name)
+    if version is None:
+        version = api(versions, {
+            'name': version_name, 'registeredModelId': model['id'], 'state': 'LIVE',
+            'description': 'Pinned upstream weights, compact community CPU runtime; basic-answer acceptance test.',
+            'customProperties': {'source_revision': prop(revision), 'runtime': prop('llamacpp-cpu'),
+                                 'catalog_source_id': prop('hetzner_cpu_lab')},
+        })
+    artifacts = f'/model_versions/{version["id"]}/artifacts'
+    if find(artifacts, 'qwen3-0.6b-weights') is None:
+        api(artifacts, {'artifactType': 'model-artifact', 'name': 'qwen3-0.6b-weights',
+                        'uri': 'pvc://qwen3-model/qwen3-0.6b-gguf', 'state': 'LIVE',
+                        'modelFormatName': 'GGUF',
+                        'customProperties': {'source_revision': prop(revision)}})
+
+    if find(artifacts, 'qwen3-upstream-gguf') is None:
+        api(artifacts, {'artifactType': 'model-artifact', 'name': 'qwen3-upstream-gguf',
+                        'uri': 'https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/23749fefcc72300e3a2ad315e1317431b06b590a/Qwen3-0.6B-Q8_0.gguf', 'state': 'LIVE', 'modelFormatName': 'GGUF',
+                        'customProperties': {'source_revision': prop(revision)}})
+
+    # Generated registry IDs become deployment metadata through this declarative Job.
+    cluster_context = ssl.create_default_context(cafile=str(service_account / 'ca.crt'))
+    url = 'https://kubernetes.default.svc/apis/serving.kserve.io/v1beta1/namespaces/showcase-models/inferenceservices/qwen3-cpu'
+    patch = {'metadata': {'labels': {'modelregistry.opendatahub.io/name': registry,
+                                     'modelregistry.opendatahub.io/registered-model-id': model['id'],
+                                     'modelregistry.opendatahub.io/model-version-id': version['id']}}}
+    request = urllib.request.Request(url, data=json.dumps(patch).encode(), method='PATCH',
+        headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/merge-patch+json'})
+    with urllib.request.urlopen(request, context=cluster_context, timeout=30):
+        pass
+    print(f'Registry ready: model {model["id"]}, version {version["id"]}; inference metadata linked')
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: register-qwen3-23749fe-q8-v3
+  namespace: rhoai-model-registries
+  annotations:
+    argocd.argoproj.io/sync-wave: '150'
+    argocd.argoproj.io/sync-options: Prune=false,SkipDryRunOnMissingResource=true
+spec:
+  activeDeadlineSeconds: 900
+  backoffLimit: 6
+  template:
+    spec:
+      containers:
+        - command:
+            - python3
+            - /bootstrap/register-model.py
+          image: registry.access.redhat.com/ubi9/python-312@sha256:b93a97b7a4728f6cf2df2e760837a429290ba77f3d41cb495f5f3f7090a0ea7b
+          name: register
+          resources:
+            limits:
+              cpu: 250m
+              memory: 256Mi
+            requests:
+              cpu: 25m
+              memory: 64Mi
+          volumeMounts:
+            - mountPath: /bootstrap
+              name: bootstrap
+              readOnly: true
+            - mountPath: /service-ca
+              name: service-ca
+              readOnly: true
+      restartPolicy: Never
+      serviceAccountName: showcase-registry-bootstrap
+      volumes:
+        - configMap:
+            name: registry-bootstrap-56t4h66484
+          name: bootstrap
+        - configMap:
+            name: openshift-service-ca.crt
+          name: service-ca

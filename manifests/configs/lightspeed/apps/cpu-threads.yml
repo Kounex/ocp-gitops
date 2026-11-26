@@ -1,0 +1,51 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionPolicy
+metadata:
+  name: showcase-lightspeed-cpu-threads
+  annotations:
+    argocd.argoproj.io/sync-wave: '100'
+spec:
+  failurePolicy: Ignore
+  matchConditions:
+    - expression: object.metadata.namespace == 'openshift-lightspeed' && has(object.metadata.labels) && 'app.kubernetes.io/name' in object.metadata.labels && object.metadata.labels['app.kubernetes.io/name'] == 'lightspeed-service-api'
+      name: only-showcase-lightspeed-api
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ''
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+        resources:
+          - pods
+  mutations:
+    - applyConfiguration:
+        expression: |-
+          Object{spec: Object.spec{containers:
+
+            object.spec.containers.filter(c, c.name == 'lightspeed-service-api').map(c,
+              Object.spec.containers{
+                name: c.name,
+                env: [
+                  Object.spec.containers.env{name: 'OMP_NUM_THREADS', value: '1'},
+                  Object.spec.containers.env{name: 'MKL_NUM_THREADS', value: '1'},
+                  Object.spec.containers.env{name: 'OPENBLAS_NUM_THREADS', value: '1'},
+                  Object.spec.containers.env{name: 'NUMEXPR_NUM_THREADS', value: '1'},
+                  Object.spec.containers.env{name: 'TOKENIZERS_PARALLELISM', value: 'false'}
+                ]
+              }
+            )
+          }}
+      patchType: ApplyConfiguration
+  reinvocationPolicy: IfNeeded
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: showcase-lightspeed-cpu-threads
+  annotations:
+    argocd.argoproj.io/sync-wave: '100'
+spec:
+  policyName: showcase-lightspeed-cpu-threads

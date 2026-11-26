@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - cpu-reservations.yml
+  - dsc-initialization.yml
+  - data-science-cluster.yml
+  - dashboard-config.yml
+  - hardware-profile.yml
+  - runtime-template.yml
+  - model-catalog-sources.yml

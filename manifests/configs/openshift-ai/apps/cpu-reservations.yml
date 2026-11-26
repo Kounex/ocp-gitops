@@ -1,0 +1,49 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionPolicy
+metadata:
+  name: showcase-ai-cpu-reservations
+  annotations:
+    argocd.argoproj.io/sync-wave: '100'
+spec:
+  failurePolicy: Ignore
+  matchConditions:
+    - expression: object.metadata.namespace in ['redhat-ods-applications', 'rhoai-model-registries'] || (object.metadata.namespace == 'openshift-ingress' && has(object.metadata.labels) && (('app' in object.metadata.labels && object.metadata.labels['app'] == 'kube-auth-proxy') || ('istio.io/rev' in object.metadata.labels && object.metadata.labels['istio.io/rev'] == 'openshift-gateway') || ('gateway.networking.k8s.io/gateway-name' in object.metadata.labels && object.metadata.labels['gateway.networking.k8s.io/gateway-name'] == 'data-science-gateway')))
+      name: only-showcase-ai-infrastructure
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ''
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+        resources:
+          - pods
+  mutations:
+    - applyConfiguration:
+        expression: |-
+          Object{spec: Object.spec{containers:
+            object.spec.containers.filter(c,
+              has(c.resources) && has(c.resources.requests) &&
+              'cpu' in c.resources.requests &&
+              quantity(c.resources.requests['cpu']).compareTo(quantity('50m')) > 0
+            ).map(c, Object.spec.containers{
+              name: c.name,
+              resources: Object.spec.containers.resources{requests: {'cpu': '50m'}}
+            })
+          }}
+      patchType: ApplyConfiguration
+    - applyConfiguration:
+        expression: 'object.metadata.namespace == ''openshift-ingress'' && has(object.metadata.labels) && ''istio.io/rev'' in object.metadata.labels && object.metadata.labels[''istio.io/rev''] == ''openshift-gateway'' ? Object{spec: Object.spec{containers: [Object.spec.containers{name: ''discovery'', resources: Object.spec.containers.resources{requests: {''memory'': ''256Mi''}}}]}} : Object{}'
+      patchType: ApplyConfiguration
+  reinvocationPolicy: IfNeeded
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: showcase-ai-cpu-reservations
+  annotations:
+    argocd.argoproj.io/sync-wave: '100'
+spec:
+  policyName: showcase-ai-cpu-reservations

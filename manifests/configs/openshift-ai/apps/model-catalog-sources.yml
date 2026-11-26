@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: model-catalog-sources
+  namespace: rhoai-model-registries
+  annotations:
+    argocd.argoproj.io/sync-wave: '140'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+data:
+  cpu-lab.yaml: |
+    source: Hetzner CPU lab
+    models:
+    - name: Qwen/Qwen3-0.6B
+      description: Tiny CPU-only end-to-end test for OpenShift AI and Lightspeed. This
+        entry is a custom lab model; it is not Red Hat validated.
+      readme: "# Qwen3 0.6B Q8 CPU lab\n\nOfficial Qwen GGUF revision: `23749fefcc72300e3a2ad315e1317431b06b590a`.\
+        \ File: `Qwen3-0.6B-Q8_0.gguf`.\n\nDeploy in showcase-models with the **llama.cpp\
+        \ CPU \u2014 Qwen3 Q8 (lab)** runtime, **Hetzner CPU smoke test** profile and\
+        \ URI `pvc://qwen3-model/qwen3-0.6b-gguf`.\n\nServed API model name: `Qwen/Qwen3-0.6B`.\
+        \ This community runtime is used for basic-answer testing on the small node. The\
+        \ optional Red Hat vLLM CPU profile needs more memory.\n"
+      provider: Qwen
+      license: Apache-2.0
+      licenseLink: https://huggingface.co/Qwen/Qwen3-0.6B/blob/main/LICENSE
+      libraryName: transformers
+      language:
+      - en
+      tasks:
+      - text-generation
+      artifacts:
+      - uri: https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/23749fefcc72300e3a2ad315e1317431b06b590a/Qwen3-0.6B-Q8_0.gguf
+        customProperties:
+          source_revision:
+            string_value: 23749fefcc72300e3a2ad315e1317431b06b590a
+            metadataType: MetadataStringValue
+          source_repository:
+            string_value: https://huggingface.co/Qwen/Qwen3-0.6B-GGUF
+            metadataType: MetadataStringValue
+  sources.yaml: |
+    catalogs:
+    - name: Hetzner CPU lab
+      id: hetzner_cpu_lab
+      type: yaml
+      enabled: true
+      properties:
+        yamlCatalogPath: cpu-lab.yaml
