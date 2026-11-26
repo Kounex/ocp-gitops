@@ -104,8 +104,8 @@ Bootstrap chain (manual steps only on a fresh cluster, see README):
 
 | Area | Entries |
 |---|---|
-| operators | `external-secrets` (Red Hat ESO, `stable-v1`), `cert-manager` (Red Hat), `lvm-storage` (channel follows the OpenShift minor: `stable-5.0`), `redhat-ai-catalog` (additional v4.22 catalog for the AI lab; preserves default v5.0 catalogs and installs no operator) |
-| configs | `external-secrets` (ExternalSecretsConfig + Doppler store), `oauth` (htpasswd IdP + login pages built from `apps/login-theme/*.html`), `gitops` (ArgoCD CR, GitopsService, ntfy notifications), `cert-manager` (Let's Encrypt via Cloudflare DNS, API + wildcard certs), `lvm-storage`, `cloudflared` (Cloudflare Tunnel `ocp`, rules in `apps/config.yaml`) |
+| operators | `external-secrets` (Red Hat ESO, `stable-v1`), `cert-manager` (Red Hat), `lvm-storage` (channel follows the OpenShift minor: `stable-5.0`), `redhat-ai-catalog` (additional v4.22 catalog for the AI lab; preserves default v5.0 catalogs and installs no operator), `openshift-ai` (`rhods-operator`, channel `beta`, from that catalog), `lightspeed` (`lightspeed-operator`, channel `stable`) |
+| configs | `external-secrets` (ExternalSecretsConfig + Doppler store), `oauth` (htpasswd IdP + login pages built from `apps/login-theme/*.html`), `gitops` (ArgoCD CR, GitopsService, ntfy notifications), `cert-manager` (Let's Encrypt via Cloudflare DNS, API + wildcard certs), `lvm-storage`, `cloudflared` (Cloudflare Tunnel `ocp`, rules in `apps/config.yaml`), `openshift-ai` (DSCI, DataScienceCluster, dashboard config, CPU hardware profile, llama.cpp runtime template, model catalog, CPU admission policy), `lightspeed` (OLSConfig, thread policy), `ai-showcase` (AI lab workloads, see "AI lab" below) |
 | apps | `it-tools`, `ctfd` (`otq.apps.ocp.kounex.com`, Open Tech Quest frontend/plugin on CTFd + MariaDB + Redis; see its README) |
 
 Projects: `apps` permits this repo. It may deploy to `openshift-gitops` and
@@ -162,6 +162,53 @@ not just Cursor. Keep them and this file in sync. In short:
   `it-env/docs/ctfd-backup-worker.md`. Preserve the personal entrypoint and prod
   resources when eventually removing those historical paths.
 
+## AI lab (OpenShift AI + Lightspeed)
+
+A CPU-only showcase: OpenShift AI serves a small GGUF model with llama.cpp
+in `showcase-models` (InferenceService `qwen3-cpu`, public Route
+`qwen3-cpu-showcase-models.apps.ocp.kounex.com`, API-key protected), a
+ModelRegistry `showcase-registry` with its own PostgreSQL records it, and
+Lightspeed uses it as its LLM provider. Installed by hand on 2026-11-12,
+adopted into Git on 2026-11-26 (apps `openshift-ai-operator-app`,
+`lightspeed-operator-app`, `openshift-ai-app`, `lightspeed-app`,
+`ai-showcase-app`). Origin and replay notes: `docs/private/ai-lab.md`.
+
+- **Manifests are the hand-applied objects verbatim** (their kubectl
+  last-applied configuration) plus Argo annotations. Client-side apply on
+  purpose: operator-defaulted fields stay outside the three-way diff. Keep
+  the literal names: hash-suffixed ConfigMaps and versioned Job names are
+  referenced by the Jobs, and a Job spec is immutable, so changing a Job
+  means a new Job name. Completed Jobs stay; if one is deleted, selfHeal runs
+  it again (download, registry registration, smoke test; all idempotent).
+- **Prune=false** on the Namespaces, OperatorGroups, Subscriptions, DSCI,
+  DataScienceCluster, OLSConfig, PVCs, ModelRegistry, InferenceService and
+  Jobs. Removing them from Git leaves them running; delete by hand if meant.
+  Never add `Replace`/`Force` here.
+- **CPU workarounds are policies:** MutatingAdmissionPolicy
+  `showcase-ai-cpu-reservations` caps CPU requests of AI pods (and the
+  data-science gateway pods in `openshift-ingress`) at creation, and
+  `showcase-lightspeed-cpu-threads` limits Lightspeed's threads. Removing
+  them pushes requests past the CPU budget on the next pod restart.
+  Subscriptions and OLSConfig also carry small requests.
+- **Editing the InferenceService restarts the model:** KServe copies its
+  annotations into the predictor pod (strategy Recreate). Git carries
+  `serving.kserve.io/deploymentMode: Standard`, the value the webhook stores
+  for `RawDeployment`; writing `RawDeployment` makes the app OutOfSync
+  forever.
+- **`model-catalog-sources`** is also applied by the model registry
+  operator. If Argo and the operator start fighting over it, add a targeted
+  `ignoreDifferences` (+ `RespectIgnoreDifferences=true`) as `oauth-app` does.
+- **Images are pinned by digest only** (as installed). Renovate skips them.
+  Moving to readable `tag@sha256` pins restarts those pods; do it with the
+  next deliberate model/runtime change.
+- **Secrets (not in Git):** see "Not in Git". The OLSConfig references
+  `showcase-model-credentials` by name only.
+- **Fresh cluster:** not rehearsed. Order: catalog → operators (wait for the
+  CSVs and CRDs) → the three Secrets → `openshift-ai-app` →
+  `ai-showcase-app` → `lightspeed-app`. CRs carry
+  `SkipDryRunOnMissingResource=true`; `rhoai-model-registries` is created
+  by the operator from the DSC, not by Git.
+
 ## Gotchas
 
 - **A stuck sync blocks the next one.** If the running operation waits for a
@@ -200,12 +247,24 @@ Cluster state that this repo does not describe:
   as is).
 - Operators installed from the console: Web Terminal and the DevWorkspace
   operator it needs.
-- Installed by hand on 2026-11-12 for the AI lab (found 2026-11-26, not
-  described here yet): OpenShift AI (`rhods-operator` 3.6.0-ea.2, channel
-  `beta`, from the `redhat-ai-operators` catalog), OpenShift Lightspeed
-  (`lightspeed-operator` 2.0.1), and namespaces `showcase-app`,
-  `showcase-models`, `showcase-preview`, `rhoai-model-registries`. They
-  count against the CPU budget above.
+- The AI lab's three Secrets (created by hand on 2026-11-12; the stack
+  itself is in Git since 2026-11-26, see "AI lab"):
+  - `openshift-lightspeed/showcase-model-credentials`, keys `apitoken` and
+    `OPENAI_API_KEY`: Lightspeed's LLM credential, referenced by the OLSConfig
+    and the smoke test.
+  - `showcase-models/model-api-key`, key `api-key`: the llama.cpp server's
+    API key. Same value as the credential above; rotate both together, then
+    restart the predictor and the Lightspeed app server.
+  - `rhoai-model-registries/showcase-registry-db`, key `database-password`:
+    the registry PostgreSQL password (read by the DB Deployment and the
+    ModelRegistry). Changing it needs the password changed inside the DB too.
+
+  The values exist only in these Secrets and a private local file (where:
+  `docs/private/ai-lab.md`). To recreate: generate a random key, then
+  `o -n showcase-models create secret generic model-api-key --from-literal=api-key=<key>`,
+  `o -n openshift-lightspeed create secret generic showcase-model-credentials --from-literal=apitoken=<key> --from-literal=OPENAI_API_KEY=<key>`,
+  `o -n rhoai-model-registries create secret generic showcase-registry-db --from-literal=database-password=<pw>`.
+  Moving them to Doppler/ExternalSecrets is open.
 - The VM size and CPU weight (libvirt, see it-env).
 
 ## Git
