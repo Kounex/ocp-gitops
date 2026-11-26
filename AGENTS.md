@@ -25,8 +25,8 @@ State (2026-11-09): OpenShift 5.0.1 (channel `fast-5.0`), OpenShift GitOps 1.22 
   (kustomize build of every kustomization + kubeconform). Run it before
   pushing when you can. Renovate automerges minor/patch updates only after it
   passes.
-- **Image tags:** exact, readable versions, never `latest` (workspace rule in
-  `~/agent/AGENTS.md`). CTFd overlays pin `newTag: X.Y.Z@sha256:...` for
+- **Image tags:** exact, readable versions, never `latest` (fleet rule in
+  `it-env/docs/fleet-agents-shared.md` → Image tags). CTFd overlays pin `newTag: X.Y.Z@sha256:...` for
   init and runtime together. Renovate proposes image updates; CTFd changes require
   review and testing on the maintained playground.
 - **Current CTFd rollout policy (owner, 2026-11-20):** playground (`prod`,
