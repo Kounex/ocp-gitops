@@ -6,7 +6,8 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: '100'
 spec:
-  # Adopted from a hand install (2026-11-12). No automated sync until the live diff is proven empty.
+  # Adopted from a hand install (2026-11-12) on 2026-11-26. Operator objects,
+  # DSC/DSCI, OLSConfig, PVCs, the model and Jobs carry Prune=false.
   source:
     path: manifests/configs/ai-showcase/apps
     repoURL: https://github.com/Kounex/ocp-gitops.git
@@ -15,3 +16,7 @@ spec:
     namespace: openshift-gitops
     server: https://kubernetes.default.svc
   project: configs
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
